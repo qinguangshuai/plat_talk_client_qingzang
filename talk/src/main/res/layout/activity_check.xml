@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_tips"
+        android:textSize="35dp"
+        android:text="请拍摄直角筛门"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/bt_camera"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/wocao"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/pic1"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/zj"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/pic2"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/jg"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/pic3"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/sj"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/pic4"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/fg"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <Button
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="30dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/bt_test"
+        android:text="置号"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="30dp"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/bt_admin"
+        android:text="管理员界面"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>

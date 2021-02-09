@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kylindev.totalk"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.microphone" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- for bluetooth -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /> <!-- for MobSMS -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- bugly升级 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application
+        android:name=".MainApp"
+        android:icon="@drawable/bjxt"
+        android:label="@string/app_name"
+        android:persistent="true"
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:windowSoftInputMode="stateAlwaysHidden">
+        <activity android:name=".qgs.PointActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".app.XNBMapActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".app.QGSActivity"
+            android:screenOrientation="landscape" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <activity
+            android:name=".app.LoginActivity"
+            android:screenOrientation="reversePortrait">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="com.kylindev.app.auto_launch" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".app.CountryActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.ChannelActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.ContactActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.DeviceScanActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.SearchChannel"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.MemberChannel"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.MapActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".chat.RecyclerViewChatActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.VideoActivity"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.ShowVideoActivity"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name=".app.AdminActivity"
+            android:screenOrientation="${screenType}" />
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <receiver android:name=".utils.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.kylindev.pttlib.service.InterpttService"
+            android:exported="true" />
+
+        <receiver
+            android:name="com.kylindev.pttlib.utils.MediaButtonIntentReceiver"
+            android:enabled="true"
+            android:priority="1000">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.kylindev.pttlib.utils.AutoRestartServiceReceiver">
+            <intent-filter>
+                <action android:name="com.kylindev.pttlib.auto_restart_service" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".app.CameraActivity" />
+        <activity
+            android:name="com.kylindev.pttlib.view.AlarmAlert"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="${screenType}"
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar" />
+        <activity
+            android:name="com.kylindev.pttlib.view.PhoneAlert"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="${screenType}"
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar" />
+        <activity
+            android:name="com.kylindev.pttlib.view.CallPassengerAlert"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="${screenType}"
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar" />
+        <activity
+            android:name="com.kylindev.pttlib.view.WhoGetOrderAlert"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="${screenType}"
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar" />
+        <activity
+            android:name=".app.ControlActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".app.CheckActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" /> <!-- for umeng -->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="55c3213de0f55ae81f0000f4" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="Channel ID" />
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="UmkUnSeEoita22G7vvvDKcvlaKprqgZd" /> <!-- 此service如果不添加，则位置只回调一次 -->
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.tencent.qcloud.tim.tuikit.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+    </application>
+
+</manifest>

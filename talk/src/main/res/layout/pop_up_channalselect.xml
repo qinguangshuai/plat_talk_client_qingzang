@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/loginPanel"
+        android:layout_width="400dp"
+        android:layout_height="450dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/background_login_div"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_channal1"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="18dp"
+            android:text="数字信道(1信道414.050)" />
+
+        <Button
+            android:id="@+id/btn_channal4"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center_horizontal"
+            android:text="模拟信道(4信道457.700)" />
+
+        <Button
+            android:id="@+id/btn_channal0"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center_horizontal"
+            android:text="其他信道" />
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

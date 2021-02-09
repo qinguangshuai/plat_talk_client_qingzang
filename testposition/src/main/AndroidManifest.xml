@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.testposition"
+    android:versionCode="1"
+    android:versionName="1.0"
+    >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 粗略定位授权 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- 精细定位授权 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <!-- 模拟定位授权 -->
+
+
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <application
+        >
+        <activity android:name=".TestActivity">
+        </activity>
+        <activity android:name=".PositionActivity"/>
+        <activity android:name=".GPSActivity"/>
+    </application>
+
+
+</manifest>

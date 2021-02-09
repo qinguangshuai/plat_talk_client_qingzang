@@ -1,0 +1,18 @@
+package com.kylindev.totalk.view.pulltorefreshview.header;
+
+import android.graphics.Rect;
+
+import androidx.recyclerview.widget.RecyclerView;
+
+/**
+ * Created by linhonghong on 2015/11/17.
+ */
+public class Header extends BaseHeader{
+
+    @Override
+    public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) {
+        if(itemPosition == 0) {
+            outRect.set(0, mHeaderHeight, 0, 0);
+        }
+    }
+}

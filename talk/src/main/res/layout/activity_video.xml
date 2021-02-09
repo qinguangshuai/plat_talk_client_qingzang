@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    tools:context=".VideoActivity">
+
+    <SurfaceView
+        android:id="@+id/capture_surfaceview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0.0dip"
+            android:layout_height="fill_parent"
+            android:gravity="top"
+            android:layout_weight="5.0">
+
+            <Chronometer
+                android:id="@+id/crm_count_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="10.0dip"
+                android:textColor="@color/red_overlay"
+                android:textSize="15.0sp" />
+
+            <TextView
+                android:id="@+id/capture_textview_information"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="10.0dip"
+                android:textColor="@color/red_overlay"
+                android:textSize="15.0sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:layout_width="fill_parent"
+            android:alpha="0.3"
+            android:background="@color/white_overlay"
+            android:padding="10.0dip">
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/capture_imagebutton_setting"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentTop="true"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:background="@drawable/settings"-->
+<!--                android:contentDescription="@string/imagedescription"-->
+<!--                android:tag="setting" />-->
+
+            <ImageButton
+                android:id="@+id/ib_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/rec_start"
+                android:contentDescription="开始"
+                android:tag="start" />
+
+            <ImageButton
+                android:id="@+id/capture_imagebutton_showfiles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/folder"
+                android:contentDescription="文件显示"
+                android:tag="showfiles" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</FrameLayout>
