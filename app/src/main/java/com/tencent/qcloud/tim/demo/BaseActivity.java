@@ -10,12 +10,20 @@ import androidx.annotation.Nullable;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.kylindev.totalk.bjxt.SpUtil;
+import com.kylindev.totalk.qgs.GPSDao;
+import com.kylindev.totalk.qgs.database.five.FiveDataDao;
+import com.kylindev.totalk.qgs.database.six.SixDataDao;
+import com.tencent.qcloud.tim.demo.bjxt.sqlite.ReceiveDao;
 import com.tencent.qcloud.tim.demo.login.LoginForDevActivity;
 import com.tencent.qcloud.tim.demo.utils.Constants;
 import com.tencent.qcloud.tim.demo.utils.DemoLog;
 import com.tencent.qcloud.tim.uikit.TUIKit;
 import com.tencent.qcloud.tim.uikit.base.IMEventListener;
 import com.tencent.qcloud.tim.uikit.utils.ToastUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -25,6 +33,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class BaseActivity extends Activity {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
+    private SpUtil mFirstInto;
 
     // 监听做成静态可以让每个子类重写时都注册相同的一份。
     private static IMEventListener mIMEventListener = new IMEventListener() {
@@ -64,6 +73,7 @@ public class BaseActivity extends Activity {
         }
 
         TUIKit.addIMEventListener(mIMEventListener);
+        mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
     }
 
     @Override
@@ -99,6 +109,7 @@ public class BaseActivity extends Activity {
     protected void onDestroy() {
         DemoLog.i(TAG, "onDestroy");
         super.onDestroy();
+        mFirstInto.setName("false");
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,12 +19,19 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 
+import com.kylindev.totalk.app.LoginActivity;
 import com.kylindev.totalk.app.QGSActivity;
 import com.kylindev.totalk.app.XNBMapActivity;
 import com.kylindev.totalk.qgs.PointActivity;
 import com.tencent.qcloud.tim.demo.R;
 import com.tencent.qcloud.tim.demo.qingzang.SendActivity;
 import com.tencent.qcloud.tim.demo.qingzang.XiNingActivity;
+import com.tencent.qcloud.tim.demo.signature.GenerateTestUserSig;
+import com.tencent.qcloud.tim.demo.utils.Constants;
+import com.tencent.qcloud.tim.demo.utils.DemoLog;
+import com.tencent.qcloud.tim.uikit.TUIKit;
+import com.tencent.qcloud.tim.uikit.base.IUIKitCallBack;
+import com.tencent.qcloud.tim.uikit.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,22 +39,23 @@ import java.util.List;
 public class LogInPage extends Activity {
     private List<String> list1 = new ArrayList<String>();
     private List<String> list2 = new ArrayList<String>();
-    private Spinner spinnertext1,spinnertext2;
-    private ArrayAdapter<String> adapter1,adapter2;
+    private Spinner spinnertext1, spinnertext2;
+    private ArrayAdapter<String> adapter1, adapter2;
 
-    private String inputpassword,zhishi,caozuoyuan;
-    private String TAG, setpassword,setnumber,setdiaohao;
+    private String inputpassword, zhishi, caozuoyuan;
+    private String TAG, setpassword, setnumber, setdiaohao;
     private int currpassword = 888;
-    private EditText password,number,diaohao;
-    private Button submit,reset;
+    private EditText password, number, diaohao;
+    private Button submit, reset;
 
     private SharedPreferences sp;
     private SoundPool soundPool;
+    private String xn = "xining";
 
     /*mode1制式
-    * mode2操作员
-    * mode3编号
-    * mode4密码*/
+     * mode2操作员
+     * mode3编号
+     * mode4密码*/
     public void onCreate(Bundle savedlnstanceState) {
         super.onCreate(savedlnstanceState);
         setContentView(R.layout.login_page);
@@ -81,33 +90,31 @@ public class LogInPage extends Activity {
         spinnertext2.setAdapter(adapter2);
         sp = getSharedPreferences("yuShe", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();//获取编辑器
-        zhishi = sp.getString("mode1","");
-        caozuoyuan = sp.getString("mode2","");
-        setnumber = sp.getString("mode3","");
-        setpassword = sp.getString("mode4","");
-        setdiaohao = sp.getString("mode5","");
-        if(zhishi.matches("A制式") && caozuoyuan.matches("调车长")){
+        zhishi = sp.getString("mode1", "");
+        caozuoyuan = sp.getString("mode2", "");
+        setnumber = sp.getString("mode3", "");
+        setpassword = sp.getString("mode4", "");
+        setdiaohao = sp.getString("mode5", "");
+        if (zhishi.matches("A制式") && caozuoyuan.matches("调车长")) {
             spinnertext1.setSelection(0);
             spinnertext2.setSelection(0);
             diaohao.setText(setdiaohao);
-        }
-        else if(zhishi.matches("B制式") && caozuoyuan.matches("调车长")){
+        } else if (zhishi.matches("B制式") && caozuoyuan.matches("调车长")) {
             spinnertext1.setSelection(1);
             spinnertext2.setSelection(0);
             diaohao.setText(setdiaohao);
-        }
-        else if(zhishi.matches("A制式") && caozuoyuan.matches("制动员")){
+        } else if (zhishi.matches("A制式") && caozuoyuan.matches("制动员")) {
             spinnertext1.setSelection(0);
             spinnertext2.setSelection(1);
             diaohao.setText(setdiaohao);
             number.setText(setnumber);
-        }
-        else if(zhishi.matches("B制式") && caozuoyuan.matches("制动员")){
+        } else if (zhishi.matches("B制式") && caozuoyuan.matches("制动员")) {
             spinnertext1.setSelection(1);
             spinnertext2.setSelection(1);
             diaohao.setText(setdiaohao);
             number.setText(setnumber);
         }
+
         password.setText(setpassword);
         //第五步：添加监听器，为下拉列表设置事件的响应
 
@@ -119,6 +126,7 @@ public class LogInPage extends Activity {
                 /* 将 spinnertext 显示^*/
                 argO.setVisibility(View.VISIBLE);
             }
+
             public void onNothingSelected(AdapterView<?> argO) {
                 // TODO Auto-generated method stub
                 argO.setVisibility(View.VISIBLE);
@@ -128,16 +136,16 @@ public class LogInPage extends Activity {
             public void onItemSelected(AdapterView<?> argO, View argl, int arg2, long arg3) {
                 // TODO Auto-generated method stub
                 caozuoyuan = adapter2.getItem(arg2);
-                if(caozuoyuan.matches("制动员")){
+                if (caozuoyuan.matches("制动员")) {
                     number.setVisibility(View.VISIBLE);
-                }
-                else if (caozuoyuan.matches("调车长")){
+                } else if (caozuoyuan.matches("调车长")) {
                     number.setVisibility(View.INVISIBLE);
                 }
                 /* 将所选spinnertext的值带入myTextView中*/
                 /* 将 spinnertext 显示^*/
                 argO.setVisibility(View.VISIBLE);
             }
+
             public void onNothingSelected(AdapterView<?> argO) {
                 // TODO Auto-generated method stub
                 argO.setVisibility(View.VISIBLE);
@@ -176,14 +184,13 @@ public class LogInPage extends Activity {
             }
         });
 
-        if(password.getText().toString().trim().matches("888")){
+        if (password.getText().toString().trim().matches("888")) {
             spinnertext1.setEnabled(false);
             spinnertext2.setEnabled(false);
             number.setFocusableInTouchMode(false);
             diaohao.setFocusableInTouchMode(false);
             password.setFocusableInTouchMode(false);
-        }
-        else if (!password.getText().toString().trim().matches("888") || password.getText() == null){
+        } else if (!password.getText().toString().trim().matches("888") || password.getText() == null) {
         }
 
         reset.setOnClickListener(new View.OnClickListener() {
@@ -199,17 +206,15 @@ public class LogInPage extends Activity {
                 inputpassword = password.getText().toString().trim();
                 sp = getSharedPreferences("yuShe", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();//获取编辑器
-                if(inputpassword == null){
-                    Toast.makeText(LogInPage.this,"请输入密码",Toast.LENGTH_SHORT).show();
-                }
-                else if(!inputpassword.matches("888")){
-                    Toast.makeText(LogInPage.this,"密码不正确",Toast.LENGTH_SHORT).show();
-                }
-                else if (inputpassword.matches("888")){
-                    if(zhishi.matches("A制式") && caozuoyuan.matches("调车长")){
+                if (inputpassword == null) {
+                    Toast.makeText(LogInPage.this, "请输入密码", Toast.LENGTH_SHORT).show();
+                } else if (!inputpassword.matches("888")) {
+                    Toast.makeText(LogInPage.this, "密码不正确", Toast.LENGTH_SHORT).show();
+                } else if (inputpassword.matches("888")) {
+                    if (zhishi.matches("A制式") && caozuoyuan.matches("调车长")) {
                         setdiaohao = diaohao.getText().toString();
-                        if (setdiaohao.length() == 1){
-                            setdiaohao = "0"+ setdiaohao;
+                        if (setdiaohao.length() == 1) {
+                            setdiaohao = "0" + setdiaohao;
                         }
                         editor.putString("mode1", zhishi);
                         editor.putString("mode2", caozuoyuan);
@@ -218,11 +223,10 @@ public class LogInPage extends Activity {
                         editor.commit();//提交修改
                         /*Intent intent = new Intent(LogInPage.this, MainActivity.class);
                         startActivity(intent);*/
-                    }
-                    else if(zhishi.matches("B制式") && caozuoyuan.matches("调车长")){
+                    } else if (zhishi.matches("B制式") && caozuoyuan.matches("调车长")) {
                         setdiaohao = diaohao.getText().toString();
-                        if (setdiaohao.length() == 1){
-                            setdiaohao = "0"+ setdiaohao;
+                        if (setdiaohao.length() == 1) {
+                            setdiaohao = "0" + setdiaohao;
                         }
                         editor.putString("mode1", zhishi);
                         editor.putString("mode2", caozuoyuan);
@@ -231,19 +235,18 @@ public class LogInPage extends Activity {
                         editor.commit();//提交修改
                         Intent intent = new Intent(LogInPage.this, SendActivity.class);
                         startActivity(intent);
-                    }
-                    else if(zhishi.matches("A制式") && caozuoyuan.matches("制动员")){
+                    } else if (zhishi.matches("A制式") && caozuoyuan.matches("制动员")) {
                         setdiaohao = diaohao.getText().toString();
                         setnumber = number.getText().toString();
-                        if (setnumber.equals("20")){
-                            Toast.makeText(LogInPage.this,"调车长为20号", Toast.LENGTH_SHORT).show();
+                        if (setnumber.equals("20")) {
+                            Toast.makeText(LogInPage.this, "调车长为20号", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        if (setdiaohao.length() == 1 ){
-                            setdiaohao = "0"+ setdiaohao;
+                        if (setdiaohao.length() == 1) {
+                            setdiaohao = "0" + setdiaohao;
                         }
-                        if (setnumber.length() == 1){
-                            setnumber = "0"+ setnumber;
+                        if (setnumber.length() == 1) {
+                            setnumber = "0" + setnumber;
                         }
 
                         editor.putString("mode1", zhishi);
@@ -254,20 +257,19 @@ public class LogInPage extends Activity {
                         editor.commit();//提交修改
                         /*Intent intent = new Intent(LogInPage.this, MainActivity.class);
                         startActivity(intent);*/
-                    }
-                    else if(zhishi.matches("B制式") && caozuoyuan.matches("制动员")){
+                    } else if (zhishi.matches("B制式") && caozuoyuan.matches("制动员")) {
 
                         setdiaohao = diaohao.getText().toString();
                         setnumber = number.getText().toString();
-                        if (setnumber.equals("20")){
-                            Toast.makeText(LogInPage.this,"调车长为20号", Toast.LENGTH_SHORT).show();
+                        if (setnumber.equals("20")) {
+                            Toast.makeText(LogInPage.this, "调车长为20号", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        if (setdiaohao.length() == 1){
-                            setdiaohao = "0"+ setdiaohao;
+                        if (setdiaohao.length() == 1) {
+                            setdiaohao = "0" + setdiaohao;
                         }
-                        if (setnumber.length() == 1){
-                            setnumber = "0"+ setnumber;
+                        if (setnumber.length() == 1) {
+                            setnumber = "0" + setnumber;
                         }
                         editor.putString("mode1", zhishi);
                         editor.putString("mode2", caozuoyuan);
@@ -283,11 +285,10 @@ public class LogInPage extends Activity {
         });
 
 
-
     }
 
-    private void showDialog(){
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+    private void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("是否确认重新设定");
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
@@ -306,8 +307,13 @@ public class LogInPage extends Activity {
                 password.setText("");
             }
         });
-        AlertDialog dialog=builder.create();
+        AlertDialog dialog = builder.create();
         dialog.show();
 
+    }
+
+    //自动登录
+    public void auto() {
+        submit.performClick();
     }
 }

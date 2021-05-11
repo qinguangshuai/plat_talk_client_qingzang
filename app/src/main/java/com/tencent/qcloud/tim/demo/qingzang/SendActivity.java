@@ -3,6 +3,7 @@ package com.tencent.qcloud.tim.demo.qingzang;
 import android.annotation.SuppressLint;
 
 import androidx.room.Room;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -105,6 +106,7 @@ public class SendActivity extends BaseActivity {
     String str1 = "";
 
     private ReportDetailAdapter detailAdapter;
+    private BroadcastReceiver mMb;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -140,7 +142,7 @@ public class SendActivity extends BaseActivity {
         TextView tv_diaohao = findViewById(R.id.tv_diaohao);
         tv_diaohao.setText("调号: " + diaohao);
         TextView tv_benji = findViewById(R.id.tv_benji);
-        tv_benji.setText("本机号码: 1001022");
+        tv_benji.setText("本机号码: 1001017");
         receive = findViewById(R.id.tv_receive_sendactivity);
         bt_refrash_send = findViewById(R.id.bt_refrash_send);
         bt_refrash_send.setOnClickListener(new View.OnClickListener() {
@@ -235,7 +237,7 @@ public class SendActivity extends BaseActivity {
             currnumber = "20";
         }
 
-        BroadcastReceiver mb = new BroadcastReceiver() {
+        mMb = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (zhishiTrans.matches("B制式") && caozuoyuan.matches("调车长") && diaochezhang_premiss) {
@@ -248,7 +250,7 @@ public class SendActivity extends BaseActivity {
                             try {
                                 DisplayDiaodanLayout(s);
                             } catch (Exception e) {
-                                Log.e("Exception:",e+"");
+                                Log.e("Exception:", e + "");
                             }
 
                             break;
@@ -345,7 +347,7 @@ public class SendActivity extends BaseActivity {
         mif.addAction("android.intent.action.side_key.keyup.TORCH");
         mif.addAction("android.intent.action.side_key.keydown.VOLUME_DOWN");
         mif.addAction("android.intent.action.side_key.keyup.VOLUME_DOWN");
-        registerReceiver(mb, mif);
+        registerReceiver(mMb, mif);
 
         /* Intent forgroundService = new Intent(this,BackGroundService.class);
          *//*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -904,7 +906,14 @@ public class SendActivity extends BaseActivity {
         } catch (Exception e) {
 
         }
+
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(mMb);//刚添加的;
+        super.onStop();
     }
 
     private void stopVideo() {
@@ -1016,15 +1025,35 @@ public class SendActivity extends BaseActivity {
         }
     }
 
+    private String xn = "xining";
+
     //进群
     private void JoinGroup(String id) {
-        TIMGroupManager.getInstance().applyJoinGroup(id, "", new TIMCallBack() {
+        TIMGroupManager.getInstance().applyJoinGroup(xn + id, "", new TIMCallBack() {
             @Override
             public void onError(int i, String s) {
             }
 
             @Override
             public void onSuccess() {
+            }
+        });
+    }
+
+    //退群
+    private void QuitGroup(String id) {
+
+        TIMGroupManager.getInstance().quitGroup(xn + id, new TIMCallBack() {
+            @Override
+            public void onError(int i, String s) {
+                Log.e("swy", "----------------------not quit--------------------");
+                //System.out.println("----------------------not quit--------------------");
+            }
+
+            @Override
+            public void onSuccess() {
+                Log.e("swy", "----------------------quit--------------------");
+                //System.out.println("----------------------quit--------------------");
             }
         });
     }

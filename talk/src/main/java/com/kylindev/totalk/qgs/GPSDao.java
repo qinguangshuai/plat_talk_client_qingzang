@@ -34,7 +34,7 @@ public class GPSDao {
         values.put("lat", lat);
         values.put("lon", lon);
         //实际底层原理 就是在组拼sql语句
-        long result = db.insert("GPS", null, values);
+        long result = db.insert("Gps", null, values);
         db.close();
         if (result == -1) {
             //说明插入失败
@@ -58,10 +58,9 @@ public class GPSDao {
          * whereClause  删除条件
          */
         //代表 影响了多少行
-        int delete = db.delete("GPS", "name=?", new String[]{name});
+        int delete = db.delete(name, null,null);
         db.close();
         return delete;
-
     }
 
     /**
@@ -80,7 +79,7 @@ public class GPSDao {
          */
 //		Cursor cursor = db.query("info", new String[]{"phone"}, "name=?", new String[]{name}, null, null, null);
 
-        Cursor cursor = db.query("GPS", null, null, null, null, null, null);
+        Cursor cursor = db.query("Gps", null, null, null, null, null, null);
         //对cursor 判断一下cursor
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {

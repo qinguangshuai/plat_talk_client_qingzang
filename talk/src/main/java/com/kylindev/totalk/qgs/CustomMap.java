@@ -37,7 +37,7 @@ public class CustomMap extends View {
 
     public CustomMap(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mBitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.train);
+        //mBitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.train);
     }
 
     @Override

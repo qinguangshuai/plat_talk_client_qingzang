@@ -12,7 +12,7 @@ public class MyOpenHelper extends SQLiteOpenHelper {
          * factory 游标工厂  目的创建 cursor(结果集)
          * version 版本    版本从1开始  版本必须>=1
          */
-        super(context, "GPS_tr.db", null, 1);
+        super(context, "GPS_gps.db", null, 1);
     }
 
     /**

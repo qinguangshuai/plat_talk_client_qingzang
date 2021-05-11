@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -21,6 +22,12 @@ import android.widget.EditText;
 
 import com.example.testposition.GpsUtils;
 import com.kylindev.totalk.app.LoginActivity;
+import com.kylindev.totalk.qgs.PointActivity;
+import com.tencent.imsdk.TIMCallBack;
+import com.tencent.imsdk.TIMConversation;
+import com.tencent.imsdk.TIMConversationType;
+import com.tencent.imsdk.TIMGroupManager;
+import com.tencent.imsdk.TIMManager;
 import com.tencent.qcloud.tim.demo.R;
 import com.tencent.qcloud.tim.demo.signature.GenerateTestUserSig;
 import com.tencent.qcloud.tim.demo.utils.Constants;
@@ -31,6 +38,8 @@ import com.tencent.qcloud.tim.uikit.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.tencent.qcloud.tim.demo.qingzang.SendActivity.diaohao;
 
 /**
  * <p>
@@ -96,11 +105,12 @@ public class LoginForDevActivity extends Activity {
             }
         });*/
 
+
         mLoginView = findViewById(R.id.login_btn);
         // 用户名可以是任意非空字符，但是前提需要按照下面文档修改代码里的 SDKAPPID 与 PRIVATEKEY
         // https://github.com/tencentyun/TIMSDK/tree/master/Android
         mUserAccount = findViewById(R.id.login_user);
-        mUserAccount.setText("1001023");
+        mUserAccount.setText("1001017");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         checkPermission(this);
         mLoginView.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +139,9 @@ public class LoginForDevActivity extends Activity {
                         SharedPreferences.Editor editor = shareInfo.edit();
                         editor.putBoolean(Constants.AUTO_LOGIN, true);
                         editor.commit();
+
                         Intent intent = new Intent(LoginForDevActivity.this, LoginActivity.class);
+                        //Intent intent = new Intent(LoginForDevActivity.this, PointActivity.class);
 //                        MainApp.setLevel(mUserAccount.getText().toString().substring(0,1));
                         String account=mUserAccount.getText().toString();
                         intent.putExtra("account",account);
@@ -209,6 +221,10 @@ public class LoginForDevActivity extends Activity {
                 SharedPreferences.Editor editor = shareInfo.edit();
                 editor.putBoolean(Constants.AUTO_LOGIN, true);
                 editor.commit();
+                TIMConversation conversation = TIMManager.getInstance().getConversation(
+                        TIMConversationType.Group,   //会话类型：
+                        "01");//会话帐号//群ID
+                JoinGroup("01");
                 //分三级  调度员d  领导l  普通用户cLoginForDevActivity.this, LoginActivity.class
                 Intent intent = new Intent(LoginForDevActivity.this, LoginActivity.class);
 //                        MainApp.setLevel(mUserAccount.getText().toString().substring(0,1));
@@ -216,6 +232,19 @@ public class LoginForDevActivity extends Activity {
                 intent.putExtra("account", account);
                 startActivity(intent);
                 finish();
+            }
+        });
+    }
+
+    //进群
+    private void JoinGroup(String id) {
+        TIMGroupManager.getInstance().applyJoinGroup(id, "", new TIMCallBack() {
+            @Override
+            public void onError(int i, String s) {
+            }
+
+            @Override
+            public void onSuccess() {
             }
         });
     }

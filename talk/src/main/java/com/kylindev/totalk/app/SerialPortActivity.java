@@ -2,6 +2,7 @@ package com.kylindev.totalk.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import com.kylindev.totalk.bjxt.StringUtils;
@@ -13,6 +14,7 @@ import java.io.OutputStream;
 import java.security.InvalidParameterException;
 
 import android_serialport_api.SerialPort;
+import util.ByteUtil;
 import util.HexUtil;
 
 /**
@@ -84,7 +86,7 @@ public abstract class SerialPortActivity extends Activity {
             while (!isInterrupted()) {
                 int size;
                 try {
-                    //Thread.sleep(1000);
+                    Thread.sleep(100);
                     byte[] buffer = new byte[1024];
                     if (mInputStream2 == null) return;
                     size = mInputStream2.read(buffer);
@@ -122,13 +124,22 @@ public abstract class SerialPortActivity extends Activity {
         }
     }
 
+    private Handler mHandler = new Handler();
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            //要做的事情
+            mHandler.postDelayed(this, 3000);
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
             ///dev/ashmem
-            mSerialPort = new SerialPort(new File("/dev/ttyS3"), 9600, 0);
+            mSerialPort = new SerialPort(new File("/dev/ttyS3"), 115200, 0);
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
             Log.i("TAG", "串口打开成功232");

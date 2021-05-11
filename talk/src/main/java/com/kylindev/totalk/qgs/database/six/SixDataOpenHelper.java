@@ -1,18 +1,21 @@
-package com.tencent.qcloud.tim.demo.bjxt.sqlite;
+package com.kylindev.totalk.qgs.database.six;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class SiveOpenHelper extends SQLiteOpenHelper {
+/**
+ * 人员号：06号
+ * */
+public class SixDataOpenHelper extends SQLiteOpenHelper {
 
-    public SiveOpenHelper(Context context) {
+    public SixDataOpenHelper(Context context) {
         /**
          * name 数据库的名字
          * factory 游标工厂  目的创建 cursor(结果集)
          * version 版本    版本从1开始  版本必须>=1
          */
-        super(context, "sive_data.db", null, 1);
+        super(context, "sixperson_gps.db", null, 1);
     }
 
     /**
@@ -25,7 +28,7 @@ public class SiveOpenHelper extends SQLiteOpenHelper {
 
         System.out.println("oncreate");
         //创建一个教info的表里面的字段有 id(android官方建议前面加下划线_) integer类型 主键  自动增长
-        db.execSQL("create table sive(_id integer primary key autoincrement,time varchar(60),name varchar(60))");
+        db.execSQL("create table sixperson(id integer primary key autoincrement,lat varchar(60),lon varchar(60))");
 
     }
 

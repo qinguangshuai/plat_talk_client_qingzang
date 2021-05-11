@@ -69,7 +69,7 @@ import static com.kylindev.pttlib.service.InterpttService.ConnState.CONNECTION_S
 import static com.kylindev.pttlib.service.InterpttService.ConnState.CONNECTION_STATE_CONNECTING;
 import static com.kylindev.pttlib.service.InterpttService.ConnState.CONNECTION_STATE_DISCONNECTED;
 
-public class ChannelActivity extends BaseActivity implements OnClickListener,InterpttNestedListView.OnNestedChildClickListener, InterpttNestedListView.OnNestedChildLongClickListener, InterpttNestedListView.OnNestedGroupClickListener, InterpttNestedListView.OnNestedGroupLongClickListener  {
+public class ChannelActivity extends BaseActivity implements OnClickListener, InterpttNestedListView.OnNestedChildClickListener, InterpttNestedListView.OnNestedChildLongClickListener, InterpttNestedListView.OnNestedGroupClickListener, InterpttNestedListView.OnNestedGroupLongClickListener {
     private Handler mHandler = new Handler();    //用于其他线程更新UI
 
     private boolean appWantQuit = false;
@@ -222,12 +222,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
 
         getPermissions();
 
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        //知道要跳转应用的包名、类名
-        ComponentName componentName = new ComponentName("com.tencent.qcloud.tim.tuikit",
-                "com.tencent.qcloud.tim.demo.login.LogInPage");
-        intent.setComponent(componentName);
-        startActivity(intent);
+
         /*Intent intent=new Intent(this, CheckActivity.class);
         startActivity(intent);*/
     }
@@ -239,6 +234,14 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         }
 
         super.onResume();
+
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        //知道要跳转应用的包名、类名
+        ComponentName componentName = new ComponentName("com.tencent.qcloud.tim.tuikit",
+                "com.tencent.qcloud.tim.demo.login.LogInPage");
+        //com.kylindev.totalk.qgs.PointActivity.java
+        intent.setComponent(componentName);
+        startActivity(intent);
     }
 
     @Override
@@ -250,15 +253,15 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         super.onDestroy();
     }
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			boolean selecting = mService!=null && mService.isSelectingContact();
-			if (selecting) {
-				mService.cancelSelect();
-				return true;
-			}
-		}
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            boolean selecting = mService != null && mService.isSelectingContact();
+            if (selecting) {
+                mService.cancelSelect();
+                return true;
+            }
+        }
 
         return super.onKeyDown(keyCode, event);
     }
@@ -294,7 +297,6 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                     break;
             }
         }
-
 
 
         @Override
@@ -433,13 +435,13 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             if (listen) {
                 AppCommonUtil.showToast(ChannelActivity.this, R.string.listen_ok);
             }
-		}
+        }
 
-		@Override
-		public void onApplyOrderResult(int uid, int cid, String phone, boolean success) throws RemoteException {
-		}
+        @Override
+        public void onApplyOrderResult(int uid, int cid, String phone, boolean success) throws RemoteException {
+        }
 
-		@Override
+        @Override
         public void onPcmRecordFinished(short[] data, int length) throws RemoteException {
         }
 
@@ -516,8 +518,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         if (pendingContactMap != null && pendingContactMap.size() > 0) {
             //联系人图标高亮
             mIVBarLeftInner.setImageResource(R.drawable.ic_contact_new_apply);
-        }
-        else {
+        } else {
             mIVBarLeftInner.setImageResource(R.drawable.ic_contact);
         }
     }
@@ -644,7 +645,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 } else {
                     //此时有两种情况，要么是合法的口令，要么为空，表示频道无需口令
                     if (mService != null && mService.getConnectionState() == CONNECTION_STATE_CONNECTED) {
-                        mService.createChannel(str, pwd1, null, pubChecked, needapplyChecked,false);
+                        mService.createChannel(str, pwd1, null, pubChecked, needapplyChecked, false);
                     }
                 }
             }
@@ -723,25 +724,25 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         final TextView tvNick = (TextView) view.findViewById(R.id.tv_my_nick);
 
         //填充账号内容
-            User me = mService.getCurrentUser();
-            if (me != null) {
-                if (me.avatar == null) {
-                    ivAvatar.setImageResource(R.drawable.ic_default_avatar);
-                } else {
-                    Bitmap bm = BitmapFactory.decodeByteArray(me.avatar, 0, me.avatar.length);
-                    ivAvatar.setImageBitmap(bm);
-                }
-
-                tvId.setText(getString(R.string.myid, me.iId));
-                tvNick.setText(getString(R.string.mynick, me.nick));
+        User me = mService.getCurrentUser();
+        if (me != null) {
+            if (me.avatar == null) {
+                ivAvatar.setImageResource(R.drawable.ic_default_avatar);
+            } else {
+                Bitmap bm = BitmapFactory.decodeByteArray(me.avatar, 0, me.avatar.length);
+                ivAvatar.setImageBitmap(bm);
             }
+
+            tvId.setText(getString(R.string.myid, me.iId));
+            tvNick.setText(getString(R.string.mynick, me.nick));
+        }
 
         builder.setPositiveButton(R.string.ok, null);
         builder.show();
     }
 
     private void rebootCallSystem() {
-       mService.rebootCallSystem();
+        mService.rebootCallSystem();
     }
 
     private void aboutCallSystem() {
@@ -981,7 +982,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                                 && keyCode != KeyEvent.KEYCODE_MEDIA_PAUSE
                                 && keyCode != KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
                                 && keyCode != KeyEvent.KEYCODE_HEADSETHOOK
-                                ) {
+                        ) {
                             //不允许设置某些特殊按键为ptt
                             etKeycode.setText(String.valueOf(keyCode));
                             return true;
@@ -1227,9 +1228,9 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                         if (mService != null) {
                             mService.setFixMtu(n);
                             if (n) {
-                                LibConstants.BLE_MTU= 23;
-                            }else{
-                                LibConstants.BLE_MTU=LibConstants.START_BLE_MTU;
+                                LibConstants.BLE_MTU = 23;
+                            } else {
+                                LibConstants.BLE_MTU = LibConstants.START_BLE_MTU;
                             }
                         }
                     }
@@ -1243,16 +1244,16 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 btQuickCh.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(edQuickCh.getText().toString().equals("")){
+                        if (edQuickCh.getText().toString().equals("")) {
                             edQuickCh.setText(String.valueOf(0));
                         }
-                       boolean res =  mService.setQuickCh(Integer.parseInt(edQuickCh.getText().toString()));
-                       if(res==false){
-                           edQuickCh.setText(String.valueOf(0));
-                           mService.showToast("频道ID无效");
-                       }else{
-                           mService.showToast("保存成功");
-                       }
+                        boolean res = mService.setQuickCh(Integer.parseInt(edQuickCh.getText().toString()));
+                        if (res == false) {
+                            edQuickCh.setText(String.valueOf(0));
+                            mService.showToast("频道ID无效");
+                        } else {
+                            mService.showToast("保存成功");
+                        }
                     }
                 });
 
@@ -1431,12 +1432,12 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 AlertDialog.Builder builder = new AlertDialog.Builder(ChannelActivity.this);
                 LayoutInflater inflater = LayoutInflater.from(ChannelActivity.this);
                 View layout = inflater.inflate(R.layout.call_setting, null);
-                LinearLayout layoutSetSms =(LinearLayout)layout.findViewById(R.id.ll_sms_set);
-                final EditText etSms =(EditText)layout.findViewById(R.id.et_str_sms_content);
-                if(mService.isDriver()) {
+                LinearLayout layoutSetSms = (LinearLayout) layout.findViewById(R.id.ll_sms_set);
+                final EditText etSms = (EditText) layout.findViewById(R.id.et_str_sms_content);
+                if (mService.isDriver()) {
                     etSms.setFocusable(true);
                     etSms.setFocusableInTouchMode(true);
-                }else{
+                } else {
                     etSms.setFocusable(false);
                     etSms.setFocusableInTouchMode(false);
                 }
@@ -1469,11 +1470,12 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 new AlertDialog.Builder(ChannelActivity.this)
                         .setTitle("提示")
                         .setMessage("确定重启接单系统？(只有管理员有效)")
-                        .setPositiveButton("是",  new DialogInterface.OnClickListener() {
+                        .setPositiveButton("是", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 rebootCallSystem();
-                            }})
+                            }
+                        })
                         .setNegativeButton("否", null)
                         .show();
 
@@ -1516,7 +1518,6 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         builder.setPositiveButton(R.string.ok, null);
         builder.show();
     }
-
 
 
     private void share() {
@@ -1630,12 +1631,11 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
          */
         channelAdapter.notifyDataSetChanged();
         //如果没有频道，则显示提示
-        if (mService!=null && mService.getConnectionState()==CONNECTION_STATE_CONNECTED) {
+        if (mService != null && mService.getConnectionState() == CONNECTION_STATE_CONNECTED) {
             if (channelAdapter.isEmpty()) {
                 mLLTips.setVisibility(View.VISIBLE);
                 mLVChannel.setVisibility(View.INVISIBLE);
-            }
-            else {
+            } else {
                 mLLTips.setVisibility(View.INVISIBLE);
                 mLVChannel.setVisibility(View.VISIBLE);
             }
@@ -1649,7 +1649,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         if (mService == null) {
             return;
         }
-        if (mService.getConnectionState()==CONNECTION_STATE_DISCONNECTED) {
+        if (mService.getConnectionState() == CONNECTION_STATE_DISCONNECTED) {
             return;
         }
 
@@ -1705,14 +1705,14 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         if (me == null) {
             return;
         }
-        if (me.iId==channel.creatorId || mService.isMonitor(me.iId, channel)) {
+        if (me.iId == channel.creatorId || mService.isMonitor(me.iId, channel)) {
             llAuth.setVisibility(View.VISIBLE);
         }
 
         llAuth.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                manageMember(channel, me.iId==channel.creatorId, 0);
+                manageMember(channel, me.iId == channel.creatorId, 0);
             }
         });
 
@@ -1721,11 +1721,10 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             @Override
             public void onClick(View v) {
                 //判断是否创建者
-                if (me.iId==channel.creatorId) {
+                if (me.iId == channel.creatorId) {
                     //删除
                     deleteChannel(channel.id, channel.name);
-                }
-                else {
+                } else {
                     quitChannel(channel);
                 }
             }
@@ -1758,15 +1757,15 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 boolean newNeedApply = cbNeedApply.isChecked();
                 boolean newAllowOrderBg = cbAllowOrderBg.isChecked();
 
-                if (! oldName.equals(newName)) {
+                if (!oldName.equals(newName)) {
                     if (!AppCommonUtil.validChannelName(newName)) {
                         AppCommonUtil.showToast(ChannelActivity.this, R.string.channel_name_bad_format);
                     } else {
                         mService.changeChannelName(channel.id, newName);
                     }
                 }
-                if (! oldPwd.equals(newPwd)) {
-                    if (newPwd.length()!=0 && !AppCommonUtil.validChannelPwd(newPwd)) {
+                if (!oldPwd.equals(newPwd)) {
+                    if (newPwd.length() != 0 && !AppCommonUtil.validChannelPwd(newPwd)) {
                         AppCommonUtil.showToast(ChannelActivity.this, R.string.channel_pwd_bad_format);
                     } else {
                         mService.changeChannelPwd(channel.id, newPwd);
@@ -1800,7 +1799,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
     }
 
     private void memberChannel(Channel c) {
-        if (c==null) {
+        if (c == null) {
             return;
         }
         Intent i = new Intent(this, MemberChannel.class);
@@ -1811,7 +1810,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
     }
 
     private void shareChannel(final Channel c) {
-        if (c==null || mService==null) {
+        if (c == null || mService == null) {
             return;
         }
         User me = mService.getCurrentUser();
@@ -1842,7 +1841,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
 
     //uid是目标用户id。uid为0时，表示未指定用户
     private void manageMember(final Channel c, final boolean isCreator, final int uid) {
-        if (c==null || mService==null) {
+        if (c == null || mService == null) {
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1853,7 +1852,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         builder.setView(layout);
 
         final EditText etUid = (EditText) layout.findViewById(R.id.et_ban_member_uid);
-        if (uid>1000000 && uid<9999999) {
+        if (uid > 1000000 && uid < 9999999) {
             etUid.setText(uid + "");
         }
         final RadioGroup rgOpt = (RadioGroup) layout.findViewById(R.id.rg_manage_member);
@@ -1866,7 +1865,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         final RadioButton rbPrior = (RadioButton) layout.findViewById(R.id.rb_prior);
         final RadioButton rbCancelPrior = (RadioButton) layout.findViewById(R.id.rb_cancel_prior);
         //副管不能设置增删其他副管
-        if (! isCreator) {
+        if (!isCreator) {
             rbMonitor.setEnabled(false);
             rbCancelMonitor.setEnabled(false);
             rbPrior.setEnabled(false);
@@ -1887,29 +1886,21 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
 
                 if (!AppCommonUtil.validTotalkId(strUid)) {
                     AppCommonUtil.showToast(ChannelActivity.this, R.string.userid_bad_format);
-                }
-                else if (check == rbBan.getId()) {
+                } else if (check == rbBan.getId()) {
                     mService.manageMember(c.id, uid, 0);
-                }
-                else if (check == rbCancelBan.getId()) {
+                } else if (check == rbCancelBan.getId()) {
                     mService.manageMember(c.id, uid, 1);
-                }
-                else if (check == rbMute.getId()) {
+                } else if (check == rbMute.getId()) {
                     mService.manageMember(c.id, uid, 2);
-                }
-                else if (check == rbCancelMute.getId()) {
+                } else if (check == rbCancelMute.getId()) {
                     mService.manageMember(c.id, uid, 3);
-                }
-                else if (check == rbMonitor.getId()) {
+                } else if (check == rbMonitor.getId()) {
                     mService.manageMember(c.id, uid, 4);
-                }
-                else if (check == rbCancelMonitor.getId()) {
+                } else if (check == rbCancelMonitor.getId()) {
                     mService.manageMember(c.id, uid, 5);
-                }
-                else if (check == rbPrior.getId()) {
+                } else if (check == rbPrior.getId()) {
                     mService.manageMember(c.id, uid, 6);
-                }
-                else if (check == rbCancelPrior.getId()) {
+                } else if (check == rbCancelPrior.getId()) {
                     mService.manageMember(c.id, uid, 7);
                 }
             }
@@ -1936,7 +1927,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
 
 
     private void quitChannel(final Channel c) {
-        if (c==null || mService==null) {
+        if (c == null || mService == null) {
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1970,7 +1961,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
      */
     @TargetApi(Build.VERSION_CODES.FROYO)
     private void scrollToChannel(Channel channel) {
-        if (channelAdapter==null || channelAdapter.channels==null) {
+        if (channelAdapter == null || channelAdapter.channels == null) {
             return;
         }
 
@@ -2004,23 +1995,23 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
         tvId.setText(String.valueOf(user.iId));
 
         ivManage.setVisibility(View.INVISIBLE);
-        if (mService!=null && mService.getCurrentUser()!=null && user.getChannel()!=null) {
+        if (mService != null && mService.getCurrentUser() != null && user.getChannel() != null) {
             final User me = mService.getCurrentUser();
             final Channel chan = user.getChannel();
-            if (me.iId==chan.creatorId || mService.isMonitor(me.iId, chan)) {
+            if (me.iId == chan.creatorId || mService.isMonitor(me.iId, chan)) {
                 ivManage.setVisibility(View.VISIBLE);
                 ivManage.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        manageMember(chan, (me.iId==chan.creatorId), user.iId);
+                        manageMember(chan, (me.iId == chan.creatorId), user.iId);
                     }
                 });
             }
         }
 
         ivAdd.setVisibility(View.INVISIBLE);
-        if (mService!=null && mService.getContacts()!=null && mService.getCurrentUser()!=null) {
-            if (! mService.getContacts().containsKey(user.iId) && user.iId != mService.getCurrentUser().iId) {
+        if (mService != null && mService.getContacts() != null && mService.getCurrentUser() != null) {
+            if (!mService.getContacts().containsKey(user.iId) && user.iId != mService.getCurrentUser().iId) {
                 //不是好友，且非本人
                 ivAdd.setVisibility(View.VISIBLE);
                 ivAdd.setOnClickListener(new OnClickListener() {
@@ -2098,8 +2089,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             if (channelAdapter.isGroupExpanded(pos)) {
                 channelAdapter.collapseGroup(pos);
                 c.expanded = 0;
-            }
-            else {
+            } else {
                 expandGroup(pos);
                 c.expanded = 1;
             }
@@ -2119,7 +2109,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             if (!channelAdapter.isGroupExpanded(channelPosition))
                 return; // Don't refresh
 
-            if (channelMap==null || channelMap.get(user.getChannel().id)==null) {
+            if (channelMap == null || channelMap.get(user.getChannel().id) == null) {
                 return;
             }
 
@@ -2138,7 +2128,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             final ImageView ivPerm = (ImageView) view.findViewById(R.id.iv_perm);
             final CircleImageView avatar = (CircleImageView) view.findViewById(R.id.userRowAvatar);
             final TextView tvNick = (TextView) view.findViewById(R.id.userRowNick);
-            final ImageView ivPrior = (ImageView) view.findViewById(R.id.iv_prior_mic);	//插话权限
+            final ImageView ivPrior = (ImageView) view.findViewById(R.id.iv_prior_mic);    //插话权限
             final ImageView ivMute = (ImageView) view.findViewById(R.id.iv_mute);
             final ImageView ivAudioSource = (ImageView) view.findViewById(R.id.iv_audio_source);
             final TextView tvId = (TextView) view.findViewById(R.id.userRowId);
@@ -2150,12 +2140,10 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             if (user.iId == user.getChannel().creatorId) {
                 ivPerm.setImageResource(R.drawable.owner);
                 ivPerm.setVisibility(View.VISIBLE);
-            }
-            else if (mService!=null && mService.isMonitor(user.iId, user.getChannel())) {
+            } else if (mService != null && mService.isMonitor(user.iId, user.getChannel())) {
                 ivPerm.setImageResource(R.drawable.monitor);
                 ivPerm.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 ivPerm.setVisibility(View.INVISIBLE);
             }
 
@@ -2207,15 +2195,13 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             //是否有插话权限
             if (mService.isPrior(user.iId, user.getChannel())) {
                 ivPrior.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 ivPrior.setVisibility(View.INVISIBLE);
             }
             //是否禁言
             if (mService.isMute(user.iId, user.getChannel())) {
                 ivMute.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 ivMute.setVisibility(View.INVISIBLE);
             }
 
@@ -2269,7 +2255,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
 
         @Override
         public int getChildCount(int arg0) {
-            if (channels == null || channelMap==null) {
+            if (channels == null || channelMap == null) {
                 return 0;
             }
             int i = channels.get(arg0).id;
@@ -2312,8 +2298,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                     if (isGroupExpanded(groupPosition)) {
                         collapseGroup(groupPosition);
                         channel.expanded = 0;
-                    }
-                    else {
+                    } else {
                         expandGroup(groupPosition);
                         channel.expanded = 1;
                     }
@@ -2330,8 +2315,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             ImageView ivLoc = (ImageView) v.findViewById(R.id.iv_channel_location);
             if (mService.getCurrentChannel().id == channel.id) {
                 ivLoc.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 ivLoc.setVisibility(View.GONE);
             }
             ivLoc.setOnClickListener(new OnClickListener() {
@@ -2357,7 +2341,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 @Override
                 public void onClick(View v) {
                     boolean oldListen = mService.isListen(mService.getCurrentUser(), channel.id);
-                    mService.setListen(channel.id, ! oldListen);
+                    mService.setListen(channel.id, !oldListen);
                 }
             });
 
@@ -2374,15 +2358,13 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             //是否监听
             if (mService.isListen(mService.getCurrentUser(), channel.id)) {
                 ivListen.setImageResource(R.drawable.ic_listen);
-            }
-            else {
+            } else {
                 ivListen.setImageResource(R.drawable.ic_listen_gray);
             }
 
             if (channel.isTemporary) {
                 ivOption.setVisibility(View.INVISIBLE);
-            }
-            else {
+            } else {
                 ivOption.setVisibility(View.VISIBLE);
             }
 
@@ -2441,8 +2423,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             Channel c = channels.get(groupPosition);
             if (c.expanded == -1) {
                 return (c.id == mService.getCurrentChannel().id);
-            }
-            else {
+            } else {
                 return (c.expanded == 1);
             }
         }
@@ -2455,19 +2436,19 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
     }
 
     public void handleChannelAdded(Channel channel) {
-        if (mService.getConnectionState()==CONNECTION_STATE_CONNECTED) {
+        if (mService.getConnectionState() == CONNECTION_STATE_CONNECTED) {
             updateChannelList();
         }
     }
 
     public void handleChannelRemoved(Channel channel) {
-        if (mService.getConnectionState()==CONNECTION_STATE_CONNECTED) {
+        if (mService.getConnectionState() == CONNECTION_STATE_CONNECTED) {
             updateChannelList();
         }
     }
 
     public void handleChannelUpdated(Channel channel) {
-        if (mService.getConnectionState()==CONNECTION_STATE_CONNECTED) {
+        if (mService.getConnectionState() == CONNECTION_STATE_CONNECTED) {
             updateChannelList();
         }
     }
@@ -2494,7 +2475,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
 
             //pending contact
             Map<String, PendingMember> pms = service.getPendingMembers();
-            for (PendingMember pm:pms.values()) {
+            for (PendingMember pm : pms.values()) {
                 mPms.add(pm);
             }
         }
@@ -2529,8 +2510,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
                 viewHolder = new InviteViewHolder();
                 viewHolder.tvApply = (TextView) view.findViewById(R.id.tv_member_apply);
                 view.setTag(viewHolder);
-            }
-            else {
+            } else {
                 viewHolder = (InviteViewHolder) view.getTag();
             }
 
@@ -2549,7 +2529,7 @@ public class ChannelActivity extends BaseActivity implements OnClickListener,Int
             if (pm == null) {
                 return;
             }
-            if (mService==null || mService.getCurrentUser()==null) {
+            if (mService == null || mService.getCurrentUser() == null) {
                 return;
             }
 

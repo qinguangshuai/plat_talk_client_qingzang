@@ -1,6 +1,5 @@
 package com.tencent.qcloud.tim.demo;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 
 import androidx.multidex.MultiDexApplication;
@@ -18,22 +17,31 @@ import android.os.Handler;
 
 import androidx.multidex.MultiDex;
 
-import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.example.mylibrary.RouterURLS;
 import com.example.mylibrary.TestService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.huawei.android.hms.agent.HMSAgent;
-import com.kylindev.totalk.app.BaseActivity;
+import com.kylindev.totalk.bjxt.SiveDao;
 import com.kylindev.totalk.bjxt.SpUtil;
+import com.kylindev.totalk.bjxt.SuoData;
 import com.kylindev.totalk.qgs.PointActivity;
+import com.kylindev.totalk.qgs.database.eight.EightDataDao;
+import com.kylindev.totalk.qgs.database.eleven.ElevenDataDao;
+import com.kylindev.totalk.qgs.database.five.FiveDataDao;
+import com.kylindev.totalk.qgs.database.fourteen.FourteenDataDao;
+import com.kylindev.totalk.qgs.database.nine.NineDataDao;
+import com.kylindev.totalk.qgs.database.seven.SevenDataDao;
+import com.kylindev.totalk.qgs.database.six.SixDataDao;
+import com.kylindev.totalk.qgs.database.ten.TenDataDao;
+import com.kylindev.totalk.qgs.database.thirteen.ThirteenDataDao;
+import com.kylindev.totalk.qgs.database.twelve.TwelveDataDao;
+import com.kylindev.totalk.qgs.tack.PickDao;
 import com.meizu.cloud.pushsdk.PushManager;
 import com.meizu.cloud.pushsdk.util.MzSystemUtils;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -41,6 +49,7 @@ import com.tencent.imsdk.TIMBackgroundParam;
 import com.tencent.imsdk.TIMCallBack;
 import com.tencent.imsdk.TIMConversation;
 import com.tencent.imsdk.TIMConversationType;
+import com.tencent.imsdk.TIMGroupManager;
 import com.tencent.imsdk.TIMManager;
 import com.tencent.imsdk.TIMMessage;
 import com.tencent.imsdk.TIMOfflinePushNotification;
@@ -48,12 +57,11 @@ import com.tencent.imsdk.TIMTextElem;
 import com.tencent.imsdk.TIMValueCallBack;
 import com.tencent.imsdk.session.SessionWrapper;
 import com.tencent.imsdk.utils.IMFunc;
+import com.tencent.openqq.protocol.imsdk.msg;
 import com.tencent.qcloud.tim.demo.Database.Diaodan;
 import com.tencent.qcloud.tim.demo.Database.DiaodanDatabase;
 import com.tencent.qcloud.tim.demo.bjxt.sqlite.ReceiveDao;
 import com.tencent.qcloud.tim.demo.bjxt.sqlite.SendDao;
-import com.tencent.qcloud.tim.demo.bjxt.sqlite.SiveDao;
-import com.tencent.qcloud.tim.demo.bjxt.sqlite.SiveData;
 import com.tencent.qcloud.tim.demo.helper.ConfigHelper;
 import com.tencent.qcloud.tim.demo.helper.CustomAVCallUIController;
 import com.tencent.qcloud.tim.demo.helper.CustomMessage;
@@ -62,7 +70,6 @@ import com.tencent.qcloud.tim.demo.signature.GenerateTestUserSig;
 import com.tencent.qcloud.tim.demo.thirdpush.ThirdPushTokenMgr;
 import com.tencent.qcloud.tim.demo.utils.CombineCommend;
 import com.tencent.qcloud.tim.demo.utils.DemoLog;
-import com.tencent.qcloud.tim.demo.utils.HexUtil;
 import com.tencent.qcloud.tim.demo.utils.PrivateConstants;
 import com.tencent.qcloud.tim.uikit.TUIKit;
 import com.tencent.qcloud.tim.uikit.base.IMEventListener;
@@ -92,6 +99,26 @@ public class DemoApplication extends MultiDexApplication implements TestService 
     private String mPeopleId;
     private SpUtil mSpUtil;
     private String mPeople;
+    private PickDao mPickDao;
+    private SpUtil mCqncast;
+    private String jieAll = "";
+    private SpUtil mControlCar;
+    private SpUtil mControlPeople;
+    private SpUtil mControlZhidongyuan;
+    private String mCumulative1;
+    private SpUtil mControlStart;
+    private String mPeopleId1;
+    private String mAck1;
+    private String mFlag;
+    private SpUtil mControlshuntinghunting;
+    private String mInstructions;
+    private SpUtil mControlZdy;
+    private String mControlZdyName;
+    private boolean tingche = false;
+    private SpUtil mControlTuiJin;
+    private SpUtil mCon;
+    private SpUtil mControlLingChe;
+    private String mConversationId = "01";
 
     public static DemoApplication instance() {
         return instance;
@@ -105,16 +132,8 @@ public class DemoApplication extends MultiDexApplication implements TestService 
     //public static List<String> gousumit_list = new ArrayList<>();
     private String[] alpha = new String[200];
     private String dateString = "";
-
-    @SuppressLint("HandlerLeak")
-    private Handler THandle = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            DemoApplication.instance().sendMessage(mId, "123");
-            //Toast.makeText(getApplicationContext(), "DemoApplication.class", Toast.LENGTH_SHORT).show();
-        }
-    };
+    private boolean tc = false;
+    private boolean jiansu = false;
 
     private class InsertDatabase extends AsyncTask<Void, Void, String> {
         @Override
@@ -151,7 +170,31 @@ public class DemoApplication extends MultiDexApplication implements TestService 
 
         MultiDex.install(this);
 
-        //THandle.sendEmptyMessageDelayed(1, 10000); // 十秒后发送消息
+        //初始化SpUtil
+        mCqncast = new SpUtil(getApplicationContext(), "cqncast");
+        //mCqncast.setName("00");
+        //指令通知协议
+        mSpUtil = new SpUtil(getApplicationContext(), "instructions");
+        //.setName("00");
+        //控制车
+        mControlCar = new SpUtil(getApplicationContext(), "controlcar");
+        //mControlCar.setName("00");
+        //控制人员
+        mControlPeople = new SpUtil(getApplicationContext(), "controlpeople");
+        mControlZhidongyuan = new SpUtil(getApplicationContext(), "controlzhidongyuan");
+        //mControlPeople.setName("00");
+        mControlStart = new SpUtil(getApplicationContext(), "controlstart");
+        mControlStart.setName("true");
+        mControlshuntinghunting = new SpUtil(getApplicationContext(), "controlshunting");
+        mControlZdy = new SpUtil(getApplicationContext(), "controlzdy");
+        mControlLingChe = new SpUtil(getApplicationContext(), "controllingche");
+        mControlTuiJin = new SpUtil(getApplicationContext(), "controltuijin");
+        mCon = new SpUtil(getApplicationContext(), "con");
+
+        TIMConversation conversation = TIMManager.getInstance().getConversation(
+                TIMConversationType.Group,   //会话类型：
+                "01");//会话帐号//群ID
+        JoinGroup("01");
 
         // bugly上报
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
@@ -224,7 +267,7 @@ public class DemoApplication extends MultiDexApplication implements TestService 
                     String str = textElem.getText().replace(" ", "");
 
                     // 20017101/02/03
-                    Log.e("wocao", textElem.getText() + "ssssss" + System.currentTimeMillis());
+                    Log.e("wocao", textElem.getText() + "  ssssss");
 
                     //获取系统时间
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日   HH:mm:ss");
@@ -234,8 +277,7 @@ public class DemoApplication extends MultiDexApplication implements TestService 
                     //存入数据库
                     ReceiveDao receiveDao = new ReceiveDao(getApplicationContext());
                     receiveDao.add(time, str);
-                    //指令通知协议
-                    mSpUtil = new SpUtil(getApplicationContext(), "instructions");
+                    mCon.setName(str + "");
 
                     int length = str.length();
                     if (length >= 2) {
@@ -243,59 +285,40 @@ public class DemoApplication extends MultiDexApplication implements TestService 
                             //人员号
                             mPeopleId = str.substring(0, 2);
                             mPeople = MyUtil.str2HexStr(mPeopleId);
-                            int parse = Integer.parseInt(mPeopleId.toString(), 16);
+                            //int parse = Integer.parseInt(mPeopleId.toString(), 16);
                             //调号（群id）
                             mId = str.substring(2, 4);
                             //指令
-                            String instructions = str.substring(4, 6);
-                            int parseInt = Integer.parseInt(instructions.toString(), 16);
-                            String s = MyUtil.str2HexStr(instructions);
+                            mInstructions = str.substring(4, 6);
+                            //int parseInt = Integer.parseInt(mInstructions.toString(), 16);
+                            String s = MyUtil.str2HexStr(mInstructions);
                             //ack
                             String ack = str.substring(6, 8);
-                            mSpUtil.setName(mId);
-                            //4G-MainBoard
-                            //A5+调号+人员号+命令+帧号+FF+checksum
-                            String s1 = String.valueOf(parse);
-                            String s2 = String.valueOf(parseInt);
-                            String form = "A5" + mId + mPeopleId + instructions + "01" + "FF";
-                            String data = form.replaceAll(" ", "");
-                            int total = 0;
-                            for (int i = 0; i < data.length(); i += 2) {
-                                //strB.append("0x").append(strData.substring(i,i+2));  //0xC30x3C0x010x120x340x560x780xAA
-                                total = total + Integer.parseInt(data.substring(i, i + 2), 16);
-                            }
-                            //noTotal为累加和取反加一
-                            int noTotal = ~total + 1;
-                            Log.i("total", String.valueOf(noTotal));
-                            //负整数时，前面输入了多余的 FF ，没有去掉前面多余的 FF，按并双字节形式输出
-                            //0xFF会像转换成0x000000FF后再进行位运算
-                            String hex = Integer.toHexString(noTotal).toUpperCase();
-                            Log.i("TAGhex", hex);
-                            String key = hex.substring(hex.length() - 2);
-                            Log.i("TAG校验码key", key);
-                            Log.i("TAGhex", key);
-                            //将求得的最后两位拼接到setup字符串后面
-                            String cumulative = data + key;
-                            Log.i("setUp", data + "    00");
-                            Log.i("cumulative", cumulative + "    00");
-                            Log.i("parse", parse + "    00");
-                            Log.i("parseInt", parseInt + "    00");
-                            Log.i("form", form + "    00");
+                            if (ack.equals("01")) {
+                                //4G-MainBoard
+                                //A5+调号+人员号+命令+帧号+FF+checksum
+                                //String s1 = String.valueOf(parse);
+                                //String s2 = String.valueOf(parseInt);
 
+                                String reply = getReply(mId, mPeopleId, mInstructions);
 
-                            SendActivity.receiveMessage(str);
-                            soundIdMap.clear();
+                                mCumulative1 = mPeopleId + mId + mInstructions + "02";
+                                SendDao sendDao = new SendDao(getApplicationContext());
+                            /*SendActivity.receiveMessage(str);
+                            soundIdMap.clear();*/
 
-                            switch (str.substring(0, 2)) {
-                                case "20"://调车长
-                                    //Select_music(str.substring(4, 6));
-                                    //Select_music(str.substring(4, 6));
-                                    break;
-                                case "0A"://机控器
-                                    break;
-                                case "0B"://区长台
-                                    break;
-                                default://制动员
+                                switch (mPeopleId) {
+                                    case "20"://调车长
+                                        //Select_music(str.substring(4, 6));
+                                        //Select_music(str.substring(4, 6));
+                                        mControlPeople.setName("90");
+                                        break;
+                                    case "0A"://机控器
+                                        break;
+                                    case "0B"://区长台
+                                        break;
+                                    default://制动员
+                                        mControlZhidongyuan.setName("60");
                                 /*Select_music(str.substring(4, 6));
                                 Select_music(str.substring(0, 1));
                                 Select_music(str.substring(1, 2));
@@ -304,29 +327,213 @@ public class DemoApplication extends MultiDexApplication implements TestService 
                                 Select_music(str.substring(0, 1));
                                 Select_music(str.substring(1, 2));
                                 Select_music("号");*/
-                                    break;
-                            }
-                            switch (ack) {
-                                case "01":
-                                    String cumulative1 = mPeopleId + mId + instructions + "02";
-                                    sendMessage(mId, cumulative1);
-                                    SendDao sendDao = new SendDao(getApplicationContext());
-                                    sendDao.add(time, cumulative1);
-                                    PointActivity.sendHexString(cumulative.replaceAll("\\s*", ""), "485");
-                                    break;
-                                case "00":
+                                        break;
+                                }
+                                //01017301
+                                switch (mInstructions) {
+                                    case "56"://作业开始
+                                        //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        break;
+                                    case "49"://领车   推进、连接、溜放
+                                        //String reply1 = getReply(mId, mPeopleId, "98");
+                                        String name1 = mControlLingChe.getName();
 
-                                    break;
+                                        if (name1 != null && name1.equals("49")) {
+                                            if (tingche == false) {
+                                                mControlZdy.setName(mPeopleId);
+                                                tingche = true;
+                                                //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                            }
+                                        }
+                                        jiansu = true;
+                                        break;
+                                    case "71"://停车
+                                        tingche = false;
+                                        tc = false;
+                                        jiansu = false;
+                                        mControlLingChe.setName("00");
+                                        mControlStart.setName("true");
+                                        mControlCar.setName("71");
+                                        mCqncast.setName(mCumulative1);
+                                        sendDao.add(time, mCumulative1);
+                                        //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        break;
+                                    case "41"://启动
+                                        jiansu = true;
+                                        mControlLingChe.setName("00");
+                                        String name = mControlStart.getName();
+                                        if (name != null && name.equals("true")) {
+                                            mControlCar.setName("41");
+                                            mCqncast.setName(mCumulative1);
+                                            sendDao.add(time, mCumulative1);
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                            mControlStart.setName("false");
+                                        }
+                                        break;
+                                    case "73"://紧急停车
+                                /*if (siveDao != null) {
+                                    siveDao.del(mPeopleId);
+                                }*/
+                                        jiansu = false;
+                                        tc = false;
+                                        mControlLingChe.setName("00");
+                                        if (siveDao != null) {
+                                            List<SuoData> suoData = siveDao.find();
+                                            int size = suoData.size();
+                                            if (size == 0) {
+                                                siveDao.add(mPeopleId, "73", "true");
+                                                //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                                siveDao.del(mPeopleId);
+                                                siveDao.add(mPeopleId, "73", "false");
+                                            } else {
+                                                for (int i = 0; i < size; i++) {
+                                                    mPeopleId1 = suoData.get(i).getPeopleId();
+                                                    mAck1 = suoData.get(i).getAck();
+                                                    mFlag = suoData.get(i).getFlag();
+                                                }
+                                                if (mPeopleId.equals(mPeopleId1) && "73".equals(mAck1) && mFlag.equals("true")) {
+                                                    //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                                    siveDao.del(mPeopleId);
+                                                    siveDao.add(mPeopleId, "73", "false");
+                                                } else if (mPeopleId != mPeopleId1) {
+                                                    siveDao.add(mPeopleId, "73", "true");
+                                                    //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                                    siveDao.del(mPeopleId);
+                                                    siveDao.add(mPeopleId, "73", "false");
+                                                }
+                                            }
+
+                                        } else if (siveDao == null) {
+                                            siveDao.add(mPeopleId, "73", "true");
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                            siveDao.del(mPeopleId);
+                                            siveDao.add(mPeopleId, "73", "false");
+                                        }
+                                        //PointActivity.sendHexString(cumulative.replaceAll("\\s*", ""), "232");
+                                        mCqncast.setName(mCumulative1);
+                                        sendDao.add(time, mCumulative1);
+                                        break;
+                                    case "75"://解锁
+                                        jiansu = true;
+                                        siveDao.del(mPeopleId);
+                                        siveDao.add(mPeopleId, "75", "false");
+                                        mCqncast.setName(mCumulative1);
+                                        sendDao.add(time, mCumulative1);
+                                        List<SuoData> suoData = siveDao.find();
+                                        int size = suoData.size();
+                                        for (int i = 0; i < size; i++) {
+                                            String peopleId = suoData.get(i).getPeopleId();
+                                            String ack1 = suoData.get(i).getAck();
+                                            String flag = suoData.get(i).getFlag();
+                                            if (mPeopleId.equals(peopleId) && "75".equals(ack1) && flag.equals("false")) {
+                                                //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                                siveDao.del(mPeopleId);
+                                                siveDao.add(mPeopleId, "75", "true");
+                                            }
+                                        }
+                                        //PointActivity.sendHexString(cumulative.replaceAll("\\s*", ""), "232");
+                                        break;
+                                    case "43"://推进
+                                        jiansu = true;
+                                        tc = true;
+                                        mControlLingChe.setName("49");
+                                        mControlStart.setName("false");
+                                        //THandle.sendEmptyMessageDelayed(1, 10000); // 十秒后发送消息
+                                        mSpUtil.setName(mInstructions);
+                                        mCqncast.setName(mCumulative1);
+                                        sendDao.add(time, mCumulative1);
+                                        //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        break;
+                                    case "21"://减速
+                                        if (jiansu == true) {
+                                            mControlLingChe.setName("00");
+                                            mControlStart.setName("false");
+                                            mSpUtil.setName(mInstructions);
+                                            mCqncast.setName(mCumulative1);
+                                            sendDao.add(time, mCumulative1);
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        }
+
+                                        break;
+                                    case "23"://三车
+                                        if (tc == true) {
+                                            jiansu = true;
+                                            mControlLingChe.setName("00");
+                                            mControlTuiJin.setName("23");
+                                            mControlStart.setName("false");
+                                            mSpUtil.setName(mInstructions);
+                                            mCqncast.setName(mCumulative1);
+                                            sendDao.add(time, mCumulative1);
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        }
+
+                                        break;
+                                    case "25"://五车
+                                        if (tc == true) {
+                                            jiansu = true;
+                                            mControlLingChe.setName("00");
+                                            mControlTuiJin.setName("25");
+                                            mControlStart.setName("false");
+                                            mSpUtil.setName(mInstructions);
+                                            mCqncast.setName(mCumulative1);
+                                            sendDao.add(time, mCumulative1);
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        }
+
+                                        break;
+                                    case "26"://一车
+                                        if (tc == true) {
+                                            jiansu = true;
+                                            mControlLingChe.setName("00");
+                                            mControlTuiJin.setName("26");
+                                            mControlStart.setName("false");
+                                            mSpUtil.setName(mInstructions);
+                                            mCqncast.setName(mCumulative1);
+                                            sendDao.add(time, mCumulative1);
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        }
+
+                                        break;
+                                    case "27"://十车
+
+                                        if (tc == true) {
+                                            jiansu = true;
+                                            mControlLingChe.setName("00");
+                                            mControlTuiJin.setName("27");
+                                            mControlStart.setName("false");
+                                            mSpUtil.setName(mInstructions);
+                                            mCqncast.setName(mCumulative1);
+                                            sendDao.add(time, mCumulative1);
+                                            //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        }
+
+                                        break;
+                                    case "45"://连接
+                                        tc = true;
+                                        jiansu = true;
+                                        mControlLingChe.setName("49");
+                                        mControlStart.setName("false");
+                                        mSpUtil.setName(mInstructions);
+                                        mCqncast.setName(mCumulative1);
+                                        sendDao.add(time, mCumulative1);
+                                        //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        break;
+                                    case "47"://溜放
+                                        tc = true;
+                                        jiansu = true;
+                                        mControlLingChe.setName("49");
+                                        mControlStart.setName("false");
+                                        mSpUtil.setName(mInstructions);
+                                        mCqncast.setName(mCumulative1);
+                                        sendDao.add(time, mCumulative1);
+                                        //PointActivity.sendHexString(reply.replaceAll("\\s*", ""), "232");
+                                        break;
+                                }
                             }
-                            switch (instructions) {
-                                case "73":
-                                    //sendMessage(mId, "9");
-                                    break;
-                                case "75":
-                                    //sendMessage(mId, "8");
-                                    break;
-                            }
-                            new PlayThread().run();
+
+                            //new PlayThread().run();
+                        } else if (str.equals("1111")) {
+                            sendMessage(mConversationId, mId + mPeopleId);
                         } else if (str.length() > 8 && str.substring(0, 4).matches("DD99")) {
                             input = str;
                             dateString = str.substring(14, 26);
@@ -336,28 +543,149 @@ public class DemoApplication extends MultiDexApplication implements TestService 
 
                             if (combineCommend.CRC_Test(str)) {
                                 //SendActivity.eml = str;
-                                sendMessage(SendActivity.diaohao, SendActivity.currnumber + "03");
+                                //sendMessage(SendActivity.diaohao, SendActivity.currnumber + "03");
                                 Intent in = new Intent("DNF");
                                 in.putExtra("name", str);
                                 sendBroadcast(in);
                             }
-                        } else if (str.equals("停车")) {
-                            mSpUtil.setNotice(str);
-                        } else if (str.equals("启动")) {
-                            mSpUtil.setNotice(str);
+                        } else if (str.indexOf("摘勾GPS") != -1) {//20-摘勾GPS-134345-463655
+                            String GPSlength = str.substring(str.indexOf("-") + 1, str.indexOf("-", str.indexOf("-") + 1));
+                            int length1 = GPSlength.length();
+                            String GPSTotal = str.substring(str.indexOf("摘勾GPS-", str.indexOf(",") + 1) + length1 + 1, str.length());
+                            String lat = GPSTotal.substring(0, GPSTotal.indexOf("-"));
+                            String lon = GPSTotal.substring(GPSTotal.indexOf("-") + 1, GPSTotal.length());
+                            mPickDao = new PickDao(getApplicationContext());
+                            mPickDao.add(lat, lon);
+                        } else if (str.indexOf("挂勾GPS") != -1) {
+                            String GPSlength = str.substring(str.indexOf("-") + 1, str.indexOf("-", str.indexOf("-") + 1));
+                            int length1 = GPSlength.length();
+                            String GPSTotal = str.substring(str.indexOf("挂勾GPS-", str.indexOf(",") + 1) + length1 + 1, str.length());
+                            String lat = GPSTotal.substring(0, GPSTotal.indexOf("-"));
+                            String lon = GPSTotal.substring(GPSTotal.indexOf("-") + 1, GPSTotal.length());
+                            mPickDao = new PickDao(getApplicationContext());
+                            mPickDao.add(lat, lon);
+                        } else if (str.indexOf("说话GPS") != -1) {
+                            //获取人员号
+                            String personNumber = str.substring(0, 2);
+                            String GPSlength = str.substring(str.indexOf("-") + 1, str.indexOf("-", str.indexOf("-") + 1));
+                            int length1 = GPSlength.length();
+                            String GPSTotal = str.substring(str.indexOf("说话GPS-", str.indexOf(",") + 1) + length1 + 1, str.length());
+                            String lat = GPSTotal.substring(0, GPSTotal.indexOf("-"));
+                            String lon = GPSTotal.substring(GPSTotal.indexOf("-") + 1, GPSTotal.length());
+                            //纬度
+                            String latitude = "36." + lat;
+                            //经度
+                            String longitude = "101." + lon;
+                            Log.i("111111",latitude);
+                            Log.i("111111",longitude);
+                            switch (personNumber) {
+                                case "20":
+                                    FiveDataDao fiveDataDao = new FiveDataDao(getApplicationContext());
+                                    fiveDataDao.add(latitude,longitude);
+                                    SpUtil people5 = new SpUtil(getApplicationContext(), "people5");
+                                    people5.setName("true");
+                                    break;
+                                case "01":
+                                    SixDataDao sixDataDao = new SixDataDao(getApplicationContext());
+                                    sixDataDao.add(latitude,longitude);
+                                    SpUtil people6 = new SpUtil(getApplicationContext(), "people6");
+                                    people6.setName("true");
+                                    break;
+                                case "02":
+                                    SevenDataDao sevenDataDao = new SevenDataDao(getApplicationContext());
+                                    sevenDataDao.add(latitude,longitude);
+                                    SpUtil people7 = new SpUtil(getApplicationContext(), "people7");
+                                    people7.setName("true");
+                                    break;
+                                case "03":
+                                    EightDataDao eightDataDao = new EightDataDao(getApplicationContext());
+                                    eightDataDao.add(latitude,longitude);
+                                    SpUtil people8 = new SpUtil(getApplicationContext(), "people8");
+                                    people8.setName("true");
+                                    break;
+                                case "04":
+                                    NineDataDao nineDataDao = new NineDataDao(getApplicationContext());
+                                    nineDataDao.add(latitude,longitude);
+                                    SpUtil people9 = new SpUtil(getApplicationContext(), "people9");
+                                    people9.setName("true");
+                                    break;
+                                case "05":
+                                    TenDataDao tenDataDao = new TenDataDao(getApplicationContext());
+                                    tenDataDao.add(latitude,longitude);
+                                    break;
+                                case "06":
+                                    ElevenDataDao elevenDataDao = new ElevenDataDao(getApplicationContext());
+                                    elevenDataDao.add(latitude,longitude);
+                                    break;
+                                case "07":
+                                    TwelveDataDao twelveDataDao = new TwelveDataDao(getApplicationContext());
+                                    twelveDataDao.add(latitude,longitude);
+                                    break;
+                                case "08":
+                                    ThirteenDataDao thirteenDataDao = new ThirteenDataDao(getApplicationContext());
+                                    thirteenDataDao.add(latitude,longitude);
+                                    break;
+                                case "09":
+                                    FourteenDataDao fourteenDataDao = new FourteenDataDao(getApplicationContext());
+                                    fourteenDataDao.add(latitude,longitude);
+                                    break;
+                            }
                         }
                     } else {
-                        if (str.equals("0") && str == "0") {
-                            siveDao.add(time, str);
-                            sendMessage(mId, "1");
-                            List<SiveData> siveData = siveDao.find();
-                            int size = siveData.size();
-                            String time1 = siveData.get(size - 1).getTime();
-
-                            THandle.removeMessages(1); // 移除这个消息队列(重新计时)
-                            THandle.sendEmptyMessageDelayed(1, 10000);// 十秒钟后重新发送消息
-                        } else {
-                            THandle.sendEmptyMessageDelayed(1, 10000); // 十秒后发送消息
+                        switch (str) {
+                            case "1":
+                                String name = mControlPeople.getName();
+                                switch (name) {
+                                    case "90":
+                                        if (name != null) {
+                                            String sum = getSum(name, "20");
+                                            //PointActivity.sendHexString(sum.replaceAll("\\s*", ""), "232");
+                                        }
+                                        break;
+                                /*case "60":
+                                    //sendMessage("01", "2");
+                                    String sum1 = getSum(name);
+                                    PointActivity.sendHexString(sum1.replaceAll("\\s*", ""), "232");
+                                    break;*/
+                                }
+                                break;
+                            case "3":
+                                String name1 = mControlZhidongyuan.getName();
+                                switch (name1) {
+                                /*case "90":
+                                    String sum = getSum(name1);
+                                    PointActivity.sendHexString(sum.replaceAll("\\s*", ""), "232");
+                                    break;*/
+                                    case "60":
+                                        //sendMessage("01", "2");
+                                        if (mControlZdy != null) {
+                                            mControlZdyName = mControlZdy.getName();
+                                        }
+                                        if (name1 != null && mPeopleId != null) {
+                                            String sum1 = getSum(name1, mControlZdyName);
+                                            //PointActivity.sendHexString(sum1.replaceAll("\\s*", ""), "232");
+                                        }
+                                        break;
+                                }
+                                break;
+                            case "7":
+                                String shunting = mControlshuntinghunting.getName();
+                                if (shunting != null) {
+                                    switch (shunting) {
+                                        case "unlock":
+                                            sendMessage(mConversationId, "9");
+                                            break;
+                                        case "lock":
+                                            sendMessage(mConversationId, "8");
+                                            break;
+                                        default:
+                                            sendMessage(mConversationId, "9");
+                                            break;
+                                    }
+                                } else {
+                                    sendMessage(mConversationId, "9");
+                                }
+                                break;
                         }
                     }
                 } catch (Exception e) {
@@ -368,17 +696,71 @@ public class DemoApplication extends MultiDexApplication implements TestService 
         TUIKit.addIMEventListener(imEventListener);
     }
 
+    public String getReply(String id, String peopleId, String instructions) {
+        String form = "A5" + id + peopleId + instructions + "01" + "01";
+        String data = form.replaceAll(" ", "");
+        int total = 0;
+        for (int i = 0; i < data.length(); i += 2) {
+            //strB.append("0x").append(strData.substring(i,i+2));  //0xC30x3C0x010x120x340x560x780xAA
+            total = total + Integer.parseInt(data.substring(i, i + 2), 16);
+        }
+        //noTotal为累加和取反加一
+        int noTotal = ~total + 1;
+        Log.i("total", String.valueOf(noTotal));
+        //负整数时，前面输入了多余的 FF ，没有去掉前面多余的 FF，按并双字节形式输出
+        //0xFF会像转换成0x000000FF后再进行位运算
+        String hex = Integer.toHexString(noTotal).toUpperCase();
+        Log.i("TAGhex", hex);
+        String key = hex.substring(hex.length() - 2);
+        Log.i("TAG校验码key", key);
+        Log.i("TAGhex", key);
+        //将求得的最后两位拼接到setup字符串后面
+        String cumulative = data + key;
+        Log.i("TAGhex", cumulative);
+        return cumulative;
+    }
+
+    public String getSum(String instructions, String people) {
+        String form = "A5" + mId + people + instructions + "01" + "FF";
+        String data = form.replaceAll(" ", "");
+        int total = 0;
+        for (int i = 0; i < data.length(); i += 2) {
+            //strB.append("0x").append(strData.substring(i,i+2));  //0xC30x3C0x010x120x340x560x780xAA
+            total = total + Integer.parseInt(data.substring(i, i + 2), 16);
+        }
+        //noTotal为累加和取反加一
+        int noTotal = ~total + 1;
+        Log.i("total", String.valueOf(noTotal));
+        //负整数时，前面输入了多余的 FF ，没有去掉前面多余的 FF，按并双字节形式输出
+        //0xFF会像转换成0x000000FF后再进行位运算
+        String hex = Integer.toHexString(noTotal).toUpperCase();
+        Log.i("TAGhex", hex);
+        String key = hex.substring(hex.length() - 2);
+        Log.i("TAG校验码key", key);
+        Log.i("TAGhex", key);
+        //将求得的最后两位拼接到setup字符串后面
+        String cumulative = data + key;
+        Log.i("setUp", data + "    00");
+        Log.i("cumulative1", cumulative + "    00");
+        //Log.i("parse", parse + "    00");
+        //Log.i("parseInt", parseInt + "    00");
+        Log.i("form", form + "    00");
+        return cumulative;
+    }
+
     @Override
     public void showToast(Context context) {
         Toast.makeText(instance.getBaseContext(), "wocao", Toast.LENGTH_SHORT);
         Log.e("wocao", "toast");
     }
 
+    private String xn = "xining";
+
     @Override
     public void sendMessage(String uid, String s) {
         TIMConversation conversation = TIMManager.getInstance().getConversation(
                 TIMConversationType.Group,    //会话类型：单聊
-                uid);                      //会话对方用户帐号//对方ID
+                xn + uid);                      //会话对方用户帐号//对方ID
 
         TIMMessage msg = new TIMMessage();
         //添加文本内容
@@ -696,4 +1078,35 @@ public class DemoApplication extends MultiDexApplication implements TestService 
         }
     }
 
+    //进群
+    private void JoinGroup(String id) {
+        TIMGroupManager.getInstance().applyJoinGroup(xn + id, "", new TIMCallBack() {
+            @Override
+            public void onError(int i, String s) {
+            }
+
+            @Override
+            public void onSuccess() {
+                Log.e("wocao", "wocao1");
+            }
+        });
+    }
+
+    //退群
+    private void QuitGroup(String id) {
+
+        TIMGroupManager.getInstance().quitGroup(xn + id, new TIMCallBack() {
+            @Override
+            public void onError(int i, String s) {
+                Log.e("swy", "----------------------not quit--------------------");
+                //System.out.println("----------------------not quit--------------------");
+            }
+
+            @Override
+            public void onSuccess() {
+                Log.e("swy", "----------------------quit--------------------");
+                //System.out.println("----------------------quit--------------------");
+            }
+        });
+    }
 }

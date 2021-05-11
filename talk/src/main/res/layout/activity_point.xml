@@ -6,15 +6,142 @@
     android:layout_height="match_parent"
     tools:context=".qgs.PointActivity">
 
-    <com.kylindev.totalk.qgs.CustomMap
+    <!--<RelativeLayout
+        android:id="@+id/relative_map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">-->
+    <com.kylindev.totalk.qgs.custom.ChangFengMap
+        android:id="@+id/changfengmap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <com.kylindev.totalk.qgs.custom.BaiLiMap
+        android:id="@+id/bailimap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <com.kylindev.totalk.qgs.custom.XiNingBeiMap
+        android:id="@+id/xiningbeimap"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.kylindev.totalk.qgs.park.one.OneParkCar
+        android:id="@+id/oneparkcar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <com.kylindev.totalk.qgs.DrawTop
         android:id="@+id/drawtop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.kylindev.totalk.qgs.people.TransferPeople
+        android:id="@+id/transferpeople"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.kylindev.totalk.qgs.people.TransferPeopleOne
+        android:id="@+id/peopleone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.kylindev.totalk.qgs.people.TransferPeopleTwo
+        android:id="@+id/peopletwo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.kylindev.totalk.qgs.people.TransferPeopleThree
+        android:id="@+id/peoplethree"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.kylindev.totalk.qgs.people.TransferPeopleFour
+        android:id="@+id/peoplefour"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
         android:id="@+id/point_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/taotao_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:text="弯道" />
+
+    <Button
+        android:id="@+id/taotao_btn1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/taotao_btn"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:text="直线"
+        android:visibility="gone" />
+    <Button
+        android:id="@+id/delete_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="删除" />
+
+    <TextView
+        android:id="@+id/juli"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="距离"
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/lat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/juli"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="距离"
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/lat1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lat"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="距离"
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/lat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lat1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="距离"
+        android:textSize="25sp"
+        android:visibility="gone" />
+    <!--</RelativeLayout>-->
+    <!--<com.kylindev.totalk.qgs.CustomMap
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+    <!--<com.kylindev.totalk.bjxt.custom.XiNingMap
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
 </RelativeLayout>

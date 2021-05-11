@@ -33,6 +33,7 @@ import com.kylindev.pttlib.service.InterpttService.LocalBinder;
 import com.kylindev.pttlib.utils.ServerProto.Reject.RejectType;
 
 import com.kylindev.totalk.R;
+import com.kylindev.totalk.bjxt.SpUtil;
 import com.kylindev.totalk.qgs.PointActivity;
 import com.kylindev.totalk.utils.AppCommonUtil;
 import com.kylindev.totalk.utils.AppSettings;
@@ -168,7 +169,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Vie
 //		uid=getIntent().getStringExtra("account");
 		login2(getIntent().getStringExtra("account"),"123456");
 
-		startActivity(new Intent(LoginActivity.this, PointActivity.class));
+		//startActivity(new Intent(LoginActivity.this, PointActivity.class));
+
+		SpUtil firstInto = new SpUtil(getApplicationContext(), "firstinto");
+		firstInto.setName("false");
 	}
 
 
@@ -497,7 +501,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Vie
 	};
 
 	private void jumpToChannel() {
-		Intent i = new Intent(LoginActivity.this, ChannelActivity.class);
+		//Intent i = new Intent(LoginActivity.this, ChannelActivity.class);
+		Intent i = new Intent(LoginActivity.this, PointActivity.class);
 		startActivity(i);
 		autoFinish = true;
 

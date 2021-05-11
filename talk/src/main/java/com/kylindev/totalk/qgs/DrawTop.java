@@ -17,8 +17,6 @@ import com.kylindev.totalk.R;
 public class DrawTop extends View {
 
     private Paint mPaint;
-    private Bitmap mBitmap;
-    private Canvas mCanvas1;
     //private GPSPointF gpsPoint = new GPSPointF(5,80);
     private Bitmap mBitmap1;
 
@@ -40,10 +38,6 @@ public class DrawTop extends View {
         super.onDraw(canvas);
         //创建一个画笔
         mPaint = new Paint(Paint.DITHER_FLAG);
-        //设置位图的宽高
-        mBitmap = Bitmap.createBitmap(1280, 800, Bitmap.Config.RGB_565);
-        //绘制内容保存到Bitmap
-        mCanvas1 = new Canvas(mBitmap);
         //设置非填充
         mPaint.setStyle(Paint.Style.STROKE);
         //笔宽5像素
@@ -58,7 +52,7 @@ public class DrawTop extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         //设置画笔为圆形样式
         //mPaint.setStrokeCap(Paint.Cap.ROUND);
-        canvas.drawBitmap(mBitmap1, 0,0, null);
+        canvas.drawBitmap(mBitmap1, 0,0, mPaint);
         //drawGps(canvas,getGpsPoint(),mPaint);
     }
 }

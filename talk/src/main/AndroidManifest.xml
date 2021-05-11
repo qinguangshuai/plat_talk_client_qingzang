@@ -38,9 +38,10 @@
         android:persistent="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:windowSoftInputMode="stateAlwaysHidden">
-        <activity android:name=".qgs.PointActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".qgs.PointActivity"
+            android:configChanges="screenSize|orientation"
+            android:screenOrientation="landscape"/>
         <activity
             android:name=".app.XNBMapActivity"
             android:configChanges="orientation|keyboardHidden"

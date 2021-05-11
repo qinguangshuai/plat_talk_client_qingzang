@@ -25,7 +25,7 @@ public class SendOpenHelper extends SQLiteOpenHelper {
 
         System.out.println("oncreate");
         //创建一个教info的表里面的字段有 id(android官方建议前面加下划线_) integer类型 主键  自动增长
-        db.execSQL("create table send(_id integer primary key autoincrement,time varchar(60),name varchar(60))");
+        db.execSQL("create table send(id integer primary key autoincrement,time varchar(60),name varchar(60))");
 
     }
 

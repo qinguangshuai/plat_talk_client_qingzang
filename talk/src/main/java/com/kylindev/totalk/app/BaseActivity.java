@@ -56,7 +56,9 @@ import com.kylindev.totalk.IO.GPIO;
 import com.kylindev.totalk.R;
 import com.kylindev.totalk.bjxt.SpUtil;
 import com.kylindev.totalk.chat.RecyclerViewChatActivity;
+import com.kylindev.totalk.qgs.GPSDao;
 import com.kylindev.totalk.qgs.PointActivity;
+import com.kylindev.totalk.qgs.database.six.SixDataDao;
 import com.kylindev.totalk.utils.AppCommonUtil;
 import com.kylindev.totalk.utils.AppSettings;
 
@@ -65,7 +67,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,13 +82,14 @@ import static com.kylindev.pttlib.service.InterpttService.ConnState;
 import static com.kylindev.pttlib.service.InterpttService.ConnState.CONNECTION_STATE_CONNECTED;
 import static com.kylindev.pttlib.service.InterpttService.ConnState.CONNECTION_STATE_CONNECTING;
 import static com.kylindev.pttlib.service.InterpttService.ConnState.CONNECTION_STATE_SYNCHRONIZING;
+import static com.kylindev.totalk.app.SerialPortActivity.sendHexString;
 
 public abstract class BaseActivity extends Activity implements OnClickListener {
 
     /**
      * The InterpttService instance that drives this activity's data.
      */
-    protected InterpttService mService;
+    public static InterpttService mService;
     // Create dialog
     //private ProgressDialog mConnectDialog = null;
     protected Intent mServiceIntent = null;
@@ -124,6 +129,12 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
     private static boolean actived = false;
     private boolean next = false;
     private static boolean bug = true;
+    private SpUtil mFirstInto;
+    //控制
+    String gpioValue = "";
+    FileReader fileReader;
+    BufferedReader reader;
+    private IOReadThread ioReadThread;
     /*private String mEncodeHexStr;
     private String mData;*/
 
@@ -391,9 +402,11 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 
         getPermissions();
 
-        /*GPIO.gpio_crtl_in(132, 1);
+        //mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
+
+        //GPIO.gpio_crtl_in(132, 1);
         ioReadThread = new IOReadThread();//监听pe2io口
-        ioReadThread.start();*/
+        ioReadThread.start();
     }
 
     public void setIsMap(boolean isMapOrNo) {
@@ -475,6 +488,9 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
         }
 
         super.onDestroy();
+
+        //mFirstInto.setName("false");
+        //mFirstInto.setName("false");
     }
 
     @Override
@@ -614,14 +630,14 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
                     mSp.setName("true");*/
                     //String dat = "A5 01 0C 21 01 00 2C";
                     String dat = "AA 55 01";
-                    PointActivity.sendHexString(dat.replaceAll("\\s*", ""), "485");
+                    sendHexString(dat.replaceAll("\\s*", ""), "485");
                     Log.i("PTT_ON", "AA 55 01" + "  有载波" + talk);
                     next = true;
                 } else if (!talk && next) {
                     /*mSp = new SpUtil(getApplication(),"itcast");
                     mSp.setName("false");*/
                     String date = "AA 55 02";
-                    PointActivity.sendHexString(date.replaceAll("\\s*", ""), "485");
+                    sendHexString(date.replaceAll("\\s*", ""), "485");
                     Log.i("PTT_OFF", "AA 55 02" + "  无载波" + talk);
                     next = false;
                 }
@@ -1057,12 +1073,6 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
         builder.setPositiveButton(R.string.ok, null);
         builder.show();
     }
-
-    //控制
-    String gpioValue = "";
-    FileReader fileReader;
-    BufferedReader reader;
-    private IOReadThread ioReadThread;
 
     //pe5//检测sql口
     private class IOReadThread extends Thread {
