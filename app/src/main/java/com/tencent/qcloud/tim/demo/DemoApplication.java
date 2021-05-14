@@ -584,30 +584,40 @@ public class DemoApplication extends MultiDexApplication implements TestService 
                                     fiveDataDao.add(latitude,longitude);
                                     SpUtil people5 = new SpUtil(getApplicationContext(), "people5");
                                     people5.setName("true");
+                                    people5.setLat(latitude);
+                                    people5.setLon(longitude);
                                     break;
                                 case "01":
                                     SixDataDao sixDataDao = new SixDataDao(getApplicationContext());
                                     sixDataDao.add(latitude,longitude);
                                     SpUtil people6 = new SpUtil(getApplicationContext(), "people6");
                                     people6.setName("true");
+                                    people6.setLat(latitude);
+                                    people6.setLon(longitude);
                                     break;
                                 case "02":
                                     SevenDataDao sevenDataDao = new SevenDataDao(getApplicationContext());
                                     sevenDataDao.add(latitude,longitude);
                                     SpUtil people7 = new SpUtil(getApplicationContext(), "people7");
                                     people7.setName("true");
+                                    people7.setLat(latitude);
+                                    people7.setLon(longitude);
                                     break;
                                 case "03":
                                     EightDataDao eightDataDao = new EightDataDao(getApplicationContext());
                                     eightDataDao.add(latitude,longitude);
                                     SpUtil people8 = new SpUtil(getApplicationContext(), "people8");
                                     people8.setName("true");
+                                    people8.setLat(latitude);
+                                    people8.setLon(longitude);
                                     break;
                                 case "04":
                                     NineDataDao nineDataDao = new NineDataDao(getApplicationContext());
                                     nineDataDao.add(latitude,longitude);
                                     SpUtil people9 = new SpUtil(getApplicationContext(), "people9");
                                     people9.setName("true");
+                                    people9.setLat(latitude);
+                                    people9.setLon(longitude);
                                     break;
                                 case "05":
                                     TenDataDao tenDataDao = new TenDataDao(getApplicationContext());

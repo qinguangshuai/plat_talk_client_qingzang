@@ -61,14 +61,16 @@ public class OneParkCar extends View {
 
         //1道停留车左点
         SpUtil mOnePickLeft = new SpUtil(getContext(), "onepickleft");
-        String nameLeft = mOnePickLeft.getName();
+        String nameLeft = mOnePickLeft.getPosition();
         //1道停留车右点
         SpUtil mOnepickrightight = new SpUtil(getContext(), "onepickright");
-        String nameRight = mOnepickrightight.getName();
+        String nameRight = mOnepickrightight.getPosition();
         if (nameLeft != null && nameRight != null){
-            Float left = Float.valueOf(nameLeft);
-            Float right = Float.valueOf(nameRight);
-            canvas.drawLine((384 + (left - 5) * 2.88f), 500, (384 + (right - 5) * 2.88f), 500, mPaint);
+            if (!nameLeft.equals("0") && !nameRight.equals("0")){
+                Float left = Float.valueOf(nameLeft);
+                Float right = Float.valueOf(nameRight);
+                canvas.drawLine((384 + (left - 5) * 2.88f), 500, (384 + (right - 5) * 2.88f), 500, mPaint);
+            }
         }
     }
 }

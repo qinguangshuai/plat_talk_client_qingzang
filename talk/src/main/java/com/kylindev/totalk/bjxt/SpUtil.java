@@ -180,6 +180,42 @@ public class SpUtil {
         editor.commit();
     }
 
+    public String getTrack() {
+        return sp.getString("track", "");
+    }
+
+    public void setTrack(String track) {
+        editor.putString("track", track);
+        editor.commit();
+    }
+
+    public String getPosition() {
+        return sp.getString("position", "");
+    }
+
+    public void setPosition(String position) {
+        editor.putString("position", position);
+        editor.commit();
+    }
+
+    public String getLon() {
+        return sp.getString("lon", "");
+    }
+
+    public void setLon(String lon) {
+        editor.putString("lon", lon);
+        editor.commit();
+    }
+
+    public String getLat() {
+        return sp.getString("lat", "");
+    }
+
+    public void setLat(String lat) {
+        editor.putString("lat", lat);
+        editor.commit();
+    }
+
     // 用户的邮箱
     public String getEmail() {
         return sp.getString("email", "");
