@@ -60,16 +60,25 @@ public class FourParkCar extends View {
         int width = canvas.getWidth();
 
         //1道停留车左点
-        SpUtil mOnePickLeft = new SpUtil(getContext(), "onepickleft");
-        String nameLeft = mOnePickLeft.getPosition();
+        SpUtil mFourPickLeft = new SpUtil(getContext(), "fourpickleft");
+        String nameLeft = mFourPickLeft.getPosition();
         //1道停留车右点
-        SpUtil mOnepickrightight = new SpUtil(getContext(), "onepickright");
-        String nameRight = mOnepickrightight.getPosition();
+        SpUtil mFourpickrightight = new SpUtil(getContext(), "fourpickright");
+        String nameRight = mFourpickrightight.getPosition();
         if (nameLeft != null && nameRight != null){
             if (!nameLeft.equals("0") && !nameRight.equals("0")){
                 Float left = Float.valueOf(nameLeft);
                 Float right = Float.valueOf(nameRight);
-                canvas.drawLine((384 + (left - 5) * 2.88f), 500, (384 + (right - 5) * 2.88f), 500, mPaint);
+
+                if (left < 6 && right > 94) {
+                    canvas.drawLine((320 + (6 - 6) * 4.36f), 350, (320 + (94 - 6) * 4.36f), 350, mPaint);
+                }else if (left < 6 && right <= 94) {
+                    canvas.drawLine((320 + (6 - 6) * 4.36f), 350, (320 + (right - 6) * 4.36f), 350, mPaint);
+                }else if (left >= 6 && right > 94){
+                    canvas.drawLine((320 + (left - 6) * 4.36f), 350, (320 + (94 - 6) * 4.36f), 350, mPaint);
+                }else {
+                    canvas.drawLine((320 + (left - 6) * 4.36f), 350, (320 + (right - 6) * 4.36f), 350, mPaint);
+                }
             }
         }
     }

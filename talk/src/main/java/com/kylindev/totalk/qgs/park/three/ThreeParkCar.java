@@ -60,16 +60,16 @@ public class ThreeParkCar extends View {
         int width = canvas.getWidth();
 
         //1道停留车左点
-        SpUtil mOnePickLeft = new SpUtil(getContext(), "onepickleft");
-        String nameLeft = mOnePickLeft.getPosition();
+        SpUtil mThreePickLeft = new SpUtil(getContext(), "threepickleft");
+        String nameLeft = mThreePickLeft.getPosition();
         //1道停留车右点
-        SpUtil mOnepickrightight = new SpUtil(getContext(), "onepickright");
-        String nameRight = mOnepickrightight.getPosition();
+        SpUtil mThreepickrightight = new SpUtil(getContext(), "threepickright");
+        String nameRight = mThreepickrightight.getPosition();
         if (nameLeft != null && nameRight != null){
             if (!nameLeft.equals("0") && !nameRight.equals("0")){
                 Float left = Float.valueOf(nameLeft);
                 Float right = Float.valueOf(nameRight);
-                canvas.drawLine((384 + (left - 5) * 2.88f), 500, (384 + (right - 5) * 2.88f), 500, mPaint);
+                canvas.drawLine((128 + left * 8.46f), 400, (128 + right * 8.46f), 400, mPaint);
             }
         }
     }
