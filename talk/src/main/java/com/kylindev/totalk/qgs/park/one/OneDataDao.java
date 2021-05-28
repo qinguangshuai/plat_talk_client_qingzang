@@ -5,8 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.kylindev.totalk.qgs.database.DataOpenHelper;
-import com.kylindev.totalk.qgs.database.DataUser;
+import com.kylindev.totalk.qgs.park.DataUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +16,16 @@ import java.util.List;
  */
 public class OneDataDao {
 
-    private OneDataOpenHelper helper;
+    private OneParkOpenHelper helper;
 
     public OneDataDao(Context context) {
-        helper = new OneDataOpenHelper(context);
+        helper = new OneParkOpenHelper(context);
     }
 
     /**
      * 数据库的增加方法
      */
-    public boolean add(String gd,String lat, String lon,String ratioOfGpsPointCar) {
+    public boolean add(String gd, String lat, String lon, String ratioOfGpsPointCar) {
         SQLiteDatabase db = helper.getWritableDatabase();
 //		db.execSQL("insert into info(name,phone) values(?,?)", new Object[]{NULL,phone});
 
@@ -55,7 +54,7 @@ public class OneDataDao {
     /**
      * 数据库的删除方法
      */
-    public int del(String name){
+    public int del(String name) {
         SQLiteDatabase db = helper.getReadableDatabase();
 //		db.execSQL("delete from info where name=?", new Object[]{name});
 
@@ -64,7 +63,7 @@ public class OneDataDao {
          * whereClause  删除条件
          */
         //代表 影响了多少行
-        int delete = db.delete(name, null,null);
+        int delete = db.delete(name, null, null);
         db.close();
         return delete;
     }
@@ -72,8 +71,8 @@ public class OneDataDao {
     /**
      * 数据库的查询方法
      */
-    public List<OneDataUser> find() {
-        List<OneDataUser> personLists = new ArrayList<OneDataUser>();
+    public List<DataUser> find() {
+        List<DataUser> personLists = new ArrayList<DataUser>();
         SQLiteDatabase db = helper.getWritableDatabase();
 //		Cursor cursor = db.rawQuery("select * from info", null);
 
@@ -95,7 +94,7 @@ public class OneDataDao {
                 String lat = cursor.getString(2);   //获取我们的phone
                 String lon = cursor.getString(3);    //获取我们的name值
                 String ratioOfGpsPointCar = cursor.getString(4);    //获取我们的name值
-                OneDataUser dataUser = new OneDataUser();
+                DataUser dataUser = new DataUser();
 
                 System.out.println("time--" + lat + "signalling--" + lon);
                 dataUser.setId(anInt);

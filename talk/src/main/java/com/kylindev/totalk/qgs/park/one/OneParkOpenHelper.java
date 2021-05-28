@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.five;
+package com.kylindev.totalk.qgs.park.one;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,15 +7,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * dmr  232数据保存
  * */
-public class FiveDataOpenHelper extends SQLiteOpenHelper {
+public class OneParkOpenHelper extends SQLiteOpenHelper {
 
-    public FiveDataOpenHelper(Context context) {
+    public OneParkOpenHelper(Context context) {
         /**
          * name 数据库的名字
          * factory 游标工厂  目的创建 cursor(结果集)
          * version 版本    版本从1开始  版本必须>=1
          */
-        super(context, "fiveparkcar_gps.db", null, 1);
+        super(context, "oneparkcar_gps.db", null, 1);
     }
 
     /**
@@ -28,7 +28,7 @@ public class FiveDataOpenHelper extends SQLiteOpenHelper {
 
         System.out.println("oncreate");
         //创建一个教info的表里面的字段有 id(android官方建议前面加下划线_) integer类型 主键  自动增长
-        db.execSQL("create table fiveparkcar(id integer primary key autoincrement,gd varchar(60),lat varchar(60),lon varchar(60),ratioOfGpsPointCar varchar(60))");
+        db.execSQL("create table oneparkcar(id integer primary key autoincrement,gd varchar(60),lat varchar(60),lon varchar(60),ratioOfGpsPointCar varchar(60))");
 
     }
 

@@ -47,6 +47,14 @@
         android:id="@+id/fiveparkcar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <com.kylindev.totalk.qgs.park.eight.EightParkCar
+        android:id="@+id/eightparkcar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <com.kylindev.totalk.qgs.park.ten.TenParkCar
+        android:id="@+id/tenparkcar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <com.kylindev.totalk.qgs.DrawTop
         android:id="@+id/drawtop"

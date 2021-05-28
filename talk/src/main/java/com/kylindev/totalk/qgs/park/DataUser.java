@@ -9,17 +9,27 @@ public class DataUser {
     private String lat;
     private String lon;
     private String ratioOfGpsPointCar;
+    private String num;
 
     public DataUser() {
         super();
     }
 
-    public DataUser(int id, String gd, String lat, String lon, String ratioOfGpsPointCar) {
+    public DataUser(int id, String gd, String lat, String lon, String ratioOfGpsPointCar,String num) {
         this.id = id;
         this.gd = gd;
         this.lat = lat;
         this.lon = lon;
         this.ratioOfGpsPointCar = ratioOfGpsPointCar;
+        this.num = num;
+    }
+
+    public String getNum() {
+        return num;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
     }
 
     public String getGd() {

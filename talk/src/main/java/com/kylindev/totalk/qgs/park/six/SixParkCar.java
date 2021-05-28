@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.five;
+package com.kylindev.totalk.qgs.park.six;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,22 +14,22 @@ import com.kylindev.totalk.bjxt.SpUtil;
  * @date 2020/8/10 16:33
  * 1道停留车
  */
-public class FiveParkCar extends View {
+public class SixParkCar extends View {
 
     private Paint mPaint;
     private Bitmap mBitmap;
     private Canvas mCanvas1;
     private Bitmap mBitmap1;
 
-    public FiveParkCar(Context context) {
+    public SixParkCar(Context context) {
         this(context, null);
     }
 
-    public FiveParkCar(Context context, AttributeSet attrs) {
+    public SixParkCar(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FiveParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SixParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -59,7 +59,7 @@ public class FiveParkCar extends View {
         int height = canvas.getHeight();
         int width = canvas.getWidth();
 
-        //1道停留车左点
+        /*//1道停留车左点
         SpUtil mFivePickLeft = new SpUtil(getContext(), "fivepickleft");
         String nameLeft = mFivePickLeft.getPosition();
         //1道停留车右点
@@ -79,6 +79,6 @@ public class FiveParkCar extends View {
                     canvas.drawLine((384 + (left - 6) * 2.94f), 300, (384 + (right - 6) * 2.94f), 300, mPaint);
                 }
             }
-        }
+        }*/
     }
 }

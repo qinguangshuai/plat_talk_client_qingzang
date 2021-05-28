@@ -35,6 +35,8 @@ import com.kylindev.totalk.qgs.database.hang.HangDao;
 import com.kylindev.totalk.qgs.database.nine.NineDataDao;
 import com.kylindev.totalk.qgs.database.seven.SevenDataDao;
 import com.kylindev.totalk.qgs.database.six.SixDataDao;
+import com.kylindev.totalk.qgs.park.eight.EightParkCar;
+import com.kylindev.totalk.qgs.park.eight.EightParkDataDao;
 import com.kylindev.totalk.qgs.park.five.FiveParkCar;
 import com.kylindev.totalk.qgs.park.five.FiveParkDataDao;
 import com.kylindev.totalk.qgs.park.four.FourDataDao;
@@ -42,6 +44,9 @@ import com.kylindev.totalk.qgs.park.four.FourParkCar;
 import com.kylindev.totalk.qgs.park.one.OneDataDao;
 import com.kylindev.totalk.qgs.park.one.OneDataUser;
 import com.kylindev.totalk.qgs.park.one.OneParkCar;
+import com.kylindev.totalk.qgs.park.six.SixParkDataDao;
+import com.kylindev.totalk.qgs.park.ten.TenParkCar;
+import com.kylindev.totalk.qgs.park.ten.TenParkDataDao;
 import com.kylindev.totalk.qgs.park.three.ThreeDataDao;
 import com.kylindev.totalk.qgs.park.three.ThreeParkCar;
 import com.kylindev.totalk.qgs.park.two.TwoDataDao;
@@ -69,6 +74,7 @@ import util.HexUtil;
 
 public class PointActivity extends SerialPortActivity {
 
+    private List<Integer> mListNum = new ArrayList<>();
     private DrawTop mTrain;
     private String mData;
     @Autowired(name = RouterURLS.BASE_MAIN)
@@ -87,36 +93,16 @@ public class PointActivity extends SerialPortActivity {
     private boolean wu = false;
     private boolean san = false;
     private boolean yi = false;
-    private String mName;
-    private String mFace;
-    private String mId;
-    private String mCumulative;
-    private String mTotal;
-    private TextView mJuli;
-    private TextView mJwd;
-    private String mTotal1;
+    private String mName, mFace, mId, mCumulative, mTotal, mTotal1, mHead, mEnd, mName1, jieAll, mId1, mSubstring;
+    private TextView mJuli, mJwd, mLat1, mLat2;
     private List<GPSUser> mGpsUsers;
-    private String mHead;
-    private String mEnd;
-    private SpUtil mInstructions;
-    private SpUtil mCqncast;
-    private SpUtil mControlCar;
-    private String mName1;
+    private SpUtil mInstructions, mCqncast, mControlCar, mControlshuntinghunting, mControlTuiJin, mCon;
     private SiveDao mSiveDao;
-    private String jieAll;
-    private String mId1;
-    private SpUtil mControlshuntinghunting;
-    private String mSubstring;
-    private SpUtil mControlTuiJin;
-    private SpUtil mCon;
     private TestService mAppService;
     private SQLiteDatabase mMDatabase;
     private WanAsynTask mWanAsynTask;
     private double mDistance;
-    private Double mLat3;
-    private Double mLon3;
     private String mConversationId = "01";
-    private TextView mLat1, mLat2;
     private boolean qiehuan = false;
     //private boolean firstInto = false;
     HashMap<Integer, ArrayList<Point3d>> gps = new HashMap<>();
@@ -151,26 +137,23 @@ public class PointActivity extends SerialPortActivity {
     //人员横向减
     int transverse1 = 15;
     private SpUtil mFirstInto;
-    private String mRatioOfGpsTrack, mRatioOfGpsTrack2, mRatioOfGpsTrack3, mRatioOfGpsTrack4, mRatioOfGpsTrack5;
-    private Double mGpsPistance, mGpsPistance2, mGpsPistance3, mGpsPistance4, mGpsPistance5;
+    private String mReceiveHead, mRatioOfGpsTrack, mRatioOfGpsTrack2, mRatioOfGpsTrack3, mRatioOfGpsTrack4, mRatioOfGpsTrack5, mRatioOfGpsTrackCar, mTime1;
+    private Double mLat3, mLon3, mGpsPistance, mGpsPistance2, mGpsPistance3, mGpsPistance4, mGpsPistance5, mLatLeadCar20, mLonLeadCar20, mGpsPistanceCar;
     private TransferPeople mTransferpeople;
     private TransferPeopleOne mPeopleOne;
     private SpUtil mPeople5, mPeople6, mPeople7, mPeople8, mPeople9;
-    private SpUtil mMap1, mMap2, mMap3;
-    private SpUtil mDataTransmission;
-    private String mReceiveHead;
+    private SpUtil mMap1, mMap2, mMap3, mDataTransmission;
     private SpUtil mReceive1, mReceive2, mReceive3, qgs;
-    private String mRatioOfGpsTrackCar;
     private double mGetRatioOfGpsPointCar;
-    private Double mGpsPistanceCar;
     private TransferPeopleTwo mPeopletwo;
     private TransferPeopleThree mPeoplethree;
     private TransferPeopleFour mPeoplefour;
-    private SpUtil mAdvancedmr;
-    private SpUtil mOnePickLeft, mTwoPickLeft, mThreePickLeft, mFourPickLeft, mFivePickLeft;
-    private SpUtil mOnepickrightight, mTwopickrightight, mThreepickright, mFourpickright, mFivepickright;
-    private Double mLatLeadCar20;
-    private Double mLonLeadCar20;
+    private SpUtil mAdvancedmr, mOnePickLeft, mTwoPickLeft, mThreePickLeft, mFourPickLeft, mFivePickLeft, mSixPickLeft, mSevenPickLeft, mEightPickLeft;
+    private SpUtil mTenPickLeft, mElevenpickleft, mTwelvePickLeft, mThirteenPickLeft, mFourteenPickLeft;
+    private SpUtil mFifteenPickLeft, mSixteenPickLeft, mSeventeenPickLeft, mEighteennPickLeft, mNineteenPickLeft;
+    private SpUtil mOnepickright, mTwopickright, mThreepickright, mFourpickright, mFivepickright, mSixpickright, mSevenpickright, mEightpickright;
+    private SpUtil mTenpickright, mElevenpickright, mTwelvepickright, mThirteenpickright, mFourteenpickright;
+    private SpUtil mFifteenPickRight, mSixteenPickRight, mSeventeenPickRight, mEighteenPickRight, mNineteenPickRight;
     private XiNingBeiMap mXiningbeimap;
     private ChangFengMap mChangfengmap;
     private BaiLiMap mBailimap;
@@ -180,55 +163,27 @@ public class PointActivity extends SerialPortActivity {
     private SevenDataDao mSevenDataDao;
     private EightDataDao mEightDataDao;
     private NineDataDao mNineDataDao;
-    private String mTime1;
-    private SpUtil mLeftCar;
-    private SpUtil mRightCar;
+    private SpUtil mLeftCar, mRightCar, mLeadcar, mStopcar, mCarLocation, mMain;
     private int mGetGudaoOfGpsPoint;
-    private SpUtil mLeadcar;
-    private SpUtil mStopcar;
-    private String mStopcar1;
-    private String mLeadcar1;
-    private SpUtil mCarLocation;
-    private SpUtil mMain;
-    private String mLat21;
-    private String mLon21;
-    private Double mLatStopCar01;
-    private Double mLonStopCar01;
+    private String mStopcar1, mLeadcar1, mRatioOfGpsTrackCar2;
+    private String mLat21, mLon21, mLat31, mLon31, mLat4, mLon4, mLat5, mLon5, mTrackCar, mLatCar, mLonCar, mPositionCar;
+    private Double mLatStopCar01, mLonStopCar01, mLatStopCar02, mLonStopCar02, mLatStopCar03, mLonStopCar03, mLatStopCar04, mLonStopCar04, mPositionCar1;
     private int mGetGudaoOfGpsPoint2;
-    private String mRatioOfGpsTrackCar2;
-    private double mGetRatioOfGpsPointCar2;
+    private double mGetRatioOfGpsPointCar2, mGetRatioOfGpsPointCar3;
     private OneParkCar mOneparkcar;
     private TwoParkCar mTwoparkcar;
     private ThreeParkCar mThreeparkcar;
     private FourParkCar mFourparkcar;
     private FiveParkCar mFiveparkcar;
-    private SpUtil mControlOnePick, mControlTwoPick, mControlThreePick, mControlFourPick, mControlFivePick;
-    private String mLat31;
-    private String mLon31;
-    private Double mLatStopCar02;
-    private Double mLonStopCar02;
-    private int mGetGudaoOfGpsPoint3;
-    private String mRatioOfGpsTrackCar3;
-    private double mGetRatioOfGpsPointCar3;
-    private String mLat4;
-    private String mLon4;
-    private Double mLatStopCar03;
-    private Double mLonStopCar03;
-    private int mGetGudaoOfGpsPoint4;
-    private String mRatioOfGpsTrackCar4;
-    private double mGetRatioOfGpsPointCar4;
-    private String mLat5;
-    private String mLon5;
-    private Double mLatStopCar04;
-    private Double mLonStopCar04;
-    private int mGetGudaoOfGpsPoint5;
-    private String mRatioOfGpsTrackCar5;
-    private double mGetRatioOfGpsPointCar5;
-    private String mTrackCar;
-    private String mLatCar;
-    private String mLonCar;
-    private String mPositionCar;
-    private Double mPositionCar1;
+    private EightParkCar mEightparkcar;
+    private TenParkCar mTenparkcar;
+    private SpUtil mControlOnePick, mControlTwoPick, mControlThreePick, mControlFourPick, mControlFivePick, mControlSixPick, mControlSevenPick, mControlEightPick;
+    private SpUtil mControlTenPick, mControlElevenPick, mControlTwelvePick, mControlThirteenPick, mControlFourteenPick;
+    private SpUtil mControlFifteenPick, mControlSixteenPick, mControlSeventeenPick, mControlEighteenPick, mControlNineteenPick;
+    private int mGetGudaoOfGpsPoint3, mGetGudaoOfGpsPoint4, mGetGudaoOfGpsPoint5;
+    private String mRatioOfGpsTrackCar3, mRatioOfGpsTrackCar4, mRatioOfGpsTrackCar5;
+    private double mGetRatioOfGpsPointCar4, mGetRatioOfGpsPointCar5;
+    private SixParkDataDao mSixParkDataDao;
 
     void sendMessage(String uid, String s) {
 
@@ -274,6 +229,8 @@ public class PointActivity extends SerialPortActivity {
                             mThreeparkcar.setVisibility(View.VISIBLE);
                             mFourparkcar.setVisibility(View.VISIBLE);
                             mFiveparkcar.setVisibility(View.VISIBLE);
+                            mEightparkcar.setVisibility(View.VISIBLE);
+                            mTenparkcar.setVisibility(View.GONE);
                         }
                         if (name2.equals("visible")) {
                             mChangfengmap.setVisibility(View.VISIBLE);
@@ -285,6 +242,8 @@ public class PointActivity extends SerialPortActivity {
                             mThreeparkcar.setVisibility(View.GONE);
                             mFourparkcar.setVisibility(View.GONE);
                             mFiveparkcar.setVisibility(View.GONE);
+                            mEightparkcar.setVisibility(View.GONE);
+                            mTenparkcar.setVisibility(View.VISIBLE);
                         }
                         if (name3.equals("visible")) {
                             mBailimap.setVisibility(View.VISIBLE);
@@ -296,7 +255,8 @@ public class PointActivity extends SerialPortActivity {
                             mThreeparkcar.setVisibility(View.GONE);
                             mFourparkcar.setVisibility(View.GONE);
                             mFiveparkcar.setVisibility(View.GONE);
-
+                            mEightparkcar.setVisibility(View.GONE);
+                            mTenparkcar.setVisibility(View.GONE);
                         }
 
                         if (mEncodeHexStr.length() >= 12) {
@@ -417,8 +377,8 @@ public class PointActivity extends SerialPortActivity {
 
                                                     proplrMove();
 
-                                                    String onePickLeftName = mOnePickLeft.getName();
-                                                    String onepickrightightName = mOnepickrightight.getName();
+                                                    /*String onePickLeftName = mOnePickLeft.getName();
+                                                    String onepickrightightName = mOnepickright.getName();
                                                     if (onePickLeftName.equals("0") && onepickrightightName.equals("0")) {
                                                         OneDataDao oneDataDao = new OneDataDao(getApplication());
                                                         List<OneDataUser> oneDataUsers = oneDataDao.find();
@@ -430,13 +390,13 @@ public class PointActivity extends SerialPortActivity {
                                                             Double ratioOfGpsPointCarDouble1 = Double.valueOf(ratioOfGpsPointCar1);
                                                             if (ratioOfGpsPointCarDouble > ratioOfGpsPointCarDouble1) {
                                                                 mOnePickLeft.setName(ratioOfGpsPointCar1);
-                                                                mOnepickrightight.setName(ratioOfGpsPointCar);
+                                                                mOnepickright.setName(ratioOfGpsPointCar);
                                                             } else if (ratioOfGpsPointCarDouble < ratioOfGpsPointCarDouble1) {
                                                                 mOnePickLeft.setName(ratioOfGpsPointCar);
-                                                                mOnepickrightight.setName(ratioOfGpsPointCar1);
+                                                                mOnepickright.setName(ratioOfGpsPointCar1);
                                                             }
                                                         }
-                                                    }
+                                                    }*/
 
                                                     /*String name = mAdvancedmr.getName();
                                                     if (name != null) {
@@ -519,13 +479,6 @@ public class PointActivity extends SerialPortActivity {
                             }
 
                         }
-
-                        //break;
-                        //default:
-                        //receive = "";
-                        //break;
-                        //}
-                        //}
                     } else if (type == 232) {
                         //String hexStr = HexUtil.encodeHexStr(buffer, false, size);
                         char[] chars = HexUtil.encodeHex(buffer);
@@ -569,14 +522,14 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint2) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
                                                 String takeOffTotal = mControlOnePick.getName();
                                                 mControlOnePick.setName(takeOffTotal + "摘钩");
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
-                                                    if (onePickLeftName.equals("0") && !onepickrightightName.equals("0")) {
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
+                                                    if (onePickLeftName.equals("0") && !onepickrightName.equals("0")) {
                                                         oneLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                    } else if (!onePickLeftName.equals("0") && onepickrightightName.equals("0")) {
+                                                    } else if (!onePickLeftName.equals("0") && onepickrightName.equals("0")) {
                                                         oneRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                     }
                                                 } else {
@@ -591,11 +544,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String onePickLeftPosition = mOnePickLeft.getPosition();
                                                         Double onePickLeftPositionDouble = Double.valueOf(onePickLeftPosition);
-                                                        String onepickrightightPosition = mOnepickrightight.getPosition();
-                                                        Double onepickrightightPositionDouble = Double.valueOf(onepickrightightPosition);
+                                                        String onepickrightPosition = mOnepickright.getPosition();
+                                                        Double onepickrightPositionDouble = Double.valueOf(onepickrightPosition);
                                                         if (positonDouble < onePickLeftPositionDouble) {
                                                             oneLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                        } else if (positonDouble > onepickrightightPositionDouble) {
+                                                        } else if (positonDouble > onepickrightPositionDouble) {
                                                             oneRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -607,14 +560,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
                                                 String takeOffTotal2 = mControlTwoPick.getName();
                                                 mControlTwoPick.setName(takeOffTotal2 + "摘钩");
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
-                                                    if (twoPickLeftName.equals("0") && !twopickrightightName.equals("0")) {
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
+                                                    if (twoPickLeftName.equals("0") && !twopickrightName.equals("0")) {
                                                         twoLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                    } else if (!twoPickLeftName.equals("0") && twopickrightightName.equals("0")) {
+                                                    } else if (!twoPickLeftName.equals("0") && twopickrightName.equals("0")) {
                                                         twoRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                     }
                                                 } else {
@@ -629,11 +582,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String twoPickLeftPosition = mTwoPickLeft.getPosition();
                                                         Double twoPickLeftPositionDouble = Double.valueOf(twoPickLeftPosition);
-                                                        String twopickrightightPosition = mTwopickrightight.getPosition();
-                                                        Double twopickrightightPositionDouble = Double.valueOf(twopickrightightPosition);
+                                                        String twopickrightPosition = mTwopickright.getPosition();
+                                                        Double twopickrightPositionDouble = Double.valueOf(twopickrightPosition);
                                                         if (positonDouble < twoPickLeftPositionDouble) {
                                                             twoLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                        } else if (positonDouble > twopickrightightPositionDouble) {
+                                                        } else if (positonDouble > twopickrightPositionDouble) {
                                                             twoRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -645,14 +598,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
                                                 String takeOffTotal3 = mControlThreePick.getName();
                                                 mControlThreePick.setName(takeOffTotal3 + "摘钩");
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
-                                                    if (threePickLeftName.equals("0") && !threepickrightightName.equals("0")) {
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
+                                                    if (threePickLeftName.equals("0") && !threepickrightName.equals("0")) {
                                                         threeLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                    } else if (!threePickLeftName.equals("0") && threepickrightightName.equals("0")) {
+                                                    } else if (!threePickLeftName.equals("0") && threepickrightName.equals("0")) {
                                                         threeRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                     }
                                                 } else {
@@ -667,11 +620,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String threePickLeftPosition = mThreePickLeft.getPosition();
                                                         Double threePickLeftPositionDouble = Double.valueOf(threePickLeftPosition);
-                                                        String threepickrightightPosition = mThreepickright.getPosition();
-                                                        Double threepickrightightPositionDouble = Double.valueOf(threepickrightightPosition);
+                                                        String threepickrightPosition = mThreepickright.getPosition();
+                                                        Double threepickrightPositionDouble = Double.valueOf(threepickrightPosition);
                                                         if (positonDouble < threePickLeftPositionDouble) {
                                                             threeLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                        } else if (positonDouble > threepickrightightPositionDouble) {
+                                                        } else if (positonDouble > threepickrightPositionDouble) {
                                                             threeRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -683,14 +636,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
                                                 String takeOffTotal4 = mControlFourPick.getName();
                                                 mControlFourPick.setName(takeOffTotal4 + "摘钩");
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
-                                                    if (fourPickLeftName.equals("0") && !fourpickrightightName.equals("0")) {
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
+                                                    if (fourPickLeftName.equals("0") && !fourpickrightName.equals("0")) {
                                                         fourLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightightName.equals("0")) {
+                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightName.equals("0")) {
                                                         fourRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                     }
                                                 } else {
@@ -705,11 +658,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fourPickLeftPosition = mFourPickLeft.getPosition();
                                                         Double fourPickLeftPositionDouble = Double.valueOf(fourPickLeftPosition);
-                                                        String fourpickrightightPosition = mFourpickright.getPosition();
-                                                        Double fourpickrightightPositionDouble = Double.valueOf(fourpickrightightPosition);
+                                                        String fourpickrightPosition = mFourpickright.getPosition();
+                                                        Double fourpickrightPositionDouble = Double.valueOf(fourpickrightPosition);
                                                         if (positonDouble < fourPickLeftPositionDouble) {
                                                             fourLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                        } else if (positonDouble > fourpickrightightPositionDouble) {
+                                                        } else if (positonDouble > fourpickrightPositionDouble) {
                                                             fourRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -721,14 +674,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
                                                 String takeOffTotal5 = mControlFivePick.getName();
                                                 mControlFivePick.setName(takeOffTotal5 + "摘钩");
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
-                                                    if (fivePickLeftName.equals("0") && !fivepickrightightName.equals("0")) {
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
+                                                    if (fivePickLeftName.equals("0") && !fivepickrightName.equals("0")) {
                                                         fiveLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightightName.equals("0")) {
+                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightName.equals("0")) {
                                                         fiveRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                     }
                                                 } else {
@@ -743,11 +696,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fivePickLeftPosition = mFivePickLeft.getPosition();
                                                         Double fivePickLeftPositionDouble = Double.valueOf(fivePickLeftPosition);
-                                                        String fivepickrightightPosition = mFivepickright.getPosition();
-                                                        Double fivepickrightightPositionDouble = Double.valueOf(fivepickrightightPosition);
+                                                        String fivepickrightPosition = mFivepickright.getPosition();
+                                                        Double fivepickrightPositionDouble = Double.valueOf(fivepickrightPosition);
                                                         if (positonDouble < fivePickLeftPositionDouble) {
                                                             fiveLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                                        } else if (positonDouble > fivepickrightightPositionDouble) {
+                                                        } else if (positonDouble > fivepickrightPositionDouble) {
                                                             fiveRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -756,6 +709,118 @@ public class PointActivity extends SerialPortActivity {
                                                         fiveRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                                                     }
                                                 }
+                                                break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                String takeOffTotal8 = mControlEightPick.getName();
+                                                mControlFivePick.setName(takeOffTotal8 + "摘钩");
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    if (eightPickLeftName.equals("0") && !eightpickrightName.equals("0")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    } else if (!eightPickLeftName.equals("0") && eightpickrightName.equals("0")) {
+                                                        eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String eightPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double eightPickLeftPositionDouble = Double.valueOf(eightPickLeftPosition);
+                                                        String eightpickrightPosition = mEightpickright.getPosition();
+                                                        Double eightpickrightPositionDouble = Double.valueOf(eightpickrightPosition);
+                                                        if (positonDouble < eightPickLeftPositionDouble) {
+                                                            eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        } else if (positonDouble > eightpickrightPositionDouble) {
+                                                            eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                String takeOffTotal10 = mControlEightPick.getName();
+                                                mControlFivePick.setName(takeOffTotal10 + "摘钩");
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    if (tenPickLeftName.equals("0") && !tenpickrightName.equals("0")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    } else if (!tenPickLeftName.equals("0") && tenpickrightName.equals("0")) {
+                                                        tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String tenPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double tenPickLeftPositionDouble = Double.valueOf(tenPickLeftPosition);
+                                                        String tenpickrightPosition = mEightpickright.getPosition();
+                                                        Double tenpickrightPositionDouble = Double.valueOf(tenpickrightPosition);
+                                                        if (positonDouble < tenPickLeftPositionDouble) {
+                                                            tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        } else if (positonDouble > tenpickrightPositionDouble) {
+                                                            tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
                                                 break;
                                         }
                                         break;
@@ -773,14 +838,14 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint3) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
                                                 String takeOffTotal = mControlOnePick.getName();
                                                 mControlOnePick.setName(takeOffTotal + "摘钩");
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
-                                                    if (onePickLeftName.equals("0") && !onepickrightightName.equals("0")) {
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
+                                                    if (onePickLeftName.equals("0") && !onepickrightName.equals("0")) {
                                                         oneLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                    } else if (!onePickLeftName.equals("0") && onepickrightightName.equals("0")) {
+                                                    } else if (!onePickLeftName.equals("0") && onepickrightName.equals("0")) {
                                                         oneRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     }
                                                 } else {
@@ -795,11 +860,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String onePickLeftPosition = mOnePickLeft.getPosition();
                                                         Double onePickLeftPositionDouble = Double.valueOf(onePickLeftPosition);
-                                                        String onepickrightightPosition = mOnepickrightight.getPosition();
-                                                        Double onepickrightightPositionDouble = Double.valueOf(onepickrightightPosition);
+                                                        String onepickrightPosition = mOnepickright.getPosition();
+                                                        Double onepickrightPositionDouble = Double.valueOf(onepickrightPosition);
                                                         if (positonDouble < onePickLeftPositionDouble) {
                                                             oneLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                        } else if (positonDouble > onepickrightightPositionDouble) {
+                                                        } else if (positonDouble > onepickrightPositionDouble) {
                                                             oneRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -811,14 +876,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
                                                 String takeOffTotal2 = mControlTwoPick.getName();
                                                 mControlTwoPick.setName(takeOffTotal2 + "摘钩");
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
-                                                    if (twoPickLeftName.equals("0") && !twopickrightightName.equals("0")) {
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
+                                                    if (twoPickLeftName.equals("0") && !twopickrightName.equals("0")) {
                                                         twoLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                    } else if (!twoPickLeftName.equals("0") && twopickrightightName.equals("0")) {
+                                                    } else if (!twoPickLeftName.equals("0") && twopickrightName.equals("0")) {
                                                         twoRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     }
                                                 } else {
@@ -833,11 +898,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String twoPickLeftPosition = mTwoPickLeft.getPosition();
                                                         Double twoPickLeftPositionDouble = Double.valueOf(twoPickLeftPosition);
-                                                        String twopickrightightPosition = mTwopickrightight.getPosition();
-                                                        Double twopickrightightPositionDouble = Double.valueOf(twopickrightightPosition);
+                                                        String twopickrightPosition = mTwopickright.getPosition();
+                                                        Double twopickrightPositionDouble = Double.valueOf(twopickrightPosition);
                                                         if (positonDouble < twoPickLeftPositionDouble) {
                                                             twoLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                        } else if (positonDouble > twopickrightightPositionDouble) {
+                                                        } else if (positonDouble > twopickrightPositionDouble) {
                                                             twoRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -849,14 +914,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
                                                 String takeOffTotal3 = mControlThreePick.getName();
                                                 mControlThreePick.setName(takeOffTotal3 + "摘钩");
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
-                                                    if (threePickLeftName.equals("0") && !threepickrightightName.equals("0")) {
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
+                                                    if (threePickLeftName.equals("0") && !threepickrightName.equals("0")) {
                                                         threeLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                    } else if (!threePickLeftName.equals("0") && threepickrightightName.equals("0")) {
+                                                    } else if (!threePickLeftName.equals("0") && threepickrightName.equals("0")) {
                                                         threeRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     }
                                                 } else {
@@ -871,11 +936,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String threePickLeftPosition = mThreePickLeft.getPosition();
                                                         Double threePickLeftPositionDouble = Double.valueOf(threePickLeftPosition);
-                                                        String threepickrightightPosition = mThreepickright.getPosition();
-                                                        Double threepickrightightPositionDouble = Double.valueOf(threepickrightightPosition);
+                                                        String threepickrightPosition = mThreepickright.getPosition();
+                                                        Double threepickrightPositionDouble = Double.valueOf(threepickrightPosition);
                                                         if (positonDouble < threePickLeftPositionDouble) {
                                                             threeLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                        } else if (positonDouble > threepickrightightPositionDouble) {
+                                                        } else if (positonDouble > threepickrightPositionDouble) {
                                                             threeRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -887,14 +952,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
                                                 String takeOffTotal4 = mControlFourPick.getName();
                                                 mControlFourPick.setName(takeOffTotal4 + "摘钩");
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
-                                                    if (fourPickLeftName.equals("0") && !fourpickrightightName.equals("0")) {
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
+                                                    if (fourPickLeftName.equals("0") && !fourpickrightName.equals("0")) {
                                                         fourLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightightName.equals("0")) {
+                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightName.equals("0")) {
                                                         fourRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     }
                                                 } else {
@@ -909,11 +974,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fourPickLeftPosition = mFourPickLeft.getPosition();
                                                         Double fourPickLeftPositionDouble = Double.valueOf(fourPickLeftPosition);
-                                                        String fourpickrightightPosition = mFourpickright.getPosition();
-                                                        Double fourpickrightightPositionDouble = Double.valueOf(fourpickrightightPosition);
+                                                        String fourpickrightPosition = mFourpickright.getPosition();
+                                                        Double fourpickrightPositionDouble = Double.valueOf(fourpickrightPosition);
                                                         if (positonDouble < fourPickLeftPositionDouble) {
                                                             fourLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                        } else if (positonDouble > fourpickrightightPositionDouble) {
+                                                        } else if (positonDouble > fourpickrightPositionDouble) {
                                                             fourRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -925,14 +990,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
                                                 String takeOffTotal5 = mControlFivePick.getName();
                                                 mControlFivePick.setName(takeOffTotal5 + "摘钩");
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
-                                                    if (fivePickLeftName.equals("0") && !fivepickrightightName.equals("0")) {
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
+                                                    if (fivePickLeftName.equals("0") && !fivepickrightName.equals("0")) {
                                                         fiveLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightightName.equals("0")) {
+                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightName.equals("0")) {
                                                         fiveRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     }
                                                 } else {
@@ -947,19 +1012,131 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fivePickLeftPosition = mFivePickLeft.getPosition();
                                                         Double fivePickLeftPositionDouble = Double.valueOf(fivePickLeftPosition);
-                                                        String fivepickrightightPosition = mFivepickright.getPosition();
-                                                        Double fivepickrightightPositionDouble = Double.valueOf(fivepickrightightPosition);
+                                                        String fivepickrightPosition = mFivepickright.getPosition();
+                                                        Double fivepickrightPositionDouble = Double.valueOf(fivepickrightPosition);
                                                         if (positonDouble < fivePickLeftPositionDouble) {
                                                             fiveLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                                        } else if (positonDouble > fivepickrightightPositionDouble) {
+                                                        } else if (positonDouble > fivepickrightPositionDouble) {
                                                             fiveRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
-                                                        fiveLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        fiveLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     } else if (name1.equals("baili")) {
-                                                        fiveRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        fiveRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
                                                     }
                                                 }
+                                                break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                String takeOffTotal8 = mControlEightPick.getName();
+                                                mControlEightPick.setName(takeOffTotal8 + "摘钩");
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    if (eightPickLeftName.equals("0") && !eightpickrightName.equals("0")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    } else if (!eightPickLeftName.equals("0") && eightpickrightName.equals("0")) {
+                                                        eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String eightPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double eightPickLeftPositionDouble = Double.valueOf(eightPickLeftPosition);
+                                                        String eightpickrightPosition = mEightpickright.getPosition();
+                                                        Double eightpickrightPositionDouble = Double.valueOf(eightpickrightPosition);
+                                                        if (positonDouble < eightPickLeftPositionDouble) {
+                                                            eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        } else if (positonDouble > eightpickrightPositionDouble) {
+                                                            eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                String takeOffTotal10 = mControlTenPick.getName();
+                                                mControlTenPick.setName(takeOffTotal10 + "摘钩");
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    if (tenPickLeftName.equals("0") && !tenpickrightName.equals("0")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    } else if (!tenPickLeftName.equals("0") && tenpickrightName.equals("0")) {
+                                                        tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String tenPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double tenPickLeftPositionDouble = Double.valueOf(tenPickLeftPosition);
+                                                        String tenpickrightightPosition = mEightpickright.getPosition();
+                                                        Double tenpickrightightPositionDouble = Double.valueOf(tenpickrightightPosition);
+                                                        if (positonDouble < tenPickLeftPositionDouble) {
+                                                            tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        } else if (positonDouble > tenpickrightightPositionDouble) {
+                                                            tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
                                                 break;
                                         }
                                         break;
@@ -977,14 +1154,14 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint4) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
                                                 String takeOffTotal = mControlOnePick.getName();
                                                 mControlOnePick.setName(takeOffTotal + "摘钩");
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
-                                                    if (onePickLeftName.equals("0") && !onepickrightightName.equals("0")) {
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
+                                                    if (onePickLeftName.equals("0") && !onepickrightName.equals("0")) {
                                                         oneLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                    } else if (!onePickLeftName.equals("0") && onepickrightightName.equals("0")) {
+                                                    } else if (!onePickLeftName.equals("0") && onepickrightName.equals("0")) {
                                                         oneRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                     }
                                                 } else {
@@ -999,11 +1176,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String onePickLeftPosition = mOnePickLeft.getPosition();
                                                         Double onePickLeftPositionDouble = Double.valueOf(onePickLeftPosition);
-                                                        String onepickrightightPosition = mOnepickrightight.getPosition();
-                                                        Double onepickrightightPositionDouble = Double.valueOf(onepickrightightPosition);
+                                                        String onepickrightPosition = mOnepickright.getPosition();
+                                                        Double onepickrightPositionDouble = Double.valueOf(onepickrightPosition);
                                                         if (positonDouble < onePickLeftPositionDouble) {
                                                             oneLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                        } else if (positonDouble > onepickrightightPositionDouble) {
+                                                        } else if (positonDouble > onepickrightPositionDouble) {
                                                             oneRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1015,14 +1192,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
                                                 String takeOffTotal2 = mControlTwoPick.getName();
                                                 mControlTwoPick.setName(takeOffTotal2 + "摘钩");
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
-                                                    if (twoPickLeftName.equals("0") && !twopickrightightName.equals("0")) {
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
+                                                    if (twoPickLeftName.equals("0") && !twopickrightName.equals("0")) {
                                                         twoLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                    } else if (!twoPickLeftName.equals("0") && twopickrightightName.equals("0")) {
+                                                    } else if (!twoPickLeftName.equals("0") && twopickrightName.equals("0")) {
                                                         twoRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                     }
                                                 } else {
@@ -1037,11 +1214,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String twoPickLeftPosition = mTwoPickLeft.getPosition();
                                                         Double twoPickLeftPositionDouble = Double.valueOf(twoPickLeftPosition);
-                                                        String twopickrightightPosition = mTwopickrightight.getPosition();
-                                                        Double twopickrightightPositionDouble = Double.valueOf(twopickrightightPosition);
+                                                        String twopickrightPosition = mTwopickright.getPosition();
+                                                        Double twopickrightPositionDouble = Double.valueOf(twopickrightPosition);
                                                         if (positonDouble < twoPickLeftPositionDouble) {
                                                             twoLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                        } else if (positonDouble > twopickrightightPositionDouble) {
+                                                        } else if (positonDouble > twopickrightPositionDouble) {
                                                             twoRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1053,14 +1230,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
                                                 String takeOffTotal3 = mControlThreePick.getName();
                                                 mControlThreePick.setName(takeOffTotal3 + "摘钩");
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
-                                                    if (threePickLeftName.equals("0") && !threepickrightightName.equals("0")) {
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
+                                                    if (threePickLeftName.equals("0") && !threepickrightName.equals("0")) {
                                                         threeLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                    } else if (!threePickLeftName.equals("0") && threepickrightightName.equals("0")) {
+                                                    } else if (!threePickLeftName.equals("0") && threepickrightName.equals("0")) {
                                                         threeRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                     }
                                                 } else {
@@ -1075,11 +1252,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String threePickLeftPosition = mThreePickLeft.getPosition();
                                                         Double threePickLeftPositionDouble = Double.valueOf(threePickLeftPosition);
-                                                        String threepickrightightPosition = mThreepickright.getPosition();
-                                                        Double threepickrightightPositionDouble = Double.valueOf(threepickrightightPosition);
+                                                        String threepickrightPosition = mThreepickright.getPosition();
+                                                        Double threepickrightPositionDouble = Double.valueOf(threepickrightPosition);
                                                         if (positonDouble < threePickLeftPositionDouble) {
                                                             threeLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                        } else if (positonDouble > threepickrightightPositionDouble) {
+                                                        } else if (positonDouble > threepickrightPositionDouble) {
                                                             threeRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1091,14 +1268,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
                                                 String takeOffTotal4 = mControlFourPick.getName();
                                                 mControlFourPick.setName(takeOffTotal4 + "摘钩");
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
-                                                    if (fourPickLeftName.equals("0") && !fourpickrightightName.equals("0")) {
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
+                                                    if (fourPickLeftName.equals("0") && !fourpickrightName.equals("0")) {
                                                         fourLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightightName.equals("0")) {
+                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightName.equals("0")) {
                                                         fourRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                     }
                                                 } else {
@@ -1113,11 +1290,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fourPickLeftPosition = mFourPickLeft.getPosition();
                                                         Double fourPickLeftPositionDouble = Double.valueOf(fourPickLeftPosition);
-                                                        String fourpickrightightPosition = mFourpickright.getPosition();
-                                                        Double fourpickrightightPositionDouble = Double.valueOf(fourpickrightightPosition);
+                                                        String fourpickrightPosition = mFourpickright.getPosition();
+                                                        Double fourpickrightPositionDouble = Double.valueOf(fourpickrightPosition);
                                                         if (positonDouble < fourPickLeftPositionDouble) {
                                                             fourLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                        } else if (positonDouble > fourpickrightightPositionDouble) {
+                                                        } else if (positonDouble > fourpickrightPositionDouble) {
                                                             fourRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1129,14 +1306,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
                                                 String takeOffTotal5 = mControlFivePick.getName();
                                                 mControlFivePick.setName(takeOffTotal5 + "摘钩");
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
-                                                    if (fivePickLeftName.equals("0") && !fivepickrightightName.equals("0")) {
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
+                                                    if (fivePickLeftName.equals("0") && !fivepickrightName.equals("0")) {
                                                         fiveLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightightName.equals("0")) {
+                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightName.equals("0")) {
                                                         fiveRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                     }
                                                 } else {
@@ -1151,11 +1328,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fivePickLeftPosition = mFivePickLeft.getPosition();
                                                         Double fivePickLeftPositionDouble = Double.valueOf(fivePickLeftPosition);
-                                                        String fivepickrightightPosition = mFivepickright.getPosition();
-                                                        Double fivepickrightightPositionDouble = Double.valueOf(fivepickrightightPosition);
+                                                        String fivepickrightPosition = mFivepickright.getPosition();
+                                                        Double fivepickrightPositionDouble = Double.valueOf(fivepickrightPosition);
                                                         if (positonDouble < fivePickLeftPositionDouble) {
                                                             fiveLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                                        } else if (positonDouble > fivepickrightightPositionDouble) {
+                                                        } else if (positonDouble > fivepickrightPositionDouble) {
                                                             fiveRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1164,6 +1341,118 @@ public class PointActivity extends SerialPortActivity {
                                                         fiveRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
                                                     }
                                                 }
+                                                break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                String takeOffTotal8 = mControlEightPick.getName();
+                                                mControlEightPick.setName(takeOffTotal8 + "摘钩");
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    if (eightPickLeftName.equals("0") && !eightpickrightName.equals("0")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    } else if (!eightPickLeftName.equals("0") && eightpickrightName.equals("0")) {
+                                                        eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String eightPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double eightPickLeftPositionDouble = Double.valueOf(eightPickLeftPosition);
+                                                        String eightpickrightPosition = mEightpickright.getPosition();
+                                                        Double eightpickrightPositionDouble = Double.valueOf(eightpickrightPosition);
+                                                        if (positonDouble < eightPickLeftPositionDouble) {
+                                                            eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        } else if (positonDouble > eightpickrightPositionDouble) {
+                                                            eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                String takeOffTotal10 = mControlTenPick.getName();
+                                                mControlTenPick.setName(takeOffTotal10 + "摘钩");
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    if (tenPickLeftName.equals("0") && !tenpickrightName.equals("0")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    } else if (!tenPickLeftName.equals("0") && tenpickrightName.equals("0")) {
+                                                        tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String tenPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double tenPickLeftPositionDouble = Double.valueOf(tenPickLeftPosition);
+                                                        String tenpickrightPosition = mEightpickright.getPosition();
+                                                        Double tenpickrightPositionDouble = Double.valueOf(tenpickrightPosition);
+                                                        if (positonDouble < tenPickLeftPositionDouble) {
+                                                            tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        } else if (positonDouble > tenpickrightPositionDouble) {
+                                                            tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
                                                 break;
                                         }
                                         break;
@@ -1181,14 +1470,14 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint5) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
                                                 String takeOffTotal = mControlOnePick.getName();
                                                 mControlOnePick.setName(takeOffTotal + "摘钩");
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
-                                                    if (onePickLeftName.equals("0") && !onepickrightightName.equals("0")) {
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
+                                                    if (onePickLeftName.equals("0") && !onepickrightName.equals("0")) {
                                                         oneLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                    } else if (!onePickLeftName.equals("0") && onepickrightightName.equals("0")) {
+                                                    } else if (!onePickLeftName.equals("0") && onepickrightName.equals("0")) {
                                                         oneRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                     }
                                                 } else {
@@ -1203,11 +1492,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String onePickLeftPosition = mOnePickLeft.getPosition();
                                                         Double onePickLeftPositionDouble = Double.valueOf(onePickLeftPosition);
-                                                        String onepickrightightPosition = mOnepickrightight.getPosition();
-                                                        Double onepickrightightPositionDouble = Double.valueOf(onepickrightightPosition);
+                                                        String onepickrightPosition = mOnepickright.getPosition();
+                                                        Double onepickrightPositionDouble = Double.valueOf(onepickrightPosition);
                                                         if (positonDouble < onePickLeftPositionDouble) {
                                                             oneLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                        } else if (positonDouble > onepickrightightPositionDouble) {
+                                                        } else if (positonDouble > onepickrightPositionDouble) {
                                                             oneRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1219,14 +1508,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
                                                 String takeOffTotal2 = mControlTwoPick.getName();
                                                 mControlTwoPick.setName(takeOffTotal2 + "摘钩");
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
-                                                    if (twoPickLeftName.equals("0") && !twopickrightightName.equals("0")) {
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
+                                                    if (twoPickLeftName.equals("0") && !twopickrightName.equals("0")) {
                                                         twoLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                    } else if (!twoPickLeftName.equals("0") && twopickrightightName.equals("0")) {
+                                                    } else if (!twoPickLeftName.equals("0") && twopickrightName.equals("0")) {
                                                         twoRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                     }
                                                 } else {
@@ -1241,11 +1530,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String twoPickLeftPosition = mTwoPickLeft.getPosition();
                                                         Double twoPickLeftPositionDouble = Double.valueOf(twoPickLeftPosition);
-                                                        String twopickrightightPosition = mTwopickrightight.getPosition();
-                                                        Double twopickrightightPositionDouble = Double.valueOf(twopickrightightPosition);
+                                                        String twopickrightPosition = mTwopickright.getPosition();
+                                                        Double twopickrightPositionDouble = Double.valueOf(twopickrightPosition);
                                                         if (positonDouble < twoPickLeftPositionDouble) {
                                                             twoLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                        } else if (positonDouble > twopickrightightPositionDouble) {
+                                                        } else if (positonDouble > twopickrightPositionDouble) {
                                                             twoRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1257,14 +1546,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
                                                 String takeOffTotal3 = mControlThreePick.getName();
                                                 mControlThreePick.setName(takeOffTotal3 + "摘钩");
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
-                                                    if (threePickLeftName.equals("0") && !threepickrightightName.equals("0")) {
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
+                                                    if (threePickLeftName.equals("0") && !threepickrightName.equals("0")) {
                                                         threeLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                    } else if (!threePickLeftName.equals("0") && threepickrightightName.equals("0")) {
+                                                    } else if (!threePickLeftName.equals("0") && threepickrightName.equals("0")) {
                                                         threeRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                     }
                                                 } else {
@@ -1279,11 +1568,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String threePickLeftPosition = mThreePickLeft.getPosition();
                                                         Double threePickLeftPositionDouble = Double.valueOf(threePickLeftPosition);
-                                                        String threepickrightightPosition = mThreepickright.getPosition();
-                                                        Double threepickrightightPositionDouble = Double.valueOf(threepickrightightPosition);
+                                                        String threepickrightPosition = mThreepickright.getPosition();
+                                                        Double threepickrightPositionDouble = Double.valueOf(threepickrightPosition);
                                                         if (positonDouble < threePickLeftPositionDouble) {
                                                             threeLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                        } else if (positonDouble > threepickrightightPositionDouble) {
+                                                        } else if (positonDouble > threepickrightPositionDouble) {
                                                             threeRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1295,14 +1584,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
                                                 String takeOffTotal4 = mControlFourPick.getName();
                                                 mControlFourPick.setName(takeOffTotal4 + "摘钩");
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
-                                                    if (fourPickLeftName.equals("0") && !fourpickrightightName.equals("0")) {
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
+                                                    if (fourPickLeftName.equals("0") && !fourpickrightName.equals("0")) {
                                                         fourLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightightName.equals("0")) {
+                                                    } else if (!fourPickLeftName.equals("0") && fourpickrightName.equals("0")) {
                                                         fourRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                     }
                                                 } else {
@@ -1317,11 +1606,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fourPickLeftPosition = mFourPickLeft.getPosition();
                                                         Double fourPickLeftPositionDouble = Double.valueOf(fourPickLeftPosition);
-                                                        String fourpickrightightPosition = mFourpickright.getPosition();
-                                                        Double fourpickrightightPositionDouble = Double.valueOf(fourpickrightightPosition);
+                                                        String fourpickrightPosition = mFourpickright.getPosition();
+                                                        Double fourpickrightPositionDouble = Double.valueOf(fourpickrightPosition);
                                                         if (positonDouble < fourPickLeftPositionDouble) {
                                                             fourLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                        } else if (positonDouble > fourpickrightightPositionDouble) {
+                                                        } else if (positonDouble > fourpickrightPositionDouble) {
                                                             fourRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1333,14 +1622,14 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
                                                 String takeOffTotal5 = mControlFivePick.getName();
                                                 mControlFivePick.setName(takeOffTotal5 + "摘钩");
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
-                                                    if (fivePickLeftName.equals("0") && !fivepickrightightName.equals("0")) {
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
+                                                    if (fivePickLeftName.equals("0") && !fivepickrightName.equals("0")) {
                                                         fiveLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightightName.equals("0")) {
+                                                    } else if (!fivePickLeftName.equals("0") && fivepickrightName.equals("0")) {
                                                         fiveRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                     }
                                                 } else {
@@ -1355,11 +1644,11 @@ public class PointActivity extends SerialPortActivity {
                                                         Double positonDouble = Double.valueOf(position);
                                                         String fivePickLeftPosition = mFivePickLeft.getPosition();
                                                         Double fivePickLeftPositionDouble = Double.valueOf(fivePickLeftPosition);
-                                                        String fivepickrightightPosition = mFivepickright.getPosition();
-                                                        Double fivepickrightightPositionDouble = Double.valueOf(fivepickrightightPosition);
+                                                        String fivepickrightPosition = mFivepickright.getPosition();
+                                                        Double fivepickrightPositionDouble = Double.valueOf(fivepickrightPosition);
                                                         if (positonDouble < fivePickLeftPositionDouble) {
                                                             fiveLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                                        } else if (positonDouble > fivepickrightightPositionDouble) {
+                                                        } else if (positonDouble > fivepickrightPositionDouble) {
                                                             fiveRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
                                                         }
                                                     } else if (name1.equals("changfeng")) {
@@ -1369,43 +1658,122 @@ public class PointActivity extends SerialPortActivity {
                                                     }
                                                 }
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                String takeOffTotal8 = mControlEightPick.getName();
+                                                mControlEightPick.setName(takeOffTotal8 + "摘钩");
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    if (eightPickLeftName.equals("0") && !eightpickrightName.equals("0")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    } else if (!eightPickLeftName.equals("0") && eightpickrightName.equals("0")) {
+                                                        eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String eightPickLeftPosition = mEightPickLeft.getPosition();
+                                                        Double eightPickLeftPositionDouble = Double.valueOf(eightPickLeftPosition);
+                                                        String eightpickrightPosition = mEightpickright.getPosition();
+                                                        Double eightpickrightPositionDouble = Double.valueOf(eightpickrightPosition);
+                                                        if (positonDouble < eightPickLeftPositionDouble) {
+                                                            eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        } else if (positonDouble > eightpickrightPositionDouble) {
+                                                            eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                String takeOffTotal10 = mControlTenPick.getName();
+                                                mControlEightPick.setName(takeOffTotal10 + "摘钩");
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    if (tenPickLeftName.equals("0") && !tenpickrightName.equals("0")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    } else if (!tenPickLeftName.equals("0") && tenpickrightName.equals("0")) {
+                                                        tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    }
+                                                } else {
+                                                    String track = mStopcar.getTrack();
+                                                    String position = mStopcar.getPosition();
+                                                    String lat = mStopcar.getLat();
+                                                    String lon = mStopcar.getLon();
+                                                    //站场布局
+                                                    String name1 = mMain.getName();
+                                                    if (name1.equals("main")) {
+                                                        //查看机车位置在停留车的哪一侧
+                                                        Double positonDouble = Double.valueOf(position);
+                                                        String tenPickLeftPosition = mTenPickLeft.getPosition();
+                                                        Double tenPickLeftPositionDouble = Double.valueOf(tenPickLeftPosition);
+                                                        String tenpickrightPosition = mTenpickright.getPosition();
+                                                        Double tenpickrightPositionDouble = Double.valueOf(tenpickrightPosition);
+                                                        if (positonDouble < tenPickLeftPositionDouble) {
+                                                            tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        } else if (positonDouble > tenpickrightPositionDouble) {
+                                                            tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        }
+                                                    } else if (name1.equals("changfeng")) {
+                                                        tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    } else if (name1.equals("baili")) {
+                                                        tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
+
                                         }
                                         break;
                                 }
-
-                                /*//停车股道号
-                                mStopcar1 = mStopcar.getName();
-                                //领车人员号
-                                mLeadcar1 = mLeadcar.getName();
-                                //先判断人员位置
-                                switch (mLeadcar1) {
-                                    case "01":
-                                        //判断是否有停留车
-                                        String onePickLeftName = mOnePickLeft.getName();
-                                        String onepickrightightName = mOnepickrightight.getName();
-                                        if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
-                                            sixPerson();
-                                            switch (mGetGudaoOfGpsPoint2) {
-                                                case 1:
-                                                    if (onePickLeftName.equals("0") && !onepickrightightName.equals("0")) {
-                                                        mOnePickLeft.setPosition(mGpsPistance2 + "");
-                                                        mOnePickLeft.setLon(mLat21);
-                                                        mOnePickLeft.setLat(mLon21);
-                                                        mOnePickLeft.setTrack(mGetGudaoOfGpsPoint2 + "");
-                                                    } else if (!onePickLeftName.equals("0") && onepickrightightName.equals("0")) {
-                                                        mOnepickrightight.setPosition(mGpsPistance2 + "");
-                                                        mOnepickrightight.setLon(mLat21);
-                                                        mOnepickrightight.setLat(mLon21);
-                                                        mOnepickrightight.setTrack(mGetGudaoOfGpsPoint2 + "");
-                                                    }
-                                                    break;
-                                            }
-                                            //5-94
-                                        } else {
-                                            //有停留车
-                                        }
-                                        break;
-                                }*/
                                 break;
                             //挂钩
                             case "5A":
@@ -1444,6 +1812,48 @@ public class PointActivity extends SerialPortActivity {
                                             case 5:
                                                 mControlFivePick.setName(hookTotal + "挂钩");
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                mControlEightPick.setName(hookTotal + "挂钩");
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                mControlTenPick.setName(hookTotal + "挂钩");
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
                                         }
                                         break;
                                     case "02":
@@ -1473,6 +1883,48 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 mControlFivePick.setName(hookTotal2 + "挂钩");
+                                                break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                mControlEightPick.setName(hookTotal2 + "挂钩");
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                mControlTenPick.setName(hookTotal2 + "挂钩");
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
                                                 break;
                                         }
                                         break;
@@ -1504,6 +1956,48 @@ public class PointActivity extends SerialPortActivity {
                                             case 5:
                                                 mControlFivePick.setName(hookTotal3 + "挂钩");
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                mControlEightPick.setName(hookTotal3 + "挂钩");
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                mControlTenPick.setName(hookTotal3 + "挂钩");
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
                                         }
                                         break;
                                     case "04":
@@ -1533,6 +2027,48 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 mControlFivePick.setName(hookTotal4 + "挂钩");
+                                                break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                mControlEightPick.setName(hookTotal4 + "挂钩");
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                mControlTenPick.setName(hookTotal4 + "挂钩");
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
                                                 break;
                                         }
                                         break;
@@ -1580,6 +2116,14 @@ public class PointActivity extends SerialPortActivity {
                                 }
                                 mControlFivePick.setName("");
                                 mFiveparkcar.invalidate();
+                                //查看5道保存的数据是否只有挂钩
+                                String controleightpickrightName41 = mControlFivePick.getName();
+                                if (controleightpickrightName41.equals("挂钩") && controleightpickrightName41.length() == 2) {
+                                    eightLeft("", "", "", "");
+                                    eightRight("", "", "", "");
+                                }
+                                mControlEightPick.setName("");
+                                mEightparkcar.invalidate();
                                 break;
                             //推进
                             case "43":
@@ -1623,6 +2167,22 @@ public class PointActivity extends SerialPortActivity {
                                 }
                                 mControlFivePick.setName("");
                                 mFiveparkcar.invalidate();
+                                //查看8道保存的数据是否只有挂钩
+                                String controlEightPickName43 = mControlEightPick.getName();
+                                if (controlEightPickName43.equals("挂钩") && controlEightPickName43.length() == 2) {
+                                    eightLeft("", "", "", "");
+                                    eightRight("", "", "", "");
+                                }
+                                mControlEightPick.setName("");
+                                mEightparkcar.invalidate();
+                                //查看10道保存的数据是否只有挂钩
+                                String controlTenPickName43 = mControlTenPick.getName();
+                                if (controlTenPickName43.equals("挂钩") && controlTenPickName43.length() == 2) {
+                                    tenLeft("", "", "", "");
+                                    tenRight("", "", "", "");
+                                }
+                                mControlTenPick.setName("");
+                                mTenparkcar.invalidate();
                                 break;
                             case "71":
                                 mAdvancedmr.setName("false");
@@ -1633,6 +2193,18 @@ public class PointActivity extends SerialPortActivity {
                                 yi = false;
                                 mControlOnePick.setName("");
                                 mOneparkcar.invalidate();
+                                mControlTwoPick.setName("");
+                                mTwoparkcar.invalidate();
+                                mControlThreePick.setName("");
+                                mThreeparkcar.invalidate();
+                                mControlFourPick.setName("");
+                                mFourparkcar.invalidate();
+                                mControlFivePick.setName("");
+                                mFiveparkcar.invalidate();
+                                mControlEightPick.setName("");
+                                mEightparkcar.invalidate();
+                                mControlTenPick.setName("");
+                                mTenparkcar.invalidate();
                                 /*String stopcar = mStopcar.getName();
                                 String leadcar = mLeadcar.getName();*/
                                 break;
@@ -1675,8 +2247,8 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint2) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightightName = mOnepickright.getPosition();
                                                 if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
                                                     OneDataDao oneDataDao = new OneDataDao(getApplication());
                                                     oneDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
@@ -1699,8 +2271,8 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightightName = mTwopickright.getPosition();
                                                 if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
                                                     TwoDataDao twoDataDao = new TwoDataDao(getApplication());
                                                     twoDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
@@ -1723,8 +2295,8 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightightName = mThreepickright.getPosition();
                                                 if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
                                                     ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
                                                     threeDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
@@ -1747,8 +2319,8 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightightName = mFourpickright.getPosition();
                                                 if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
                                                     FourDataDao fourDataDao = new FourDataDao(getApplication());
                                                     fourDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
@@ -1771,8 +2343,8 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightightName = mFivepickright.getPosition();
                                                 if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
                                                     FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
                                                     fiveDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
@@ -1793,6 +2365,90 @@ public class PointActivity extends SerialPortActivity {
                                                     }
                                                 }
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
+                                                    eightDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint2)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
+                                                    tenDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint2)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
                                         }
                                         break;
                                     case "02":
@@ -1800,9 +2456,9 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint3) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
                                                     OneDataDao oneDataDao = new OneDataDao(getApplication());
                                                     oneDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
                                                     String name = mCarLocation.getName();
@@ -1824,9 +2480,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
                                                     TwoDataDao twoDataDao = new TwoDataDao(getApplication());
                                                     twoDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
                                                     String name2 = mCarLocation.getName();
@@ -1848,9 +2504,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
                                                     ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
                                                     threeDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
                                                     String name3 = mCarLocation.getName();
@@ -1872,9 +2528,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
                                                     FourDataDao fourDataDao = new FourDataDao(getApplication());
                                                     fourDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
                                                     String name4 = mCarLocation.getName();
@@ -1896,11 +2552,11 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
                                                     FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
-                                                    fiveDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
+                                                    fiveDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat31, mLon31, mGpsPistance2 + "");
                                                     String name5 = mCarLocation.getName();
                                                     if (mTrackCar.equals(mGetGudaoOfGpsPoint3)) {
                                                         if (mGpsPistance2 < mPositionCar1) {
@@ -1918,6 +2574,90 @@ public class PointActivity extends SerialPortActivity {
                                                     }
                                                 }
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
+                                                    eightDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint3)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
+                                                    tenDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint3)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
                                         }
                                         break;
                                     case "03":
@@ -1925,9 +2665,9 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint4) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
                                                     OneDataDao oneDataDao = new OneDataDao(getApplication());
                                                     oneDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
                                                     String name = mCarLocation.getName();
@@ -1949,9 +2689,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
                                                     TwoDataDao twoDataDao = new TwoDataDao(getApplication());
                                                     twoDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
                                                     String name2 = mCarLocation.getName();
@@ -1973,9 +2713,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
                                                     ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
                                                     threeDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
                                                     String name3 = mCarLocation.getName();
@@ -1997,9 +2737,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
                                                     FourDataDao fourDataDao = new FourDataDao(getApplication());
                                                     fourDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
                                                     String name4 = mCarLocation.getName();
@@ -2021,9 +2761,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
                                                     FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
                                                     fiveDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
                                                     String name5 = mCarLocation.getName();
@@ -2043,6 +2783,90 @@ public class PointActivity extends SerialPortActivity {
                                                     }
                                                 }
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
+                                                    eightDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint4)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
+                                                    tenDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint4)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
                                         }
                                         break;
                                     case "04":
@@ -2050,9 +2874,9 @@ public class PointActivity extends SerialPortActivity {
                                         switch (mGetGudaoOfGpsPoint4) {
                                             case 1:
                                                 //判断是否有停留车
-                                                String onePickLeftName = mOnePickLeft.getName();
-                                                String onepickrightightName = mOnepickrightight.getName();
-                                                if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
+                                                String onePickLeftName = mOnePickLeft.getPosition();
+                                                String onepickrightName = mOnepickright.getPosition();
+                                                if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
                                                     OneDataDao oneDataDao = new OneDataDao(getApplication());
                                                     oneDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
                                                     String name = mCarLocation.getName();
@@ -2074,9 +2898,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 2:
                                                 //判断是否有停留车
-                                                String twoPickLeftName = mTwoPickLeft.getName();
-                                                String twopickrightightName = mTwopickrightight.getName();
-                                                if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
+                                                String twoPickLeftName = mTwoPickLeft.getPosition();
+                                                String twopickrightName = mTwopickright.getPosition();
+                                                if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
                                                     TwoDataDao twoDataDao = new TwoDataDao(getApplication());
                                                     twoDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
                                                     String name2 = mCarLocation.getName();
@@ -2098,9 +2922,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 3:
                                                 //判断是否有停留车
-                                                String threePickLeftName = mThreePickLeft.getName();
-                                                String threepickrightightName = mThreepickright.getName();
-                                                if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
+                                                String threePickLeftName = mThreePickLeft.getPosition();
+                                                String threepickrightName = mThreepickright.getPosition();
+                                                if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
                                                     ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
                                                     threeDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
                                                     String name3 = mCarLocation.getName();
@@ -2122,9 +2946,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 4:
                                                 //判断是否有停留车
-                                                String fourPickLeftName = mFourPickLeft.getName();
-                                                String fourpickrightightName = mFourpickright.getName();
-                                                if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
+                                                String fourPickLeftName = mFourPickLeft.getPosition();
+                                                String fourpickrightName = mFourpickright.getPosition();
+                                                if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
                                                     FourDataDao fourDataDao = new FourDataDao(getApplication());
                                                     fourDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
                                                     String name4 = mCarLocation.getName();
@@ -2146,9 +2970,9 @@ public class PointActivity extends SerialPortActivity {
                                                 break;
                                             case 5:
                                                 //判断是否有停留车
-                                                String fivePickLeftName = mFivePickLeft.getName();
-                                                String fivepickrightightName = mFivepickright.getName();
-                                                if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
+                                                String fivePickLeftName = mFivePickLeft.getPosition();
+                                                String fivepickrightName = mFivepickright.getPosition();
+                                                if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
                                                     FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
                                                     fiveDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
                                                     String name5 = mCarLocation.getName();
@@ -2168,6 +2992,90 @@ public class PointActivity extends SerialPortActivity {
                                                     }
                                                 }
                                                 break;
+                                            case 6:
+
+                                                break;
+                                            case 7:
+
+                                                break;
+                                            case 8:
+                                                //判断是否有停留车
+                                                String eightPickLeftName = mEightPickLeft.getPosition();
+                                                String eightpickrightName = mEightpickright.getPosition();
+                                                if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
+                                                    EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
+                                                    eightDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint5)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 9:
+
+                                                break;
+                                            case 10:
+                                                //判断是否有停留车
+                                                String tenPickLeftName = mTenPickLeft.getPosition();
+                                                String tenpickrightName = mTenpickright.getPosition();
+                                                if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
+                                                    TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
+                                                    tenDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
+                                                    String name5 = mCarLocation.getName();
+                                                    if (mTrackCar.equals(mGetGudaoOfGpsPoint5)) {
+                                                        if (mGpsPistance2 < mPositionCar1) {
+                                                            tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        } else if (mGpsPistance2 > mPositionCar1) {
+                                                            tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        }
+                                                    } else {
+                                                        String name1 = mMain.getName();
+                                                        if (name1.equals("baili")) {
+                                                            tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        } else if (name1.equals("changfeng")) {
+                                                            tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            case 11:
+
+                                                break;
+                                            case 12:
+
+                                                break;
+                                            case 13:
+
+                                                break;
+                                            case 14:
+
+                                                break;
+                                            case 15:
+
+                                                break;
+                                            case 16:
+
+                                                break;
+                                            case 17:
+
+                                                break;
+                                            case 18:
+
+                                                break;
+                                            case 19:
+
+                                                break;
                                         }
                                         break;
                                 }
@@ -2182,6 +3090,386 @@ public class PointActivity extends SerialPortActivity {
         });
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_point);
+        setSystemUIVisible(false);
+        mDelete = findViewById(R.id.delete_btn);
+        mXiningbeimap = findViewById(R.id.xiningbeimap);
+        mChangfengmap = findViewById(R.id.changfengmap);
+        mOneparkcar = findViewById(R.id.oneparkcar);
+        mTwoparkcar = findViewById(R.id.twoparkcar);
+        mThreeparkcar = findViewById(R.id.threeparkcar);
+        mFourparkcar = findViewById(R.id.fourparkcar);
+        mFiveparkcar = findViewById(R.id.fiveparkcar);
+        mEightparkcar = findViewById(R.id.eightparkcar);
+        mTenparkcar = findViewById(R.id.tenparkcar);
+        mBailimap = findViewById(R.id.bailimap);
+        mTrain = findViewById(R.id.drawtop);
+        mPointText = findViewById(R.id.point_text);
+        mBtn = findViewById(R.id.taotao_btn);
+        mBtn1 = findViewById(R.id.taotao_btn1);
+        mJuli = findViewById(R.id.juli);
+        mJwd = findViewById(R.id.lat);
+        mLat1 = findViewById(R.id.lat1);
+        mLat2 = findViewById(R.id.lat2);
+        mTransferpeople = findViewById(R.id.transferpeople);
+        mPeopleOne = findViewById(R.id.peopleone);
+        mPeopletwo = findViewById(R.id.peopletwo);
+        mPeoplethree = findViewById(R.id.peoplethree);
+        mPeoplefour = findViewById(R.id.peoplefour);
+
+        addLoc();
+
+        //if (mJump.equals("false")) {
+        /*Intent intent = new Intent(PointActivity.this, ChannelActivity.class);
+        startActivity(intent);*/
+        //mJump = "true";
+        //}
+
+        mAppService = AppJoint.service(TestService.class);
+
+        mGpsDao = new GPSDao(getApplicationContext());
+        //mGpsDao.add("36.659485000000004", "101.768762");
+
+        /*//摘钩
+        mPickDao = new PickDao(getApplicationContext());
+        //mPickDao.add("133438", "463264");
+        double latDifference = a1 - 0.000017;
+        double lonDifference = b1 - 0.000021;
+        String a2 = String.valueOf(latDifference);
+        String b2 = String.valueOf(lonDifference);
+        String lat1 = a2.substring(a2.indexOf(".") + 1);
+        String lon1 = b2.substring(b2.indexOf(".") + 1);
+        mTotal1 = "0A-机车GPS-" + lat1 + "-" + lon1;
+        Log.e("弯点", "弯点a1: " + latDifference + " ");
+        Log.e("弯点", "弯点b1: " + lonDifference + " ");
+        //mGpsDao = new GPSDao(getApplicationContext());
+        //mJwd.setText(lat + "    " + lon);
+        mGpsDao.add(a2, b2);*/
+
+        /*mTrain.setX(384 - transverse);
+        mTrain.setY(500 - disparity);*/
+        //控制三个布局
+        //站内图
+        mMain = new SpUtil(getApplicationContext(), "main");
+
+        mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
+
+        //dmr控制推进信令
+        mAdvancedmr = new SpUtil(getApplicationContext(), "advancedmr");
+
+        //1道停留车左点
+        mOnePickLeft = new SpUtil(getApplicationContext(), "onepickleft");
+        //mOnePickLeft.setPosition("0");
+        //1道停留车右点
+        mOnepickright = new SpUtil(getApplicationContext(), "onepickright");
+        //mOnepickright.setPosition("0");
+        //控制1道是否有停留车
+        mControlOnePick = new SpUtil(getApplicationContext(), "controlonepick");
+        //2道停留车左点
+        mTwoPickLeft = new SpUtil(getApplicationContext(), "twopickleft");
+        //mTwoPickLeft.setPosition("0");
+        //2道停留车右点
+        mTwopickright = new SpUtil(getApplicationContext(), "twopickright");
+        //mTwopickright.setPosition("0");
+        //控制2道是否有停留车
+        mControlTwoPick = new SpUtil(getApplicationContext(), "controltwopick");
+        //3道停留车左点
+        mThreePickLeft = new SpUtil(getApplicationContext(), "threepickleft");
+        //mThreePickLeft.setPosition("0");
+        //3道停留车右点
+        mThreepickright = new SpUtil(getApplicationContext(), "threepickright");
+        //mThreepickright.setPosition("0");
+        //控制3道是否有停留车
+        mControlThreePick = new SpUtil(getApplicationContext(), "controlthreepick");
+        //4道停留车左点
+        mFourPickLeft = new SpUtil(getApplicationContext(), "fourpickleft");
+        //mFourPickLeft.setPosition("0");
+        //4道停留车右点
+        mFourpickright = new SpUtil(getApplicationContext(), "fourpickright");
+        //mFourpickright.setPosition("0");
+        //控制4道是否有停留车
+        mControlFourPick = new SpUtil(getApplicationContext(), "controlfourpick");
+        //5道停留车左点
+        mFivePickLeft = new SpUtil(getApplicationContext(), "fivepickleft");
+        //mFivePickLeft.setPosition("0");
+        //5道停留车右点
+        mFivepickright = new SpUtil(getApplicationContext(), "fivepickright");
+        //mFivepickright.setPosition("0");
+        //控制5道是否有停留车
+        mControlFivePick = new SpUtil(getApplicationContext(), "controlfivepick");
+        //6道停留车左点
+        mSixPickLeft = new SpUtil(getApplicationContext(), "sixpickleft");
+        //mFivePickLeft.setPosition("0");
+        //6道停留车右点
+        mSixpickright = new SpUtil(getApplicationContext(), "sixpickright");
+        //mFivepickright.setPosition("0");
+        //控制6道是否有停留车
+        mControlSixPick = new SpUtil(getApplicationContext(), "controlsixpick");
+
+        mSixParkDataDao = new SixParkDataDao(getApplicationContext());
+        mSixParkDataDao.add("0","0","0","0","0");
+
+        //7道停留车左点
+        mSevenPickLeft = new SpUtil(getApplicationContext(), "sevenpickleft");
+        //mFivePickLeft.setPosition("0");
+        //7道停留车右点
+        mSevenpickright = new SpUtil(getApplicationContext(), "sevenpickright");
+        //mFivepickright.setPosition("0");
+        //控制7道是否有停留车
+        mControlSevenPick = new SpUtil(getApplicationContext(), "controlsevenpick");
+        //8道停留车左点
+        mEightPickLeft = new SpUtil(getApplicationContext(), "eightpickleft");
+        //mEightPickLeft.setPosition("0");
+        //8道停留车右点
+        mEightpickright = new SpUtil(getApplicationContext(), "eightpickright");
+        //mEightpickright.setPosition("0");
+        //控制8道是否有停留车
+        mControlEightPick = new SpUtil(getApplicationContext(), "controleightpick");
+        //10道停留车左点
+        mTenPickLeft = new SpUtil(getApplicationContext(), "tenpickleft");
+        //mTenPickLeft.setPosition("0");
+        //10道停留车右点
+        mTenpickright = new SpUtil(getApplicationContext(), "tenpickright");
+        //mTenpickright.setPosition("0");
+        //控制10道是否有停留车
+        mControlTenPick = new SpUtil(getApplicationContext(), "controltenpick");
+        //11道停留车左点
+        mElevenpickleft = new SpUtil(getApplicationContext(), "elevenpickleft");
+        //mElevenpickleft.setPosition("0");
+        //11道停留车右点
+        mElevenpickright = new SpUtil(getApplicationContext(), "elevenpickright");
+        //mElevenpickright.setPosition("0");
+        //控制11道是否有停留车
+        mControlElevenPick = new SpUtil(getApplicationContext(), "controlelevenpick");
+        //12道停留车左点
+        mTwelvePickLeft = new SpUtil(getApplicationContext(), "twelvepickleft");
+        //mTwelvePickLeft.setPosition("0");
+        //12道停留车右点
+        mTwelvepickright = new SpUtil(getApplicationContext(), "twelvepickright");
+        //mTwelvepickright.setPosition("0");
+        //控制12道是否有停留车
+        mControlTwelvePick = new SpUtil(getApplicationContext(), "controltwelvepick");
+        //13道停留车左点
+        mThirteenPickLeft = new SpUtil(getApplicationContext(), "thirteenpickleft");
+        //mThirteenPickLeft.setPosition("0");
+        //13道停留车右点
+        mThirteenpickright = new SpUtil(getApplicationContext(), "thirteenpickright");
+        //mThirteenpickright.setPosition("0");
+        //控制13道是否有停留车
+        mControlThirteenPick = new SpUtil(getApplicationContext(), "controlthirteenpick");
+        //14道停留车左点
+        mFourteenPickLeft = new SpUtil(getApplicationContext(), "fourteenpickleft");
+        //mFourteenPickLeft.setPosition("0");
+        //14道停留车右点
+        mFourteenpickright = new SpUtil(getApplicationContext(), "fourteenpickright");
+        //mFourteenpickright.setPosition("0");
+        //控制14道是否有停留车
+        mControlFourteenPick = new SpUtil(getApplicationContext(), "controlfourteenpick");
+        //15道停留车左点
+        mFifteenPickLeft = new SpUtil(getApplicationContext(), "fifteenpickleft");
+        //mFifteenPickLeft.setPosition("0");
+        //15道停留车右点
+        mFifteenPickRight = new SpUtil(getApplicationContext(), "fifteenpickright");
+        //mFifteenPickRight.setPosition("0");
+        //控制15道是否有停留车
+        mControlFifteenPick = new SpUtil(getApplicationContext(), "controlfifteenpick");
+        //16道停留车左点
+        mSixteenPickLeft = new SpUtil(getApplicationContext(), "sixteenpickleft");
+        //mSixteenPickLeft.setPosition("0");
+        //16道停留车右点
+        mSixteenPickRight = new SpUtil(getApplicationContext(), "sixteenpickright");
+        //mSixteenPickRight.setPosition("0");
+        //控制16道是否有停留车
+        mControlSixteenPick = new SpUtil(getApplicationContext(), "controlsixteenpick");
+        //17道停留车左点
+        mSeventeenPickLeft = new SpUtil(getApplicationContext(), "seventeenpickleft");
+        //mSeventeenPickLeft.setPosition("0");
+        //17道停留车右点
+        mSeventeenPickRight = new SpUtil(getApplicationContext(), "seventeenpickright");
+        //mSeventeenPickRight.setPosition("0");
+        //控制17道是否有停留车
+        mControlSeventeenPick = new SpUtil(getApplicationContext(), "controlseventeenpick");
+        //18道停留车左点
+        mEighteennPickLeft = new SpUtil(getApplicationContext(), "eighteenpickleft");
+        //mEighteennPickLeft.setPosition("0");
+        //18道停留车右点
+        mEighteenPickRight = new SpUtil(getApplicationContext(), "eighteenpickright");
+        //mEighteenPickRight.setPosition("0");
+        //控制18道是否有停留车
+        mControlEighteenPick = new SpUtil(getApplicationContext(), "controleighteenpick");
+        //19道停留车左点
+        mNineteenPickLeft = new SpUtil(getApplicationContext(), "nineteenpickleft");
+        //mNineteenPickLeft.setPosition("0");
+        //19道停留车右点
+        mNineteenPickRight = new SpUtil(getApplicationContext(), "nineteenpickright");
+        //mNineteenPickRight.setPosition("0");
+        //控制19道是否有停留车
+        mControlNineteenPick = new SpUtil(getApplicationContext(), "controlnineteenpick");
+
+        //领车
+        mLeadcar = new SpUtil(getApplicationContext(), "leadcar");
+
+        //停车后查看机车位置，为了绑定摘挂钩时候的人员位置与机车位置
+        mStopcar = new SpUtil(getApplicationContext(), "stopcar");
+        //查看机车位置
+        mCarLocation = new SpUtil(getApplicationContext(), "carlocation");
+
+        //调车长开机后通知是否是调车长领车还是几号制动员领车
+        String name = mFirstInto.getName();
+        if (name.equals("false")) {
+            mSiveDao = new SiveDao(getApplicationContext());
+            List<SuoData> suoData = mSiveDao.find();
+            if (suoData != null) {
+                int size = suoData.size();
+                if (size > 0) {
+                    for (int i = 0; i < size; i++) {
+                        String ack1 = suoData.get(i).getAck();
+                        jieAll += ack1;
+                        //Log.e("jiesuo", ack1 + "");
+                    }
+                    Log.e("jiesuo", jieAll + "");
+                    if (jieAll.indexOf("73") != -1) {
+                        jieAll = "";
+                    } else {
+                        //sendMessage(mId, "8");
+                        sendMessage(mConversationId, "9");
+                        //mControlshuntinghunting.setName("unlock");
+                        jieAll = "";
+                    }
+                } else {
+                    sendMessage(mConversationId, "9");
+                }
+            } else {
+                sendMessage(mConversationId, "9");
+            }
+            mFirstInto.setName("true");
+        }
+
+        //new TimeThread().start(); //启动新的线程
+
+        mReceive1 = new SpUtil(getApplicationContext(), "receive1");
+        mReceive2 = new SpUtil(getApplicationContext(), "receive2");
+        mReceive3 = new SpUtil(getApplicationContext(), "receive3");
+        qgs = new SpUtil(getApplicationContext(), "qgs");
+
+        //发送机车、检测人员位置
+
+        mHandler.postDelayed(mRunnable, 1500);
+        mCqncast = new SpUtil(getApplicationContext(), "cqncast");
+        mInstructions = new SpUtil(getApplicationContext(), "instructions");
+        mControlCar = new SpUtil(getApplicationContext(), "controlcar");
+        //根据制动员解锁状态来判断调车长是否启动
+        mControlshuntinghunting = new SpUtil(getApplicationContext(), "controlshunting");
+        //mControlshuntinghunting.setName("unlock");
+        //注意十车五车三车一车
+        mControlTuiJin = new SpUtil(getApplicationContext(), "controltuijin");
+        //控制停车
+        //mDataTransmission = new SpUtil(getApplicationContext(), "datatransmission");
+        //mDataTransmission.setName("false");
+        //人员号5
+        mPeople5 = new SpUtil(getApplicationContext(), "people5");
+        //人员号6
+        mPeople6 = new SpUtil(getApplicationContext(), "people6");
+        //人员号7
+        mPeople7 = new SpUtil(getApplicationContext(), "people7");
+        //人员号8
+        mPeople8 = new SpUtil(getApplicationContext(), "people8");
+        //人员号9
+        mPeople9 = new SpUtil(getApplicationContext(), "people9");
+
+        mMap1 = new SpUtil(getApplicationContext(), "map1");
+        mMap2 = new SpUtil(getApplicationContext(), "map2");
+        mMap3 = new SpUtil(getApplicationContext(), "map3");
+        /*mMap1.setName("visible");
+        mMap2.setName("gone");
+        mMap3.setName("gone");*/
+        mLeftCar = new SpUtil(getApplicationContext(), "leftcar");
+        mLeftCar.setName("000000");
+        mRightCar = new SpUtil(getApplicationContext(), "rightcar");
+        mRightCar.setName("000000");
+        mBtn.setText("平调系统");
+        mFiveDataDao = new FiveDataDao(getApplicationContext());
+        mSixDataDao = new SixDataDao(getApplicationContext());
+        mSevenDataDao = new SevenDataDao(getApplicationContext());
+        mEightDataDao = new EightDataDao(getApplicationContext());
+        mNineDataDao = new NineDataDao(getApplicationContext());
+        mDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPickDao.del("zhaigouGPS");
+                mGpsDao.del("Gps");
+                mFiveDataDao.del("fiveperson");
+                mSixDataDao.del("sixperson");
+                mSevenDataDao.del("sevenperson");
+                mEightDataDao.del("eightperson");
+                mNineDataDao.del("nineperson");
+            }
+        });
+
+        /*mWanAsynTask = new WanAsynTask(getApplication());
+        AssetsDatabaseManager db = AssetsDatabaseManager.getManager();
+        mMDatabase = db.getDatabase("wandian.db");*/
+
+        /*int getGudaoOfGpsPoint = GetGudaoOfGpsPoint(101.771547, 36.646941);
+        //mJuli.setText(getGudaoOfGpsPoint + "");
+        mRatioOfGpsTrackCar = String.valueOf(getGudaoOfGpsPoint);
+        Point3d point3d = new Point3d();
+        point3d.setX(101.771547);
+        point3d.setY(36.646941);
+        mGetRatioOfGpsPointCar = GetRatioOfGpsPoint(point3d, getGudaoOfGpsPoint);
+
+        DecimalFormat df1 = new DecimalFormat("#####0.00%");
+        DecimalFormatSymbols symbols1 = new DecimalFormatSymbols();
+        df1.setDecimalFormatSymbols(symbols1);
+        String ratioOfGpsPoint = df1.format(mGetRatioOfGpsPointCar);
+        String gpsPoint = ratioOfGpsPoint.substring(0, ratioOfGpsPoint.indexOf("."));
+        mGpsPistanceCar = Double.valueOf(gpsPoint);
+        Log.i("TAG", "mRatioOfGpsTrackCar" + mRatioOfGpsTrackCar);
+        Log.i("TAG", "mGetRatioOfGpsPointCar" + mGetRatioOfGpsPointCar);
+        Log.i("TAG", "mGpsPistanceCar" + mGpsPistanceCar);
+
+        proplrMove();*/
+
+        /*DecimalFormat df = new DecimalFormat("#.000000");
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        df.setDecimalFormatSymbols(symbols);
+        String lat = df.format(Double.valueOf(a1));
+        String lon = df.format(Double.valueOf(b1));
+        Double latDouble = Double.valueOf(lat);
+        Double lonDouble = Double.valueOf(lon);
+        Log.i("二宝",""+a1);
+        Log.i("二宝",""+b1);
+        //大圆盘坐标减去与实际坐标的差值
+        double latDifference = latDouble - 0.000017;
+        double lonDifference = lonDouble - 0.000021;
+        String a2 = String.valueOf(latDifference);
+        String b2 = String.valueOf(lonDifference);
+        Log.i("二宝a2",""+a2);
+        Log.i("二宝b2",""+b2);
+        String lat1 = a2.substring(a2.indexOf(".") + 1);
+        String lon1 = b2.substring(b2.indexOf(".") + 1);
+        Log.i("二宝lat1",""+lat1);
+        Log.i("二宝lon1",""+lon1);
+        mTotal1 = "0A-机车GPS-" + lat1 + "-" + lon1;
+        String ma = lat.substring(lat.length() - 4, lat.length());
+        String mb = lon.substring(lon.length() - 4, lon.length());
+        float mvalue1 = Float.valueOf(ma);
+        float mvalue2 = Float.valueOf(mb);
+        //mGpsDao = new GPSDao(getApplicationContext());
+        //mJwd.setText(lat + "    " + lon);
+        mGpsDao.add(a2, b2);
+        mGpsUsers = mGpsDao.find();
+        int size = mGpsUsers.size();
+        Log.i("二宝size",""+size);
+        String latsize = mGpsUsers.get(size - 1).getLat();
+        String lonsize = mGpsUsers.get(size - 1).getLon();
+        Log.i("二宝size",""+latsize);
+        Log.i("二宝size",""+lonsize);*/
+    }
+
     private void oneLeft(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
         mOnePickLeft.setPosition(mGpsPistance2);
         mOnePickLeft.setLon(mLat21);
@@ -2190,10 +3478,10 @@ public class PointActivity extends SerialPortActivity {
     }
 
     private void oneRight(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
-        mOnepickrightight.setPosition(mGpsPistance2);
-        mOnepickrightight.setLon(mLat21);
-        mOnepickrightight.setLat(mLon21);
-        mOnepickrightight.setTrack(mGetGudaoOfGpsPoint2);
+        mOnepickright.setPosition(mGpsPistance2);
+        mOnepickright.setLon(mLat21);
+        mOnepickright.setLat(mLon21);
+        mOnepickright.setTrack(mGetGudaoOfGpsPoint2);
     }
 
     private void twoLeft(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
@@ -2204,10 +3492,10 @@ public class PointActivity extends SerialPortActivity {
     }
 
     private void twoRight(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
-        mTwopickrightight.setPosition(mGpsPistance2);
-        mTwopickrightight.setLon(mLat21);
-        mTwopickrightight.setLat(mLon21);
-        mTwopickrightight.setTrack(mGetGudaoOfGpsPoint2);
+        mTwopickright.setPosition(mGpsPistance2);
+        mTwopickright.setLon(mLat21);
+        mTwopickright.setLat(mLon21);
+        mTwopickright.setTrack(mGetGudaoOfGpsPoint2);
     }
 
     private void threeLeft(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
@@ -2250,6 +3538,34 @@ public class PointActivity extends SerialPortActivity {
         mFivepickright.setLon(mLat21);
         mFivepickright.setLat(mLon21);
         mFivepickright.setTrack(mGetGudaoOfGpsPoint2);
+    }
+
+    private void eightLeft(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
+        mEightPickLeft.setPosition(mGpsPistance2);
+        mEightPickLeft.setLon(mLat21);
+        mEightPickLeft.setLat(mLon21);
+        mEightPickLeft.setTrack(mGetGudaoOfGpsPoint2);
+    }
+
+    private void eightRight(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
+        mEightpickright.setPosition(mGpsPistance2);
+        mEightpickright.setLon(mLat21);
+        mEightpickright.setLat(mLon21);
+        mEightpickright.setTrack(mGetGudaoOfGpsPoint2);
+    }
+
+    private void tenLeft(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
+        mTenPickLeft.setPosition(mGpsPistance2);
+        mTenPickLeft.setLon(mLat21);
+        mTenPickLeft.setLat(mLon21);
+        mTenPickLeft.setTrack(mGetGudaoOfGpsPoint2);
+    }
+
+    private void tenRight(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {
+        mTenpickright.setPosition(mGpsPistance2);
+        mTenpickright.setLon(mLat21);
+        mTenpickright.setLat(mLon21);
+        mTenpickright.setTrack(mGetGudaoOfGpsPoint2);
     }
 
     private void sixPerson() {
@@ -2414,276 +3730,6 @@ public class PointActivity extends SerialPortActivity {
     private String mJump = "false";
     /*private double a1 = 36.659485000001234;
     private double b1 = 101.76685599999999;*/
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_point);
-        setSystemUIVisible(false);
-        mDelete = findViewById(R.id.delete_btn);
-        mXiningbeimap = findViewById(R.id.xiningbeimap);
-        mChangfengmap = findViewById(R.id.changfengmap);
-        mOneparkcar = findViewById(R.id.oneparkcar);
-        mTwoparkcar = findViewById(R.id.twoparkcar);
-        mThreeparkcar = findViewById(R.id.threeparkcar);
-        mFourparkcar = findViewById(R.id.fourparkcar);
-        mFiveparkcar = findViewById(R.id.fiveparkcar);
-        mBailimap = findViewById(R.id.bailimap);
-        mTrain = findViewById(R.id.drawtop);
-        mPointText = findViewById(R.id.point_text);
-        mBtn = findViewById(R.id.taotao_btn);
-        mBtn1 = findViewById(R.id.taotao_btn1);
-        mJuli = findViewById(R.id.juli);
-        mJwd = findViewById(R.id.lat);
-        mLat1 = findViewById(R.id.lat1);
-        mLat2 = findViewById(R.id.lat2);
-        mTransferpeople = findViewById(R.id.transferpeople);
-        mPeopleOne = findViewById(R.id.peopleone);
-        mPeopletwo = findViewById(R.id.peopletwo);
-        mPeoplethree = findViewById(R.id.peoplethree);
-        mPeoplefour = findViewById(R.id.peoplefour);
-
-        addLoc();
-
-        //if (mJump.equals("false")) {
-        /*Intent intent = new Intent(PointActivity.this, ChannelActivity.class);
-        startActivity(intent);*/
-        //mJump = "true";
-        //}
-
-        mAppService = AppJoint.service(TestService.class);
-
-        mGpsDao = new GPSDao(getApplicationContext());
-        //mGpsDao.add("36.659485000000004", "101.768762");
-
-        /*//摘钩
-        mPickDao = new PickDao(getApplicationContext());
-        //mPickDao.add("133438", "463264");
-        double latDifference = a1 - 0.000017;
-        double lonDifference = b1 - 0.000021;
-        String a2 = String.valueOf(latDifference);
-        String b2 = String.valueOf(lonDifference);
-        String lat1 = a2.substring(a2.indexOf(".") + 1);
-        String lon1 = b2.substring(b2.indexOf(".") + 1);
-        mTotal1 = "0A-机车GPS-" + lat1 + "-" + lon1;
-        Log.e("弯点", "弯点a1: " + latDifference + " ");
-        Log.e("弯点", "弯点b1: " + lonDifference + " ");
-        //mGpsDao = new GPSDao(getApplicationContext());
-        //mJwd.setText(lat + "    " + lon);
-        mGpsDao.add(a2, b2);*/
-
-        /*mTrain.setX(384 - transverse);
-        mTrain.setY(500 - disparity);*/
-        //控制三个布局
-        //站内图
-        mMain = new SpUtil(getApplicationContext(), "main");
-
-        mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
-
-        //dmr控制推进信令
-        mAdvancedmr = new SpUtil(getApplicationContext(), "advancedmr");
-
-        //1道停留车左点
-        mOnePickLeft = new SpUtil(getApplicationContext(), "onepickleft");
-        mOnePickLeft.setName("0");
-        //1道停留车右点
-        mOnepickrightight = new SpUtil(getApplicationContext(), "onepickright");
-        mOnepickrightight.setName("0");
-        //控制1道是否有停留车
-        mControlOnePick = new SpUtil(getApplicationContext(), "controlonepick");
-        //2道停留车左点
-        mTwoPickLeft = new SpUtil(getApplicationContext(), "twopickleft");
-        mTwoPickLeft.setName("0");
-        //2道停留车右点
-        mTwopickrightight = new SpUtil(getApplicationContext(), "twopickright");
-        mTwopickrightight.setName("0");
-        //控制2道是否有停留车
-        mControlTwoPick = new SpUtil(getApplicationContext(), "controltwopick");
-        //3道停留车左点
-        mThreePickLeft = new SpUtil(getApplicationContext(), "threepickleft");
-        mThreePickLeft.setName("0");
-        //3道停留车右点
-        mThreepickright = new SpUtil(getApplicationContext(), "threepickright");
-        mThreepickright.setName("0");
-        //控制3道是否有停留车
-        mControlThreePick = new SpUtil(getApplicationContext(), "controlthreepick");
-        //4道停留车左点
-        mFourPickLeft = new SpUtil(getApplicationContext(), "fourpickleft");
-        mFourPickLeft.setName("0");
-        //4道停留车右点
-        mFourpickright = new SpUtil(getApplicationContext(), "fourpickright");
-        mFourpickright.setName("0");
-        //控制4道是否有停留车
-        mControlFourPick = new SpUtil(getApplicationContext(), "controlfourpick");
-        //5道停留车左点
-        mFivePickLeft = new SpUtil(getApplicationContext(), "Fivepickleft");
-        mFivePickLeft.setName("0");
-        //5道停留车右点
-        mFivepickright = new SpUtil(getApplicationContext(), "Fivepickright");
-        mFivepickright.setName("0");
-        //控制5道是否有停留车
-        mControlFivePick = new SpUtil(getApplicationContext(), "controlFivepick");
-
-        //领车
-        mLeadcar = new SpUtil(getApplicationContext(), "leadcar");
-
-        //停车后查看机车位置，为了绑定摘挂钩时候的人员位置与机车位置
-        mStopcar = new SpUtil(getApplicationContext(), "stopcar");
-        //查看机车位置
-        mCarLocation = new SpUtil(getApplicationContext(), "carlocation");
-
-        //调车长开机后通知是否是调车长领车还是几号制动员领车
-        String name = mFirstInto.getName();
-        if (name.equals("false")) {
-            mSiveDao = new SiveDao(getApplicationContext());
-            List<SuoData> suoData = mSiveDao.find();
-            if (suoData != null) {
-                int size = suoData.size();
-                if (size > 0) {
-                    for (int i = 0; i < size; i++) {
-                        String ack1 = suoData.get(i).getAck();
-                        jieAll += ack1;
-                        //Log.e("jiesuo", ack1 + "");
-                    }
-                    Log.e("jiesuo", jieAll + "");
-                    if (jieAll.indexOf("73") != -1) {
-                        jieAll = "";
-                    } else {
-                        //sendMessage(mId, "8");
-                        sendMessage(mConversationId, "9");
-                        //mControlshuntinghunting.setName("unlock");
-                        jieAll = "";
-                    }
-                } else {
-                    sendMessage(mConversationId, "9");
-                }
-            } else {
-                sendMessage(mConversationId, "9");
-            }
-            mFirstInto.setName("true");
-        }
-
-        //new TimeThread().start(); //启动新的线程
-
-        mReceive1 = new SpUtil(getApplicationContext(), "receive1");
-        mReceive2 = new SpUtil(getApplicationContext(), "receive2");
-        mReceive3 = new SpUtil(getApplicationContext(), "receive3");
-        qgs = new SpUtil(getApplicationContext(), "qgs");
-
-        //发送机车、检测人员位置
-
-        mHandler.postDelayed(mRunnable, 1500);
-        mCqncast = new SpUtil(getApplicationContext(), "cqncast");
-        mInstructions = new SpUtil(getApplicationContext(), "instructions");
-        mControlCar = new SpUtil(getApplicationContext(), "controlcar");
-        //根据制动员解锁状态来判断调车长是否启动
-        mControlshuntinghunting = new SpUtil(getApplicationContext(), "controlshunting");
-        //mControlshuntinghunting.setName("unlock");
-        //注意十车五车三车一车
-        mControlTuiJin = new SpUtil(getApplicationContext(), "controltuijin");
-        //控制停车
-        //mDataTransmission = new SpUtil(getApplicationContext(), "datatransmission");
-        //mDataTransmission.setName("false");
-        //人员号5
-        mPeople5 = new SpUtil(getApplicationContext(), "people5");
-        //人员号6
-        mPeople6 = new SpUtil(getApplicationContext(), "people6");
-        //人员号7
-        mPeople7 = new SpUtil(getApplicationContext(), "people7");
-        //人员号8
-        mPeople8 = new SpUtil(getApplicationContext(), "people8");
-        //人员号9
-        mPeople9 = new SpUtil(getApplicationContext(), "people9");
-
-        mMap1 = new SpUtil(getApplicationContext(), "map1");
-        mMap2 = new SpUtil(getApplicationContext(), "map2");
-        mMap3 = new SpUtil(getApplicationContext(), "map3");
-        /*mMap1.setName("visible");
-        mMap2.setName("gone");
-        mMap3.setName("gone");*/
-        mLeftCar = new SpUtil(getApplicationContext(), "leftcar");
-        mLeftCar.setName("000000");
-        mRightCar = new SpUtil(getApplicationContext(), "rightcar");
-        mRightCar.setName("000000");
-        mBtn.setText("平调系统");
-        mFiveDataDao = new FiveDataDao(getApplicationContext());
-        mSixDataDao = new SixDataDao(getApplicationContext());
-        mSevenDataDao = new SevenDataDao(getApplicationContext());
-        mEightDataDao = new EightDataDao(getApplicationContext());
-        mNineDataDao = new NineDataDao(getApplicationContext());
-        mDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPickDao.del("zhaigouGPS");
-                mGpsDao.del("Gps");
-                mFiveDataDao.del("fiveperson");
-                mSixDataDao.del("sixperson");
-                mSevenDataDao.del("sevenperson");
-                mEightDataDao.del("eightperson");
-                mNineDataDao.del("nineperson");
-            }
-        });
-
-        /*mWanAsynTask = new WanAsynTask(getApplication());
-        AssetsDatabaseManager db = AssetsDatabaseManager.getManager();
-        mMDatabase = db.getDatabase("wandian.db");*/
-
-        /*int getGudaoOfGpsPoint = GetGudaoOfGpsPoint(101.771547, 36.646941);
-        //mJuli.setText(getGudaoOfGpsPoint + "");
-        mRatioOfGpsTrackCar = String.valueOf(getGudaoOfGpsPoint);
-        Point3d point3d = new Point3d();
-        point3d.setX(101.771547);
-        point3d.setY(36.646941);
-        mGetRatioOfGpsPointCar = GetRatioOfGpsPoint(point3d, getGudaoOfGpsPoint);
-
-        DecimalFormat df1 = new DecimalFormat("#####0.00%");
-        DecimalFormatSymbols symbols1 = new DecimalFormatSymbols();
-        df1.setDecimalFormatSymbols(symbols1);
-        String ratioOfGpsPoint = df1.format(mGetRatioOfGpsPointCar);
-        String gpsPoint = ratioOfGpsPoint.substring(0, ratioOfGpsPoint.indexOf("."));
-        mGpsPistanceCar = Double.valueOf(gpsPoint);
-        Log.i("TAG", "mRatioOfGpsTrackCar" + mRatioOfGpsTrackCar);
-        Log.i("TAG", "mGetRatioOfGpsPointCar" + mGetRatioOfGpsPointCar);
-        Log.i("TAG", "mGpsPistanceCar" + mGpsPistanceCar);
-
-        proplrMove();*/
-
-        /*DecimalFormat df = new DecimalFormat("#.000000");
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        df.setDecimalFormatSymbols(symbols);
-        String lat = df.format(Double.valueOf(a1));
-        String lon = df.format(Double.valueOf(b1));
-        Double latDouble = Double.valueOf(lat);
-        Double lonDouble = Double.valueOf(lon);
-        Log.i("二宝",""+a1);
-        Log.i("二宝",""+b1);
-        //大圆盘坐标减去与实际坐标的差值
-        double latDifference = latDouble - 0.000017;
-        double lonDifference = lonDouble - 0.000021;
-        String a2 = String.valueOf(latDifference);
-        String b2 = String.valueOf(lonDifference);
-        Log.i("二宝a2",""+a2);
-        Log.i("二宝b2",""+b2);
-        String lat1 = a2.substring(a2.indexOf(".") + 1);
-        String lon1 = b2.substring(b2.indexOf(".") + 1);
-        Log.i("二宝lat1",""+lat1);
-        Log.i("二宝lon1",""+lon1);
-        mTotal1 = "0A-机车GPS-" + lat1 + "-" + lon1;
-        String ma = lat.substring(lat.length() - 4, lat.length());
-        String mb = lon.substring(lon.length() - 4, lon.length());
-        float mvalue1 = Float.valueOf(ma);
-        float mvalue2 = Float.valueOf(mb);
-        //mGpsDao = new GPSDao(getApplicationContext());
-        //mJwd.setText(lat + "    " + lon);
-        mGpsDao.add(a2, b2);
-        mGpsUsers = mGpsDao.find();
-        int size = mGpsUsers.size();
-        Log.i("二宝size",""+size);
-        String latsize = mGpsUsers.get(size - 1).getLat();
-        String lonsize = mGpsUsers.get(size - 1).getLon();
-        Log.i("二宝size",""+latsize);
-        Log.i("二宝size",""+lonsize);*/
-    }
 
     private Handler mHandler = new Handler();
     private Runnable mRunnable = new Runnable() {
@@ -3090,6 +4136,54 @@ public class PointActivity extends SerialPortActivity {
             //n = (int)Math.Round(r * 100);
         }
         return r;
+    }
+
+    //获取最小值下标
+    private int getMinIndex(List<Integer> mList) {
+        int min = mList.get(0);
+        int index = 0;
+        for (int i = 0; i < mList.size(); i++) {
+            if (min > mList.get(i)) {
+                min = mList.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    //获取最小值
+    private int getMin(List<Integer> mList) {
+        int min = mList.get(0);
+        for (int i = 0; i < mList.size(); i++) {
+            if (min > mList.get(i)) {
+                min = mList.get(i);
+            }
+        }
+        return min;
+    }
+
+    //获取最大值下标
+    private int getMaxIndex(List<Integer> mList) {
+        int max = mList.get(0);
+        int index = 0;
+        for (int i = 0; i < mList.size(); i++) {
+            if (max < mList.get(i)) {
+                max = mList.get(i);
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    //获取最大值
+    private int getMax(List<Integer> mList) {
+        int max = mList.get(0);
+        for (int i = 0; i < mList.size(); i++) {
+            if (max > mList.get(i)) {
+                max = mList.get(i);
+            }
+        }
+        return max;
     }
 
     //机车

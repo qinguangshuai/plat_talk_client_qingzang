@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.five;
+package com.kylindev.totalk.qgs.park.ten;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,22 +14,22 @@ import com.kylindev.totalk.bjxt.SpUtil;
  * @date 2020/8/10 16:33
  * 1道停留车
  */
-public class FiveParkCar extends View {
+public class TenParkCar extends View {
 
     private Paint mPaint;
     private Bitmap mBitmap;
     private Canvas mCanvas1;
     private Bitmap mBitmap1;
 
-    public FiveParkCar(Context context) {
+    public TenParkCar(Context context) {
         this(context, null);
     }
 
-    public FiveParkCar(Context context, AttributeSet attrs) {
+    public TenParkCar(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FiveParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TenParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -60,23 +60,23 @@ public class FiveParkCar extends View {
         int width = canvas.getWidth();
 
         //1道停留车左点
-        SpUtil mFivePickLeft = new SpUtil(getContext(), "fivepickleft");
-        String nameLeft = mFivePickLeft.getPosition();
+        SpUtil mTenPickLeft = new SpUtil(getContext(), "tenpickleft");
+        String nameLeft = mTenPickLeft.getPosition();
         //1道停留车右点
-        SpUtil mFivepickrightight = new SpUtil(getContext(), "fivepickright");
-        String nameRight = mFivepickrightight.getPosition();
+        SpUtil mTenpickrightight = new SpUtil(getContext(), "tenpickright");
+        String nameRight = mTenpickrightight.getPosition();
         if (nameLeft != null && nameRight != null){
             if (!nameLeft.equals("0") && !nameRight.equals("0")){
                 Float left = Float.valueOf(nameLeft);
                 Float right = Float.valueOf(nameRight);
-                if (left < 6 && right > 93) {
-                    canvas.drawLine((384 + (6 - 6) * 2.94f), 300, (384 + (93 - 6) * 2.94f), 300, mPaint);
-                }else if (left < 6 && right <= 93) {
-                    canvas.drawLine((384 + (6 - 6) * 2.94f), 300, (384 + (right - 6) * 2.94f), 300, mPaint);
-                }else if (left >= 6 && right > 93){
-                    canvas.drawLine((384 + (left - 6) * 2.94f), 300, (384 + (93 - 6) * 2.94f), 300, mPaint);
+                if (left < 21 && right > 76) {
+                    canvas.drawLine((384 + (21 - 21) * 6.05f), 50, (384 + (76 - 21) * 6.05f), 50, mPaint);
+                }else if (left < 21 && right <= 76) {
+                    canvas.drawLine((384 + (21 - 21) * 6.05f), 50, (384 + (right - 21) * 6.05f), 50, mPaint);
+                }else if (left >= 21 && right > 76){
+                    canvas.drawLine((384 + (left - 21) * 6.05f), 50, (384 + (76 - 21) * 6.05f), 50, mPaint);
                 }else {
-                    canvas.drawLine((384 + (left - 6) * 2.94f), 300, (384 + (right - 6) * 2.94f), 300, mPaint);
+                    canvas.drawLine((384 + (left - 21) * 6.05f), 50, (384 + (right - 21) * 6.05f), 50, mPaint);
                 }
             }
         }

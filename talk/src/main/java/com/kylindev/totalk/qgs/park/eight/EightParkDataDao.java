@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.four;
+package com.kylindev.totalk.qgs.park.eight;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,12 +14,12 @@ import java.util.List;
  * @date 2021/2/3 9:01
  * 1道无数据时摘挂钩保存
  */
-public class FourDataDao {
+public class EightParkDataDao {
 
-    private FourParkOpenHelper helper;
+    private EightParkOpenHelper helper;
 
-    public FourDataDao(Context context) {
-        helper = new FourParkOpenHelper(context);
+    public EightParkDataDao(Context context) {
+        helper = new EightParkOpenHelper(context);
     }
 
     /**
@@ -39,7 +39,7 @@ public class FourDataDao {
         values.put("lon", lon);
         values.put("ratioOfGpsPointCar", ratioOfGpsPointCar);
         //实际底层原理 就是在组拼sql语句
-        long result = db.insert("fourparkcar", null, values);
+        long result = db.insert("eightparkcar", null, values);
         db.close();
         if (result == -1) {
             //说明插入失败
@@ -84,7 +84,7 @@ public class FourDataDao {
          */
 //		Cursor cursor = db.query("info", new String[]{"phone"}, "name=?", new String[]{name}, null, null, null);
 
-        Cursor cursor = db.query("fourparkcar", null, null, null, null, null, null);
+        Cursor cursor = db.query("eightparkcar", null, null, null, null, null, null);
         //对cursor 判断一下cursor
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {

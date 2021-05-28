@@ -5,9 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.kylindev.totalk.qgs.database.DataOpenHelper;
 import com.kylindev.totalk.qgs.park.DataUser;
-import com.kylindev.totalk.qgs.park.two.TwoDataOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +16,10 @@ import java.util.List;
  */
 public class FiveParkDataDao {
 
-    private FiveDataOpenHelper helper;
+    private FiveParkOpenHelper helper;
 
     public FiveParkDataDao(Context context) {
-        helper = new FiveDataOpenHelper(context);
+        helper = new FiveParkOpenHelper(context);
     }
 
     /**

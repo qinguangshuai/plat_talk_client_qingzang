@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.four;
+package com.kylindev.totalk.qgs.park.six;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,26 +6,28 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.kylindev.totalk.qgs.park.DataUser;
+import com.kylindev.totalk.qgs.park.one.OneDataUser;
+import com.kylindev.totalk.qgs.park.one.OneParkOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @date 2021/2/3 9:01
- * 1道无数据时摘挂钩保存
+ * 6道无数据时摘挂钩保存
  */
-public class FourDataDao {
+public class SixParkDataDao {
 
-    private FourParkOpenHelper helper;
+    private SixParkOpenHelper helper;
 
-    public FourDataDao(Context context) {
-        helper = new FourParkOpenHelper(context);
+    public SixParkDataDao(Context context) {
+        helper = new SixParkOpenHelper(context);
     }
 
     /**
      * 数据库的增加方法
      */
-    public boolean add(String gd,String lat, String lon,String ratioOfGpsPointCar) {
+    public boolean add(String gd, String lat, String lon, String ratioOfGpsPointCar, String num) {
         SQLiteDatabase db = helper.getWritableDatabase();
 //		db.execSQL("insert into info(name,phone) values(?,?)", new Object[]{NULL,phone});
 
@@ -38,8 +40,9 @@ public class FourDataDao {
         values.put("lat", lat);
         values.put("lon", lon);
         values.put("ratioOfGpsPointCar", ratioOfGpsPointCar);
+        values.put("num", num);
         //实际底层原理 就是在组拼sql语句
-        long result = db.insert("fourparkcar", null, values);
+        long result = db.insert("sixparkcar", null, values);
         db.close();
         if (result == -1) {
             //说明插入失败
@@ -54,7 +57,7 @@ public class FourDataDao {
     /**
      * 数据库的删除方法
      */
-    public int del(String name){
+    public int del(String name) {
         SQLiteDatabase db = helper.getReadableDatabase();
 //		db.execSQL("delete from info where name=?", new Object[]{name});
 
@@ -63,7 +66,7 @@ public class FourDataDao {
          * whereClause  删除条件
          */
         //代表 影响了多少行
-        int delete = db.delete(name, null,null);
+        int delete = db.delete(name, null, null);
         db.close();
         return delete;
     }
@@ -84,7 +87,7 @@ public class FourDataDao {
          */
 //		Cursor cursor = db.query("info", new String[]{"phone"}, "name=?", new String[]{name}, null, null, null);
 
-        Cursor cursor = db.query("fourparkcar", null, null, null, null, null, null);
+        Cursor cursor = db.query("sixparkcar", null, null, null, null, null, null);
         //对cursor 判断一下cursor
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
@@ -94,6 +97,7 @@ public class FourDataDao {
                 String lat = cursor.getString(2);   //获取我们的phone
                 String lon = cursor.getString(3);    //获取我们的name值
                 String ratioOfGpsPointCar = cursor.getString(4);    //获取我们的name值
+                String num = cursor.getString(5);    //获取我们的name值
                 DataUser dataUser = new DataUser();
 
                 System.out.println("time--" + lat + "signalling--" + lon);
@@ -102,6 +106,7 @@ public class FourDataDao {
                 dataUser.setLat(lat);
                 dataUser.setLon(lon);
                 dataUser.setRatioOfGpsPointCar(ratioOfGpsPointCar);
+                dataUser.setNum(num);
                 // 把Person对象 加入到 personLists集合中.
                 personLists.add(dataUser);
             }
