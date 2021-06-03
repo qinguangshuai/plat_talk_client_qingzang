@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 /**
  * BJXT-QGS
+ *
  * @date 2020/8/14 16:01
  */
 public class SpUtil {
@@ -26,7 +27,7 @@ public class SpUtil {
      * @param value
      */
     public void saveString(Context context, String key, String value) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
         sp.edit().putString(key, value).commit();
@@ -41,7 +42,7 @@ public class SpUtil {
      * @return
      */
     public String getString(Context context, String key, String defValue) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
         return sp.getString(key, defValue);
@@ -55,7 +56,7 @@ public class SpUtil {
      * @param value
      */
     public void saveBoolean(Context context, String key, boolean value) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
         sp.edit().putBoolean(key, value).commit();
@@ -70,7 +71,7 @@ public class SpUtil {
      * @return
      */
     public boolean getBoolean(Context context, String key, boolean defValue) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
 
@@ -85,12 +86,13 @@ public class SpUtil {
      * @param value
      */
     public void saveInt(Context context, String key, int value) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
 
         sp.edit().putInt(key, value).commit();
     }
+
     /**
      * 返回int
      *
@@ -100,12 +102,13 @@ public class SpUtil {
      * @return
      */
     public int getInt(Context context, String key, int defValue) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
 
         return sp.getInt(key, defValue);
     }
+
     /**
      * 保存float
      *
@@ -114,12 +117,13 @@ public class SpUtil {
      * @param value
      */
     public void saveFloat(Context context, String key, float value) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
 
         sp.edit().putFloat(key, value).commit();
     }
+
     /**
      * 返回float
      *
@@ -129,7 +133,7 @@ public class SpUtil {
      * @return
      */
     public float getFloat(Context context, String key, float defValue) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
 
@@ -144,7 +148,7 @@ public class SpUtil {
      * @return
      */
     public boolean contains(Context context, String key) {
-        if (sp == null){
+        if (sp == null) {
             sp = context.getSharedPreferences(SP_NAME, 0);
         }
         return sp.contains(key);
@@ -246,6 +250,16 @@ public class SpUtil {
     public void setPort(int port) {
         editor.putInt("port", port);
         editor.commit();
+    }
+
+    //index
+    public void setIndex(int index) {
+        editor.putInt("index", index);
+        editor.commit();
+    }
+
+    public int getIndex(int index) {
+        return sp.getInt("index", index);
     }
 
     // 是否在后台运行标记

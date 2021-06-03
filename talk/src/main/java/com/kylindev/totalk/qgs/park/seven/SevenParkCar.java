@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.six;
+package com.kylindev.totalk.qgs.park.seven;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,8 +8,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.kylindev.totalk.bjxt.SpUtil;
 import com.kylindev.totalk.qgs.park.DataUser;
+import com.kylindev.totalk.qgs.park.six.SixParkDataDao;
 
 import java.util.List;
 
@@ -17,22 +17,22 @@ import java.util.List;
  * @date 2020/8/10 16:33
  * 1道停留车
  */
-public class SixParkCar extends View {
+public class SevenParkCar extends View {
 
     private Paint mPaint;
     private Bitmap mBitmap;
     private Canvas mCanvas1;
     private Bitmap mBitmap1;
 
-    public SixParkCar(Context context) {
+    public SevenParkCar(Context context) {
         this(context, null);
     }
 
-    public SixParkCar(Context context, AttributeSet attrs) {
+    public SevenParkCar(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public SixParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SevenParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -62,8 +62,8 @@ public class SixParkCar extends View {
         int height = canvas.getHeight();
         int width = canvas.getWidth();
 
-        SixParkDataDao sixParkDataDao = new SixParkDataDao(getContext());
-        List<DataUser> dataUsers = sixParkDataDao.find();
+        SevenParkDataDao sevenParkDataDao = new SevenParkDataDao(getContext());
+        List<DataUser> dataUsers = sevenParkDataDao.find();
         int size = dataUsers.size();
         if (size > 1 && size % 2 != 0) {
             for (int i = 1; i < size; i += 2) {

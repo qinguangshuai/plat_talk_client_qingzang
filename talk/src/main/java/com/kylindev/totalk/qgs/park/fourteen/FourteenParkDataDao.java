@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.six;
+package com.kylindev.totalk.qgs.park.fourteen;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,8 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.kylindev.totalk.qgs.park.DataUser;
-import com.kylindev.totalk.qgs.park.one.OneDataUser;
-import com.kylindev.totalk.qgs.park.one.OneParkOpenHelper;
+import com.kylindev.totalk.qgs.park.thirteen.ThirteenParkOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +15,12 @@ import java.util.List;
  * @date 2021/2/3 9:01
  * 6道无数据时摘挂钩保存
  */
-public class SixParkDataDao {
+public class FourteenParkDataDao {
 
-    private SixParkOpenHelper helper;
+    private FourteenParkOpenHelper helper;
 
-    public SixParkDataDao(Context context) {
-        helper = new SixParkOpenHelper(context);
+    public FourteenParkDataDao(Context context) {
+        helper = new FourteenParkOpenHelper(context);
     }
 
     /**
@@ -42,7 +41,7 @@ public class SixParkDataDao {
         values.put("ratioOfGpsPointCar", ratioOfGpsPointCar);
         values.put("num", num);
         //实际底层原理 就是在组拼sql语句
-        long result = db.insert("sixparkcar", null, values);
+        long result = db.insert("fourteenparkcar", null, values);
         db.close();
         if (result == -1) {
             //说明插入失败
@@ -97,7 +96,7 @@ public class SixParkDataDao {
          */
 //		Cursor cursor = db.query("info", new String[]{"phone"}, "name=?", new String[]{name}, null, null, null);
 
-        Cursor cursor = db.query("sixparkcar", null, null, null, null, null, null);
+        Cursor cursor = db.query("fourteenparkcar", null, null, null, null, null, null);
         //对cursor 判断一下cursor
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {

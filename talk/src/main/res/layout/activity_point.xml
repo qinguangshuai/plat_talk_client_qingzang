@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/relative"
     tools:context=".qgs.PointActivity">
 
     <!--<RelativeLayout
@@ -47,6 +48,10 @@
         android:id="@+id/fiveparkcar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <!--<com.kylindev.totalk.qgs.park.six.SixParkCar
+        android:id="@+id/sixparkcar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
     <com.kylindev.totalk.qgs.park.eight.EightParkCar
         android:id="@+id/eightparkcar"
         android:layout_width="match_parent"
