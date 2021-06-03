@@ -1,4 +1,4 @@
-package com.kylindev.totalk.qgs.park.seven;
+package com.kylindev.totalk.qgs.park.seventeen;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,30 +9,30 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.kylindev.totalk.qgs.park.DataUser;
-import com.kylindev.totalk.qgs.park.six.SixParkDataDao;
+import com.kylindev.totalk.qgs.park.sixteen.SixteenParkDataDao;
 
 import java.util.List;
 
 /**
- * @date 2020/8/10 16:33
- * 1道停留车
+ * @date 2021/6/2 16:33
+ * 12道停留车
  */
-public class SevenParkCar extends View {
+public class SeventeenParkCar extends View {
 
     private Paint mPaint;
     private Bitmap mBitmap;
     private Canvas mCanvas1;
     private Bitmap mBitmap1;
 
-    public SevenParkCar(Context context) {
+    public SeventeenParkCar(Context context) {
         this(context, null);
     }
 
-    public SevenParkCar(Context context, AttributeSet attrs) {
+    public SeventeenParkCar(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public SevenParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SeventeenParkCar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -62,8 +62,8 @@ public class SevenParkCar extends View {
         int height = canvas.getHeight();
         int width = canvas.getWidth();
 
-        SevenParkDataDao sevenParkDataDao = new SevenParkDataDao(getContext());
-        List<DataUser> dataUsers = sevenParkDataDao.find();
+        SeventeenParkDataDao seventeenParkDataDao = new SeventeenParkDataDao(getContext());
+        List<DataUser> dataUsers = seventeenParkDataDao.find();
         int size = dataUsers.size();
         if (size > 1 && size % 2 != 0) {
             for (int i = 1; i < size; i += 2) {
@@ -71,12 +71,15 @@ public class SevenParkCar extends View {
                 Float aDoubleRatioOfGpsPointCar = Float.valueOf(ratioOfGpsPointCar);
                 String ratioOfGpsPointCar1 = dataUsers.get(i + 1).getRatioOfGpsPointCar();
                 Float aDoubleRatioOfGpsPointCar1 = Float.valueOf(ratioOfGpsPointCar1);
-                if (aDoubleRatioOfGpsPointCar < 83 && aDoubleRatioOfGpsPointCar1 < 83) {
-                    canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 250, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 250, mPaint);
-                } else if (aDoubleRatioOfGpsPointCar > 83 && aDoubleRatioOfGpsPointCar1 < 83) {
-                    canvas.drawLine((50 + 83 * 8.65f), 250, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 250, mPaint);
-                } else if (aDoubleRatioOfGpsPointCar < 83 && aDoubleRatioOfGpsPointCar1 > 83) {
-                    canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 250, (50 + 83 * 8.65f), 250, mPaint);
+                //(400 + (mGpsPistanceCar - 53) * 8.51f)
+                if (aDoubleRatioOfGpsPointCar < 53 && aDoubleRatioOfGpsPointCar1 < 53) {
+                    canvas.drawLine((400 + (53 - 53) * 8.51f), 350, (400 + (53 - 53) * 8.51f), 350, mPaint);
+                } else if (aDoubleRatioOfGpsPointCar > 53 && aDoubleRatioOfGpsPointCar1 < 53) {
+                    canvas.drawLine((400 + (aDoubleRatioOfGpsPointCar - 53) * 8.51f), 350, (400 + (53 - 53) * 8.51f), 350, mPaint);
+                } else if (aDoubleRatioOfGpsPointCar < 53 && aDoubleRatioOfGpsPointCar1 > 53) {
+                    canvas.drawLine((400 + (53 - 53) * 8.51f), 350, (400 + (aDoubleRatioOfGpsPointCar1 - 53) * 8.51f), 350, mPaint);
+                }else if (aDoubleRatioOfGpsPointCar > 53 && aDoubleRatioOfGpsPointCar1 > 53) {
+                    canvas.drawLine((400 + (aDoubleRatioOfGpsPointCar - 53) * 8.51f), 350, (400 + (aDoubleRatioOfGpsPointCar1 - 53) * 8.51f), 350, mPaint);
                 }
             }
         }

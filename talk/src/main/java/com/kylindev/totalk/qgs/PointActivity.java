@@ -38,8 +38,12 @@ import com.kylindev.totalk.qgs.database.six.SixDataDao;
 import com.kylindev.totalk.qgs.park.DataUser;
 import com.kylindev.totalk.qgs.park.eight.EightParkCar;
 import com.kylindev.totalk.qgs.park.eight.EightParkDataDao;
+import com.kylindev.totalk.qgs.park.eighteen.EighteenParkCar;
+import com.kylindev.totalk.qgs.park.eighteen.EighteenParkDataDao;
 import com.kylindev.totalk.qgs.park.eleven.ElevenParkCar;
 import com.kylindev.totalk.qgs.park.eleven.ElevenParkDataDao;
+import com.kylindev.totalk.qgs.park.fifteen.FifteenParkCar;
+import com.kylindev.totalk.qgs.park.fifteen.FifteenParkDataDao;
 import com.kylindev.totalk.qgs.park.five.FiveParkCar;
 import com.kylindev.totalk.qgs.park.five.FiveParkDataDao;
 import com.kylindev.totalk.qgs.park.four.FourDataDao;
@@ -48,12 +52,18 @@ import com.kylindev.totalk.qgs.park.fourteen.FourteenParkCar;
 import com.kylindev.totalk.qgs.park.fourteen.FourteenParkDataDao;
 import com.kylindev.totalk.qgs.park.nine.NineParkCar;
 import com.kylindev.totalk.qgs.park.nine.NineParkDataDao;
+import com.kylindev.totalk.qgs.park.nineteen.NineteenParkCar;
+import com.kylindev.totalk.qgs.park.nineteen.NineteenParkDataDao;
 import com.kylindev.totalk.qgs.park.one.OneDataDao;
 import com.kylindev.totalk.qgs.park.one.OneParkCar;
 import com.kylindev.totalk.qgs.park.seven.SevenParkCar;
 import com.kylindev.totalk.qgs.park.seven.SevenParkDataDao;
+import com.kylindev.totalk.qgs.park.seventeen.SeventeenParkCar;
+import com.kylindev.totalk.qgs.park.seventeen.SeventeenParkDataDao;
 import com.kylindev.totalk.qgs.park.six.SixParkCar;
 import com.kylindev.totalk.qgs.park.six.SixParkDataDao;
+import com.kylindev.totalk.qgs.park.sixteen.SixteenParkCar;
+import com.kylindev.totalk.qgs.park.sixteen.SixteenParkDataDao;
 import com.kylindev.totalk.qgs.park.ten.TenParkCar;
 import com.kylindev.totalk.qgs.park.ten.TenParkDataDao;
 import com.kylindev.totalk.qgs.park.thirteen.ThirteenParkCar;
@@ -164,7 +174,7 @@ public class PointActivity extends SerialPortActivity {
     private TransferPeopleFour mPeoplefour;
     private SpUtil mAdvancedmr, mOnePickLeft, mTwoPickLeft, mThreePickLeft, mFourPickLeft, mFivePickLeft, mSixPickLeft, mSevenPickLeft, mEightPickLeft;
     private SpUtil mNinePickLeft, mTenPickLeft, mElevenpickleft, mTwelvePickLeft, mThirteenPickLeft, mFourteenPickLeft;
-    private SpUtil mFifteenPickLeft, mSixteenPickLeft, mSeventeenPickLeft, mEighteennPickLeft, mNineteenPickLeft;
+    private SpUtil mFifteenPickLeft, mSixteenPickLeft, mSeventeenPickLeft, mEighteenPickLeft, mNineteenPickLeft;
     private SpUtil mOnepickright, mTwopickright, mThreepickright, mFourpickright, mFivepickright, mSixpickright, mSevenpickright, mEightpickright;
     private SpUtil mNinepickright, mTenpickright, mElevenpickright, mTwelvepickright, mThirteenpickright, mFourteenpickright;
     private SpUtil mFifteenPickRight, mSixteenPickRight, mSeventeenPickRight, mEighteenPickRight, mNineteenPickRight;
@@ -213,6 +223,16 @@ public class PointActivity extends SerialPortActivity {
     private TwelveParkCar mTwelveParkCar;
     private ThirteenParkCar mThirteenParkCar;
     private FourteenParkCar mFourteenParkCar;
+    private FifteenParkDataDao mFifteenParkDataDao;
+    private SixteenParkDataDao mSixteenParkDataDao;
+    private SeventeenParkDataDao mSeventeenParkDataDao;
+    private EighteenParkDataDao mEighteenParkDataDao;
+    private NineteenParkDataDao mNineteenParkDataDao;
+    private FifteenParkCar mFifteenParkCar;
+    private SixteenParkCar mSixteenParkCar;
+    private SeventeenParkCar mSeventeenParkCar;
+    private EighteenParkCar mEighteenParkCar;
+    private NineteenParkCar mNineteenParkCar;
 
     void sendMessage(String uid, String s) {
 
@@ -1088,19 +1108,194 @@ public class PointActivity extends SerialPortActivity {
                                                 }
                                                 break;
                                             case 15:
+                                                String takeOffTotal15 = mControlFifteenPick.getName();
+                                                mControlFifteenPick.setName(takeOffTotal15 + "摘钩");
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 2) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                String takeOffTotal16 = mControlSixteenPick.getName();
+                                                mControlSixteenPick.setName(takeOffTotal16 + "摘钩");
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 2) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                String takeOffTotal17 = mControlSeventeenPick.getName();
+                                                mControlSeventeenPick.setName(takeOffTotal17 + "摘钩");
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 2) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                String takeOffTotal18 = mControlEighteenPick.getName();
+                                                mControlEighteenPick.setName(takeOffTotal18 + "摘钩");
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 2) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                String takeOffTotal19 = mControlNineteenPick.getName();
+                                                mControlNineteenPick.setName(takeOffTotal19 + "摘钩");
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 2) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -1648,19 +1843,194 @@ public class PointActivity extends SerialPortActivity {
                                                     mFourteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", fourteenSum + "");
                                                 }
                                             case 15:
+                                                String takeOffTotal15 = mControlFifteenPick.getName();
+                                                mControlFifteenPick.setName(takeOffTotal15 + "摘钩");
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 2) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                String takeOffTotal16 = mControlSixteenPick.getName();
+                                                mControlSixteenPick.setName(takeOffTotal16 + "摘钩");
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 2) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                String takeOffTotal17 = mControlSeventeenPick.getName();
+                                                mControlSeventeenPick.setName(takeOffTotal17 + "摘钩");
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 2) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                String takeOffTotal18 = mControlEighteenPick.getName();
+                                                mControlEighteenPick.setName(takeOffTotal18 + "摘钩");
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 2) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                String takeOffTotal19 = mControlNineteenPick.getName();
+                                                mControlNineteenPick.setName(takeOffTotal19 + "摘钩");
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 2) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -2208,19 +2578,194 @@ public class PointActivity extends SerialPortActivity {
                                                     mFourteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", fourteenSum + "");
                                                 }
                                             case 15:
+                                                String takeOffTotal15 = mControlFifteenPick.getName();
+                                                mControlFifteenPick.setName(takeOffTotal15 + "摘钩");
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 2) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                String takeOffTotal16 = mControlSixteenPick.getName();
+                                                mControlSixteenPick.setName(takeOffTotal16 + "摘钩");
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 2) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                String takeOffTotal17 = mControlSeventeenPick.getName();
+                                                mControlSeventeenPick.setName(takeOffTotal17 + "摘钩");
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 2) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                String takeOffTotal18 = mControlEighteenPick.getName();
+                                                mControlEighteenPick.setName(takeOffTotal18 + "摘钩");
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 2) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                String takeOffTotal19 = mControlNineteenPick.getName();
+                                                mControlNineteenPick.setName(takeOffTotal19 + "摘钩");
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 2) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -2768,19 +3313,194 @@ public class PointActivity extends SerialPortActivity {
                                                     mFourteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", fourteenSum + "");
                                                 }
                                             case 15:
+                                                String takeOffTotal15 = mControlFifteenPick.getName();
+                                                mControlFifteenPick.setName(takeOffTotal15 + "摘钩");
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 2) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                String takeOffTotal16 = mControlSixteenPick.getName();
+                                                mControlSixteenPick.setName(takeOffTotal16 + "摘钩");
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 2) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                String takeOffTotal17 = mControlSeventeenPick.getName();
+                                                mControlSeventeenPick.setName(takeOffTotal17 + "摘钩");
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 2) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                String takeOffTotal18 = mControlEighteenPick.getName();
+                                                mControlEighteenPick.setName(takeOffTotal18 + "摘钩");
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 2) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                String takeOffTotal19 = mControlNineteenPick.getName();
+                                                mControlNineteenPick.setName(takeOffTotal19 + "摘钩");
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 2) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
 
                                         }
@@ -2894,19 +3614,49 @@ public class PointActivity extends SerialPortActivity {
                                                 mControlFourteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 15:
-
+                                                mControlFifteenPick.setName(hookTotal + "挂钩");
+                                                mControlFifteenPick.setLat(mLat21);
+                                                mControlFifteenPick.setLon(mLon21);
+                                                //股道
+                                                mControlFifteenPick.setTrack(mRatioOfGpsTrackCar2);
+                                                //位置
+                                                mControlFifteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 16:
-
+                                                mControlSixteenPick.setName(hookTotal + "挂钩");
+                                                mControlSixteenPick.setLat(mLat21);
+                                                mControlSixteenPick.setLon(mLon21);
+                                                //股道
+                                                mControlSixteenPick.setTrack(mRatioOfGpsTrackCar2);
+                                                //位置
+                                                mControlSixteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 17:
-
+                                                mControlSeventeenPick.setName(hookTotal + "挂钩");
+                                                mControlSeventeenPick.setLat(mLat21);
+                                                mControlSeventeenPick.setLon(mLon21);
+                                                //股道
+                                                mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar2);
+                                                //位置
+                                                mControlSeventeenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 18:
-
+                                                mControlEighteenPick.setName(hookTotal + "挂钩");
+                                                mControlEighteenPick.setLat(mLat21);
+                                                mControlEighteenPick.setLon(mLon21);
+                                                //股道
+                                                mControlEighteenPick.setTrack(mRatioOfGpsTrackCar2);
+                                                //位置
+                                                mControlEighteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 19:
-
+                                                mControlNineteenPick.setName(hookTotal + "挂钩");
+                                                mControlNineteenPick.setLat(mLat21);
+                                                mControlNineteenPick.setLon(mLon21);
+                                                //股道
+                                                mControlNineteenPick.setTrack(mRatioOfGpsTrackCar2);
+                                                //位置
+                                                mControlNineteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                         }
                                         break;
@@ -3008,19 +3758,49 @@ public class PointActivity extends SerialPortActivity {
                                                 mControlFourteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 15:
-
+                                                mControlFifteenPick.setName(hookTotal2 + "挂钩");
+                                                mControlFifteenPick.setLat(mLat31);
+                                                mControlFifteenPick.setLon(mLon31);
+                                                //股道
+                                                mControlFifteenPick.setTrack(mRatioOfGpsTrackCar3);
+                                                //位置
+                                                mControlFifteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 16:
-
+                                                mControlSixteenPick.setName(hookTotal2 + "挂钩");
+                                                mControlSixteenPick.setLat(mLat31);
+                                                mControlSixteenPick.setLon(mLon31);
+                                                //股道
+                                                mControlSixteenPick.setTrack(mRatioOfGpsTrackCar3);
+                                                //位置
+                                                mControlSixteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 17:
-
+                                                mControlSeventeenPick.setName(hookTotal2 + "挂钩");
+                                                mControlSeventeenPick.setLat(mLat31);
+                                                mControlSeventeenPick.setLon(mLon31);
+                                                //股道
+                                                mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar3);
+                                                //位置
+                                                mControlSeventeenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 18:
-
+                                                mControlEighteenPick.setName(hookTotal2 + "挂钩");
+                                                mControlEighteenPick.setLat(mLat31);
+                                                mControlEighteenPick.setLon(mLon31);
+                                                //股道
+                                                mControlEighteenPick.setTrack(mRatioOfGpsTrackCar3);
+                                                //位置
+                                                mControlEighteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 19:
-
+                                                mControlNineteenPick.setName(hookTotal2 + "挂钩");
+                                                mControlNineteenPick.setLat(mLat31);
+                                                mControlNineteenPick.setLon(mLon31);
+                                                //股道
+                                                mControlNineteenPick.setTrack(mRatioOfGpsTrackCar3);
+                                                //位置
+                                                mControlNineteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                         }
                                         break;
@@ -3122,19 +3902,49 @@ public class PointActivity extends SerialPortActivity {
                                                 mControlFourteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 15:
-
+                                                mControlFifteenPick.setName(hookTotal3 + "挂钩");
+                                                mControlFifteenPick.setLat(mLat4);
+                                                mControlFifteenPick.setLon(mLon4);
+                                                //股道
+                                                mControlFifteenPick.setTrack(mRatioOfGpsTrackCar4);
+                                                //位置
+                                                mControlFifteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 16:
-
+                                                mControlSixteenPick.setName(hookTotal3 + "挂钩");
+                                                mControlSixteenPick.setLat(mLat4);
+                                                mControlSixteenPick.setLon(mLon4);
+                                                //股道
+                                                mControlSixteenPick.setTrack(mRatioOfGpsTrackCar4);
+                                                //位置
+                                                mControlSixteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 17:
-
+                                                mControlSeventeenPick.setName(hookTotal3 + "挂钩");
+                                                mControlSeventeenPick.setLat(mLat4);
+                                                mControlSeventeenPick.setLon(mLon4);
+                                                //股道
+                                                mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar4);
+                                                //位置
+                                                mControlSeventeenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 18:
-
+                                                mControlEighteenPick.setName(hookTotal3 + "挂钩");
+                                                mControlEighteenPick.setLat(mLat4);
+                                                mControlEighteenPick.setLon(mLon4);
+                                                //股道
+                                                mControlEighteenPick.setTrack(mRatioOfGpsTrackCar4);
+                                                //位置
+                                                mControlEighteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 19:
-
+                                                mControlNineteenPick.setName(hookTotal3 + "挂钩");
+                                                mControlNineteenPick.setLat(mLat4);
+                                                mControlNineteenPick.setLon(mLon4);
+                                                //股道
+                                                mControlNineteenPick.setTrack(mRatioOfGpsTrackCar4);
+                                                //位置
+                                                mControlNineteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                         }
                                         break;
@@ -3236,19 +4046,49 @@ public class PointActivity extends SerialPortActivity {
                                                 mControlFourteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 15:
-
+                                                mControlFifteenPick.setName(hookTotal4 + "挂钩");
+                                                mControlFifteenPick.setLat(mLat5);
+                                                mControlFifteenPick.setLon(mLon5);
+                                                //股道
+                                                mControlFifteenPick.setTrack(mRatioOfGpsTrackCar5);
+                                                //位置
+                                                mControlFifteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 16:
-
+                                                mControlSixteenPick.setName(hookTotal4 + "挂钩");
+                                                mControlSixteenPick.setLat(mLat5);
+                                                mControlSixteenPick.setLon(mLon5);
+                                                //股道
+                                                mControlSixteenPick.setTrack(mRatioOfGpsTrackCar5);
+                                                //位置
+                                                mControlSixteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 17:
-
+                                                mControlSeventeenPick.setName(hookTotal4 + "挂钩");
+                                                mControlSeventeenPick.setLat(mLat5);
+                                                mControlSeventeenPick.setLon(mLon5);
+                                                //股道
+                                                mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar5);
+                                                //位置
+                                                mControlSeventeenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 18:
-
+                                                mControlEighteenPick.setName(hookTotal4 + "挂钩");
+                                                mControlEighteenPick.setLat(mLat5);
+                                                mControlEighteenPick.setLon(mLon5);
+                                                //股道
+                                                mControlEighteenPick.setTrack(mRatioOfGpsTrackCar5);
+                                                //位置
+                                                mControlEighteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                             case 19:
-
+                                                mControlNineteenPick.setName(hookTotal4 + "挂钩");
+                                                mControlNineteenPick.setLat(mLat5);
+                                                mControlNineteenPick.setLon(mLon5);
+                                                //股道
+                                                mControlNineteenPick.setTrack(mRatioOfGpsTrackCar5);
+                                                //位置
+                                                mControlNineteenPick.setPosition(mGpsPistance2 + "");
                                                 break;
                                         }
                                         break;
@@ -3755,6 +4595,326 @@ public class PointActivity extends SerialPortActivity {
                                 }
                                 mControlFourteenPick.setName("");
                                 mFourteenParkCar.invalidate();
+
+                                //查看15道保存的数据是否只有挂钩
+                                String controlfifteenpickrightName41 = mControlFifteenPick.getName();
+                                if (controlfifteenpickrightName41.equals("挂钩挂钩挂钩") && controlfifteenpickrightName41.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String fifteenTrack = mControlFifteenPick.getTrack();
+                                    String fifteenPosition = mControlFifteenPick.getPosition();
+                                    String fifteenLat = mControlFifteenPick.getLat();
+                                    String fifteenLon = mControlFifteenPick.getLon();
+
+                                    List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                    int fifteenSize = fifteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (fifteenSize > 1) {
+                                        for (int i = 1; i < fifteenSize; i++) {
+                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerFifteenPosition = Integer.valueOf(fifteenPosition);
+                                            int fifteenNum = integerGpsPoint - integerFifteenPosition;
+                                            if (fifteenNum < 0) {
+                                                int fifteenZheng = -fifteenNum;
+                                                mListInteger.add(fifteenZheng);
+                                            } else {
+                                                mListInteger.add(fifteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int fifteenMinIndex = getMinIndex(mListInteger);
+                                        if (fifteenMinIndex % 2 == 0) {
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex);
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex + 1);
+                                            for (int i = 1; i < fifteenSize; i++) {
+                                                String fifteenNum = fifteenDataUsers.get(i).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                if (integerFifteenNum > fifteenMinIndex) {
+                                                    int fifteenZhai = integerFifteenNum - 2;
+                                                    mFifteenParkDataDao.updateData("fifteenparkcar", "" + fifteenZhai, fifteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex);
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex - 1);
+                                            for (int i = 1; i < fifteenSize; i++) {
+                                                String fifteenNum = fifteenDataUsers.get(i).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                if (integerFifteenNum > fifteenMinIndex) {
+                                                    int fifteenZhai = integerFifteenNum - 2;
+                                                    mFifteenParkDataDao.updateData("fifteenparkcar", "" + fifteenZhai, fifteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mFifteenPickLeft.setPosition("");
+                                        mFifteenPickRight.setPosition("");
+                                    }
+                                    getFifteenNum();
+                                }
+                                mControlFifteenPick.setName("");
+                                mFifteenParkCar.invalidate();
+
+                                //查看16道保存的数据是否只有挂钩
+                                String controlsixteenpickrightName41 = mControlSixteenPick.getName();
+                                if (controlsixteenpickrightName41.equals("挂钩挂钩挂钩") && controlsixteenpickrightName41.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String sixteenTrack = mControlSixteenPick.getTrack();
+                                    String sixteenPosition = mControlSixteenPick.getPosition();
+                                    String sixteenLat = mControlSixteenPick.getLat();
+                                    String sixteenLon = mControlSixteenPick.getLon();
+
+                                    List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                    int sixteenSize = sixteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (sixteenSize > 1) {
+                                        for (int i = 1; i < sixteenSize; i++) {
+                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerSixteenPosition = Integer.valueOf(sixteenPosition);
+                                            int sixteenNum = integerGpsPoint - integerSixteenPosition;
+                                            if (sixteenNum < 0) {
+                                                int sixteenZheng = -sixteenNum;
+                                                mListInteger.add(sixteenZheng);
+                                            } else {
+                                                mListInteger.add(sixteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int sixteenMinIndex = getMinIndex(mListInteger);
+                                        if (sixteenMinIndex % 2 == 0) {
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex);
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex + 1);
+                                            for (int i = 1; i < sixteenSize; i++) {
+                                                String sixteenNum = sixteenDataUsers.get(i).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                if (integerSixteenNum > sixteenMinIndex) {
+                                                    int sixteenZhai = integerSixteenNum - 2;
+                                                    mSixteenParkDataDao.updateData("sixteenparkcar", "" + sixteenZhai, sixteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex);
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex - 1);
+                                            for (int i = 1; i < sixteenSize; i++) {
+                                                String sixteenNum = sixteenDataUsers.get(i).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                if (integerSixteenNum > sixteenMinIndex) {
+                                                    int sixteenZhai = integerSixteenNum - 2;
+                                                    mSixteenParkDataDao.updateData("sixteenparkcar", "" + sixteenZhai, sixteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mSixteenPickLeft.setPosition("");
+                                        mSixteenPickRight.setPosition("");
+                                    }
+                                    getSixteenNum();
+                                }
+                                mControlSixteenPick.setName("");
+                                mSixteenParkCar.invalidate();
+
+                                //查看17道保存的数据是否只有挂钩
+                                String controlseventeenpickrightName41 = mControlSeventeenPick.getName();
+                                if (controlseventeenpickrightName41.equals("挂钩挂钩挂钩") && controlseventeenpickrightName41.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String seventeenTrack = mControlSeventeenPick.getTrack();
+                                    String seventeenPosition = mControlSeventeenPick.getPosition();
+                                    String seventeenLat = mControlSeventeenPick.getLat();
+                                    String seventeenLon = mControlSeventeenPick.getLon();
+
+                                    List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                    int seventeenSize = seventeenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (seventeenSize > 1) {
+                                        for (int i = 1; i < seventeenSize; i++) {
+                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerSeventeenPosition = Integer.valueOf(seventeenPosition);
+                                            int seventeenNum = integerGpsPoint - integerSeventeenPosition;
+                                            if (seventeenNum < 0) {
+                                                int seventeenZheng = -seventeenNum;
+                                                mListInteger.add(seventeenZheng);
+                                            } else {
+                                                mListInteger.add(seventeenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int seventeenMinIndex = getMinIndex(mListInteger);
+                                        if (seventeenMinIndex % 2 == 0) {
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex);
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex + 1);
+                                            for (int i = 1; i < seventeenSize; i++) {
+                                                String seventeenNum = seventeenDataUsers.get(i).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                if (integerSeventeenNum > seventeenMinIndex) {
+                                                    int seventeenZhai = integerSeventeenNum - 2;
+                                                    mSeventeenParkDataDao.updateData("seventeenparkcar", "" + seventeenZhai, seventeenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex);
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex - 1);
+                                            for (int i = 1; i < seventeenSize; i++) {
+                                                String seventeenNum = seventeenDataUsers.get(i).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                if (integerSeventeenNum > seventeenMinIndex) {
+                                                    int seventeenZhai = integerSeventeenNum - 2;
+                                                    mSeventeenParkDataDao.updateData("seventeenparkcar", "" + seventeenZhai, seventeenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mSeventeenPickLeft.setPosition("");
+                                        mSeventeenPickRight.setPosition("");
+                                    }
+                                    getSeventeenNum();
+                                }
+                                mControlSeventeenPick.setName("");
+                                mSeventeenParkCar.invalidate();
+
+                                //查看18道保存的数据是否只有挂钩
+                                String controleighteenpickrightName41 = mControlEighteenPick.getName();
+                                if (controleighteenpickrightName41.equals("挂钩挂钩挂钩") && controleighteenpickrightName41.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String eighteenTrack = mControlEighteenPick.getTrack();
+                                    String eighteenPosition = mControlEighteenPick.getPosition();
+                                    String eighteenLat = mControlEighteenPick.getLat();
+                                    String eighteenLon = mControlEighteenPick.getLon();
+
+                                    List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                    int eighteenSize = eighteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (eighteenSize > 1) {
+                                        for (int i = 1; i < eighteenSize; i++) {
+                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerEighteenPosition = Integer.valueOf(eighteenPosition);
+                                            int eighteenNum = integerGpsPoint - integerEighteenPosition;
+                                            if (eighteenNum < 0) {
+                                                int eighteenZheng = -eighteenNum;
+                                                mListInteger.add(eighteenZheng);
+                                            } else {
+                                                mListInteger.add(eighteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int eighteenMinIndex = getMinIndex(mListInteger);
+                                        if (eighteenMinIndex % 2 == 0) {
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex);
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex + 1);
+                                            for (int i = 1; i < eighteenSize; i++) {
+                                                String eighteenNum = eighteenDataUsers.get(i).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                if (integerEighteenNum > eighteenMinIndex) {
+                                                    int eighteenZhai = integerEighteenNum - 2;
+                                                    mEighteenParkDataDao.updateData("eighteenparkcar", "" + eighteenZhai, eighteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex);
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex - 1);
+                                            for (int i = 1; i < eighteenSize; i++) {
+                                                String eighteenNum = eighteenDataUsers.get(i).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                if (integerEighteenNum > eighteenMinIndex) {
+                                                    int eighteenZhai = integerEighteenNum - 2;
+                                                    mEighteenParkDataDao.updateData("eighteenparkcar", "" + eighteenZhai, eighteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mEighteenPickLeft.setPosition("");
+                                        mEighteenPickRight.setPosition("");
+                                    }
+                                    getEighteenNum();
+                                }
+                                mControlEighteenPick.setName("");
+                                mEighteenParkCar.invalidate();
+
+                                //查看19道保存的数据是否只有挂钩
+                                String controlnineteenpickrightName41 = mControlNineteenPick.getName();
+                                if (controlnineteenpickrightName41.equals("挂钩挂钩挂钩") && controlnineteenpickrightName41.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String nineteenTrack = mControlNineteenPick.getTrack();
+                                    String nineteenPosition = mControlNineteenPick.getPosition();
+                                    String nineteenLat = mControlNineteenPick.getLat();
+                                    String nineteenLon = mControlNineteenPick.getLon();
+
+                                    List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                    int nineteenSize = nineteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (nineteenSize > 1) {
+                                        for (int i = 1; i < nineteenSize; i++) {
+                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerNineteenPosition = Integer.valueOf(nineteenPosition);
+                                            int nineteenNum = integerGpsPoint - integerNineteenPosition;
+                                            if (nineteenNum < 0) {
+                                                int nineteenZheng = -nineteenNum;
+                                                mListInteger.add(nineteenZheng);
+                                            } else {
+                                                mListInteger.add(nineteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int nineteenMinIndex = getMinIndex(mListInteger);
+                                        if (nineteenMinIndex % 2 == 0) {
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex);
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex + 1);
+                                            for (int i = 1; i < nineteenSize; i++) {
+                                                String nineteenNum = nineteenDataUsers.get(i).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                if (integerNineteenNum > nineteenMinIndex) {
+                                                    int nineteenZhai = integerNineteenNum - 2;
+                                                    mNineteenParkDataDao.updateData("nineteenparkcar", "" + nineteenZhai, nineteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex);
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex - 1);
+                                            for (int i = 1; i < nineteenSize; i++) {
+                                                String enineteenNum = nineteenDataUsers.get(i).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(enineteenNum);
+                                                if (integerNineteenNum > nineteenMinIndex) {
+                                                    int nineteenZhai = integerNineteenNum - 2;
+                                                    mNineteenParkDataDao.updateData("nineteenparkcar", "" + nineteenZhai, nineteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mNineteenPickLeft.setPosition("");
+                                        mNineteenPickRight.setPosition("");
+                                    }
+                                    getNineteenNum();
+                                }
+                                mControlNineteenPick.setName("");
+                                mNineteenParkCar.invalidate();
                                 break;
                             //推进
                             case "43":
@@ -4263,6 +5423,326 @@ public class PointActivity extends SerialPortActivity {
                                 }
                                 mControlFourteenPick.setName("");
                                 mFourteenParkCar.invalidate();
+
+                                //查看15道保存的数据是否只有挂钩
+                                String controlfifteenpickrightName43 = mControlFifteenPick.getName();
+                                if (controlfifteenpickrightName43.equals("挂钩挂钩挂钩") && controlfifteenpickrightName43.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String fifteenTrack = mControlFifteenPick.getTrack();
+                                    String fifteenPosition = mControlFifteenPick.getPosition();
+                                    String fifteenLat = mControlFifteenPick.getLat();
+                                    String fifteenLon = mControlFifteenPick.getLon();
+
+                                    List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                    int fifteenSize = fifteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (fifteenSize > 1) {
+                                        for (int i = 1; i < fifteenSize; i++) {
+                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerFifteenPosition = Integer.valueOf(fifteenPosition);
+                                            int fifteenNum = integerGpsPoint - integerFifteenPosition;
+                                            if (fifteenNum < 0) {
+                                                int fifteenZheng = -fifteenNum;
+                                                mListInteger.add(fifteenZheng);
+                                            } else {
+                                                mListInteger.add(fifteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int fifteenMinIndex = getMinIndex(mListInteger);
+                                        if (fifteenMinIndex % 2 == 0) {
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex);
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex + 1);
+                                            for (int i = 1; i < fifteenSize; i++) {
+                                                String fifteenNum = fifteenDataUsers.get(i).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                if (integerFifteenNum > fifteenMinIndex) {
+                                                    int fifteenZhai = integerFifteenNum - 2;
+                                                    mFifteenParkDataDao.updateData("fifteenparkcar", "" + fifteenZhai, fifteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex);
+                                            mFifteenParkDataDao.delete("fifteenparkcar", fifteenMinIndex - 1);
+                                            for (int i = 1; i < fifteenSize; i++) {
+                                                String fifteenNum = fifteenDataUsers.get(i).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                if (integerFifteenNum > fifteenMinIndex) {
+                                                    int fifteenZhai = integerFifteenNum - 2;
+                                                    mFifteenParkDataDao.updateData("fifteenparkcar", "" + fifteenZhai, fifteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mFifteenPickLeft.setPosition("");
+                                        mFifteenPickRight.setPosition("");
+                                    }
+                                    getFifteenNum();
+                                }
+                                mControlFifteenPick.setName("");
+                                mFifteenParkCar.invalidate();
+
+                                //查看16道保存的数据是否只有挂钩
+                                String controlsixteenpickrightName43 = mControlSixteenPick.getName();
+                                if (controlsixteenpickrightName43.equals("挂钩挂钩挂钩") && controlsixteenpickrightName43.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String sixteenTrack = mControlSixteenPick.getTrack();
+                                    String sixteenPosition = mControlSixteenPick.getPosition();
+                                    String sixteenLat = mControlSixteenPick.getLat();
+                                    String sixteenLon = mControlSixteenPick.getLon();
+
+                                    List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                    int sixteenSize = sixteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (sixteenSize > 1) {
+                                        for (int i = 1; i < sixteenSize; i++) {
+                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerSixteenPosition = Integer.valueOf(sixteenPosition);
+                                            int sixteenNum = integerGpsPoint - integerSixteenPosition;
+                                            if (sixteenNum < 0) {
+                                                int sixteenZheng = -sixteenNum;
+                                                mListInteger.add(sixteenZheng);
+                                            } else {
+                                                mListInteger.add(sixteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int sixteenMinIndex = getMinIndex(mListInteger);
+                                        if (sixteenMinIndex % 2 == 0) {
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex);
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex + 1);
+                                            for (int i = 1; i < sixteenSize; i++) {
+                                                String sixteenNum = sixteenDataUsers.get(i).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                if (integerSixteenNum > sixteenMinIndex) {
+                                                    int sixteenZhai = integerSixteenNum - 2;
+                                                    mSixteenParkDataDao.updateData("sixteenparkcar", "" + sixteenZhai, sixteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex);
+                                            mSixteenParkDataDao.delete("sixteenparkcar", sixteenMinIndex - 1);
+                                            for (int i = 1; i < sixteenSize; i++) {
+                                                String sixteenNum = sixteenDataUsers.get(i).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                if (integerSixteenNum > sixteenMinIndex) {
+                                                    int sixteenZhai = integerSixteenNum - 2;
+                                                    mSixteenParkDataDao.updateData("sixteenparkcar", "" + sixteenZhai, sixteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mSixteenPickLeft.setPosition("");
+                                        mSixteenPickRight.setPosition("");
+                                    }
+                                    getSixteenNum();
+                                }
+                                mControlSixteenPick.setName("");
+                                mSixteenParkCar.invalidate();
+
+                                //查看17道保存的数据是否只有挂钩
+                                String controlseventeenpickrightName43 = mControlSeventeenPick.getName();
+                                if (controlseventeenpickrightName43.equals("挂钩挂钩挂钩") && controlseventeenpickrightName43.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String seventeenTrack = mControlSeventeenPick.getTrack();
+                                    String seventeenPosition = mControlSeventeenPick.getPosition();
+                                    String seventeenLat = mControlSeventeenPick.getLat();
+                                    String seventeenLon = mControlSeventeenPick.getLon();
+
+                                    List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                    int seventeenSize = seventeenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (seventeenSize > 1) {
+                                        for (int i = 1; i < seventeenSize; i++) {
+                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerSeventeenPosition = Integer.valueOf(seventeenPosition);
+                                            int seventeenNum = integerGpsPoint - integerSeventeenPosition;
+                                            if (seventeenNum < 0) {
+                                                int seventeenZheng = -seventeenNum;
+                                                mListInteger.add(seventeenZheng);
+                                            } else {
+                                                mListInteger.add(seventeenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int seventeenMinIndex = getMinIndex(mListInteger);
+                                        if (seventeenMinIndex % 2 == 0) {
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex);
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex + 1);
+                                            for (int i = 1; i < seventeenSize; i++) {
+                                                String seventeenNum = seventeenDataUsers.get(i).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                if (integerSeventeenNum > seventeenMinIndex) {
+                                                    int seventeenZhai = integerSeventeenNum - 2;
+                                                    mSeventeenParkDataDao.updateData("seventeenparkcar", "" + seventeenZhai, seventeenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex);
+                                            mSeventeenParkDataDao.delete("seventeenparkcar", seventeenMinIndex - 1);
+                                            for (int i = 1; i < seventeenSize; i++) {
+                                                String seventeenNum = seventeenDataUsers.get(i).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                if (integerSeventeenNum > seventeenMinIndex) {
+                                                    int seventeenZhai = integerSeventeenNum - 2;
+                                                    mSeventeenParkDataDao.updateData("seventeenparkcar", "" + seventeenZhai, seventeenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mSeventeenPickLeft.setPosition("");
+                                        mSeventeenPickRight.setPosition("");
+                                    }
+                                    getSeventeenNum();
+                                }
+                                mControlSeventeenPick.setName("");
+                                mSeventeenParkCar.invalidate();
+
+                                //查看18道保存的数据是否只有挂钩
+                                String controleighteenpickrightName43 = mControlEighteenPick.getName();
+                                if (controleighteenpickrightName43.equals("挂钩挂钩挂钩") && controleighteenpickrightName43.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String eighteenTrack = mControlEighteenPick.getTrack();
+                                    String eighteenPosition = mControlEighteenPick.getPosition();
+                                    String eighteenLat = mControlEighteenPick.getLat();
+                                    String eighteenLon = mControlEighteenPick.getLon();
+
+                                    List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                    int eighteenSize = eighteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (eighteenSize > 1) {
+                                        for (int i = 1; i < eighteenSize; i++) {
+                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerEighteenPosition = Integer.valueOf(eighteenPosition);
+                                            int eighteenNum = integerGpsPoint - integerEighteenPosition;
+                                            if (eighteenNum < 0) {
+                                                int eighteenZheng = -eighteenNum;
+                                                mListInteger.add(eighteenZheng);
+                                            } else {
+                                                mListInteger.add(eighteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int eighteenMinIndex = getMinIndex(mListInteger);
+                                        if (eighteenMinIndex % 2 == 0) {
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex);
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex + 1);
+                                            for (int i = 1; i < eighteenSize; i++) {
+                                                String eighteenNum = eighteenDataUsers.get(i).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                if (integerEighteenNum > eighteenMinIndex) {
+                                                    int eighteenZhai = integerEighteenNum - 2;
+                                                    mEighteenParkDataDao.updateData("eighteenparkcar", "" + eighteenZhai, eighteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex);
+                                            mEighteenParkDataDao.delete("eighteenparkcar", eighteenMinIndex - 1);
+                                            for (int i = 1; i < eighteenSize; i++) {
+                                                String eighteenNum = eighteenDataUsers.get(i).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                if (integerEighteenNum > eighteenMinIndex) {
+                                                    int eighteenZhai = integerEighteenNum - 2;
+                                                    mEighteenParkDataDao.updateData("eighteenparkcar", "" + eighteenZhai, eighteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mEighteenPickLeft.setPosition("");
+                                        mEighteenPickRight.setPosition("");
+                                    }
+                                    getEighteenNum();
+                                }
+                                mControlEighteenPick.setName("");
+                                mEighteenParkCar.invalidate();
+
+                                //查看19道保存的数据是否只有挂钩
+                                String controlnineteenpickrightName43 = mControlNineteenPick.getName();
+                                if (controlnineteenpickrightName43.equals("挂钩挂钩挂钩") && controlnineteenpickrightName43.length() == 6) {
+                                    //mSixPickLeft.setName("");
+                                    //mSixPickLeft.setName("");
+                                    String nineteenTrack = mControlNineteenPick.getTrack();
+                                    String nineteenPosition = mControlNineteenPick.getPosition();
+                                    String nineteenLat = mControlNineteenPick.getLat();
+                                    String nineteenLon = mControlNineteenPick.getLon();
+
+                                    List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                    int nineteenSize = nineteenDataUsers.size();
+                                    /*String num = sixDataUsers.get(sixSize - 1).getNum();
+                                    Integer integerNum = Integer.valueOf(num);
+                                    int sum = integerNum + 1;*/
+                                    if (nineteenSize > 1) {
+                                        for (int i = 1; i < nineteenSize; i++) {
+                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                            Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
+                                            Integer integerNineteenPosition = Integer.valueOf(nineteenPosition);
+                                            int nineteenNum = integerGpsPoint - integerNineteenPosition;
+                                            if (nineteenNum < 0) {
+                                                int nineteenZheng = -nineteenNum;
+                                                mListInteger.add(nineteenZheng);
+                                            } else {
+                                                mListInteger.add(nineteenNum);
+                                            }
+                                        }
+
+                                        //获取最小值下标
+                                        int nineteenMinIndex = getMinIndex(mListInteger);
+                                        if (nineteenMinIndex % 2 == 0) {
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex);
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex + 1);
+                                            for (int i = 1; i < nineteenSize; i++) {
+                                                String nineteenNum = nineteenDataUsers.get(i).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                if (integerNineteenNum > nineteenMinIndex) {
+                                                    int nineteenZhai = integerNineteenNum - 2;
+                                                    mNineteenParkDataDao.updateData("nineteenparkcar", "" + nineteenZhai, nineteenSize);
+                                                }
+                                            }
+                                        } else {
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex);
+                                            mNineteenParkDataDao.delete("nineteenparkcar", nineteenMinIndex - 1);
+                                            for (int i = 1; i < nineteenSize; i++) {
+                                                String enineteenNum = nineteenDataUsers.get(i).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(enineteenNum);
+                                                if (integerNineteenNum > nineteenMinIndex) {
+                                                    int nineteenZhai = integerNineteenNum - 2;
+                                                    mNineteenParkDataDao.updateData("nineteenparkcar", "" + nineteenZhai, nineteenSize);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        mNineteenPickLeft.setPosition("");
+                                        mNineteenPickRight.setPosition("");
+                                    }
+                                    getNineteenNum();
+                                }
+                                mControlNineteenPick.setName("");
+                                mNineteenParkCar.invalidate();
                                 break;
                             case "71":
                                 mAdvancedmr.setName("false");
@@ -4746,19 +6226,184 @@ public class PointActivity extends SerialPortActivity {
                                                 }
                                                 break;
                                             case 15:
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 1) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 1) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 1) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 1) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 1) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -5186,19 +6831,184 @@ public class PointActivity extends SerialPortActivity {
                                                 }
                                                 break;
                                             case 15:
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 1) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 1) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 1) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 1) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 1) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -5625,19 +7435,184 @@ public class PointActivity extends SerialPortActivity {
                                                     mFourteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", fourteenSum + "");
                                                 }
                                             case 15:
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 1) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 1) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 1) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 1) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 1) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -6065,19 +8040,184 @@ public class PointActivity extends SerialPortActivity {
                                                 }
                                                 break;
                                             case 15:
+                                                List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
+                                                int fifteenSize = fifteenDataUsers.size();
+                                                String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
+                                                Integer integerFifteenNum = Integer.valueOf(fifteenNum);
+                                                int fifteenSum = integerFifteenNum + 1;
+                                                if (fifteenSize > 1) {
+                                                    for (int i = 1; i < fifteenSize; i++) {
+                                                        String lat = fifteenDataUsers.get(i).getLat();
+                                                        String lon = fifteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", fifteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mFifteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", fifteenSum + "");
+                                                }
                                                 break;
                                             case 16:
+                                                List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
+                                                int sixteenSize = sixteenDataUsers.size();
+                                                String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
+                                                Integer integerSixteenNum = Integer.valueOf(sixteenNum);
+                                                int sixteenSum = integerSixteenNum + 1;
+                                                if (sixteenSize > 1) {
+                                                    for (int i = 1; i < sixteenSize; i++) {
+                                                        String lat = sixteenDataUsers.get(i).getLat();
+                                                        String lon = sixteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", sixteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mSixteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", sixteenSum + "");
+                                                }
                                                 break;
                                             case 17:
+                                                List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
+                                                int seventeenSize = seventeenDataUsers.size();
+                                                String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
+                                                Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
+                                                int seventeenSum = integerSeventeenNum + 1;
+                                                if (seventeenSize > 1) {
+                                                    for (int i = 1; i < seventeenSize; i++) {
+                                                        String lat = seventeenDataUsers.get(i).getLat();
+                                                        String lon = seventeenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", seventeenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", seventeenSum + "");
+                                                }
                                                 break;
                                             case 18:
+                                                List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
+                                                int eighteenSize = eighteenDataUsers.size();
+                                                String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
+                                                Integer integerEighteenNum = Integer.valueOf(eighteenNum);
+                                                int eighteenSum = integerEighteenNum + 1;
+                                                if (eighteenSize > 1) {
+                                                    for (int i = 1; i < eighteenSize; i++) {
+                                                        String lat = eighteenDataUsers.get(i).getLat();
+                                                        String lon = eighteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", eighteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mEighteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", eighteenSum + "");
+                                                }
                                                 break;
                                             case 19:
+                                                List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
+                                                int nineteenSize = nineteenDataUsers.size();
+                                                String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
+                                                Integer integerNineteenNum = Integer.valueOf(nineteenNum);
+                                                int nineteenSum = integerNineteenNum + 1;
+                                                if (nineteenSize > 1) {
+                                                    for (int i = 1; i < nineteenSize; i++) {
+                                                        String lat = nineteenDataUsers.get(i).getLat();
+                                                        String lon = nineteenDataUsers.get(i).getLon();
+                                                        //计算紧急停车位置与数据库里的每一条数据的距离
+                                                        double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
+                                                        if (distance > 11) {
+                                                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", nineteenSum + "");
+                                                        } else {
+                                                            //获取在某个股道上的位置
+                                                            String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
+                                                            Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                                            Integer integerGpsPistance2 = Integer.valueOf(mGpsPistance2 + "");
+                                                            int i1 = integerPointCar - integerGpsPistance2;
+                                                            if (i1 < 0) {
+                                                                int i2 = -i1;
+                                                                mListNum.add(i2);
+                                                            } else {
+                                                                mListNum.add(i1);
+                                                            }
+                                                        }
+                                                    }
 
+                                                    //取出list里最小值的下标替换
+                                                    int minIndex = getMinIndex(mListNum);
+                                                    mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, minIndex);
+                                                } else {
+                                                    mNineteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "", nineteenSum + "");
+                                                }
                                                 break;
                                         }
                                         break;
@@ -6296,40 +8436,161 @@ public class PointActivity extends SerialPortActivity {
         }
     }
 
+    private void getFifteenNum() {
+        //找6道最大值最小值下标
+        List<DataUser> dataUsers = mFifteenParkDataDao.find();
+        int size = dataUsers.size();
+        if (size > 1) {
+            for (int i = 1; i < size; i++) {
+                String ratioOfGpsPointCar = dataUsers.get(i).getRatioOfGpsPointCar();
+                Integer integer = Integer.valueOf(ratioOfGpsPointCar);
+                mListInteger.add(integer);
+            }
+            int min = getMin(mListInteger);
+            int minIndex = getMinIndex(mListInteger);
+            int max = getMax(mListInteger);
+            int maxIndex = getMaxIndex(mListInteger);
+            String minRatioOfGpsPointCar = dataUsers.get(minIndex).getRatioOfGpsPointCar();
+            String minLat = dataUsers.get(minIndex).getLat();
+            String minLon = dataUsers.get(minIndex).getLon();
+            String maxRatioOfGpsPointCar = dataUsers.get(maxIndex).getRatioOfGpsPointCar();
+            String maxLat = dataUsers.get(minIndex).getLat();
+            String maxLon = dataUsers.get(minIndex).getLon();
+            mFifteenPickLeft.setPosition(minRatioOfGpsPointCar + "");
+            mFifteenPickLeft.setLat(minLat);
+            mFifteenPickLeft.setLon(minLon);
+            mFifteenPickRight.setPosition(maxRatioOfGpsPointCar + "");
+            mFifteenPickRight.setLat(maxLat);
+            mFifteenPickRight.setLon(maxLon);
+        }
+    }
+
+    private void getSixteenNum() {
+        //找6道最大值最小值下标
+        List<DataUser> dataUsers = mSixteenParkDataDao.find();
+        int size = dataUsers.size();
+        if (size > 1) {
+            for (int i = 1; i < size; i++) {
+                String ratioOfGpsPointCar = dataUsers.get(i).getRatioOfGpsPointCar();
+                Integer integer = Integer.valueOf(ratioOfGpsPointCar);
+                mListInteger.add(integer);
+            }
+            int min = getMin(mListInteger);
+            int minIndex = getMinIndex(mListInteger);
+            int max = getMax(mListInteger);
+            int maxIndex = getMaxIndex(mListInteger);
+            String minRatioOfGpsPointCar = dataUsers.get(minIndex).getRatioOfGpsPointCar();
+            String minLat = dataUsers.get(minIndex).getLat();
+            String minLon = dataUsers.get(minIndex).getLon();
+            String maxRatioOfGpsPointCar = dataUsers.get(maxIndex).getRatioOfGpsPointCar();
+            String maxLat = dataUsers.get(minIndex).getLat();
+            String maxLon = dataUsers.get(minIndex).getLon();
+            mSixteenPickLeft.setPosition(minRatioOfGpsPointCar + "");
+            mSixteenPickLeft.setLat(minLat);
+            mSixteenPickLeft.setLon(minLon);
+            mSixteenPickRight.setPosition(maxRatioOfGpsPointCar + "");
+            mSixteenPickRight.setLat(maxLat);
+            mSixteenPickRight.setLon(maxLon);
+        }
+    }
+
+    private void getSeventeenNum() {
+        //找6道最大值最小值下标
+        List<DataUser> dataUsers = mSeventeenParkDataDao.find();
+        int size = dataUsers.size();
+        if (size > 1) {
+            for (int i = 1; i < size; i++) {
+                String ratioOfGpsPointCar = dataUsers.get(i).getRatioOfGpsPointCar();
+                Integer integer = Integer.valueOf(ratioOfGpsPointCar);
+                mListInteger.add(integer);
+            }
+            int min = getMin(mListInteger);
+            int minIndex = getMinIndex(mListInteger);
+            int max = getMax(mListInteger);
+            int maxIndex = getMaxIndex(mListInteger);
+            String minRatioOfGpsPointCar = dataUsers.get(minIndex).getRatioOfGpsPointCar();
+            String minLat = dataUsers.get(minIndex).getLat();
+            String minLon = dataUsers.get(minIndex).getLon();
+            String maxRatioOfGpsPointCar = dataUsers.get(maxIndex).getRatioOfGpsPointCar();
+            String maxLat = dataUsers.get(minIndex).getLat();
+            String maxLon = dataUsers.get(minIndex).getLon();
+            mSeventeenPickLeft.setPosition(minRatioOfGpsPointCar + "");
+            mSeventeenPickLeft.setLat(minLat);
+            mSeventeenPickLeft.setLon(minLon);
+            mSeventeenPickRight.setPosition(maxRatioOfGpsPointCar + "");
+            mSeventeenPickRight.setLat(maxLat);
+            mSeventeenPickRight.setLon(maxLon);
+        }
+    }
+
+    private void getEighteenNum() {
+        //找6道最大值最小值下标
+        List<DataUser> dataUsers = mEighteenParkDataDao.find();
+        int size = dataUsers.size();
+        if (size > 1) {
+            for (int i = 1; i < size; i++) {
+                String ratioOfGpsPointCar = dataUsers.get(i).getRatioOfGpsPointCar();
+                Integer integer = Integer.valueOf(ratioOfGpsPointCar);
+                mListInteger.add(integer);
+            }
+            int min = getMin(mListInteger);
+            int minIndex = getMinIndex(mListInteger);
+            int max = getMax(mListInteger);
+            int maxIndex = getMaxIndex(mListInteger);
+            String minRatioOfGpsPointCar = dataUsers.get(minIndex).getRatioOfGpsPointCar();
+            String minLat = dataUsers.get(minIndex).getLat();
+            String minLon = dataUsers.get(minIndex).getLon();
+            String maxRatioOfGpsPointCar = dataUsers.get(maxIndex).getRatioOfGpsPointCar();
+            String maxLat = dataUsers.get(minIndex).getLat();
+            String maxLon = dataUsers.get(minIndex).getLon();
+            mEighteenPickLeft.setPosition(minRatioOfGpsPointCar + "");
+            mEighteenPickLeft.setLat(minLat);
+            mEighteenPickLeft.setLon(minLon);
+            mEighteenPickRight.setPosition(maxRatioOfGpsPointCar + "");
+            mEighteenPickRight.setLat(maxLat);
+            mEighteenPickRight.setLon(maxLon);
+        }
+    }
+
+    private void getNineteenNum() {
+        //找6道最大值最小值下标
+        List<DataUser> dataUsers = mNineteenParkDataDao.find();
+        int size = dataUsers.size();
+        if (size > 1) {
+            for (int i = 1; i < size; i++) {
+                String ratioOfGpsPointCar = dataUsers.get(i).getRatioOfGpsPointCar();
+                Integer integer = Integer.valueOf(ratioOfGpsPointCar);
+                mListInteger.add(integer);
+            }
+            int min = getMin(mListInteger);
+            int minIndex = getMinIndex(mListInteger);
+            int max = getMax(mListInteger);
+            int maxIndex = getMaxIndex(mListInteger);
+            String minRatioOfGpsPointCar = dataUsers.get(minIndex).getRatioOfGpsPointCar();
+            String minLat = dataUsers.get(minIndex).getLat();
+            String minLon = dataUsers.get(minIndex).getLon();
+            String maxRatioOfGpsPointCar = dataUsers.get(maxIndex).getRatioOfGpsPointCar();
+            String maxLat = dataUsers.get(minIndex).getLat();
+            String maxLon = dataUsers.get(minIndex).getLon();
+            mNineteenPickLeft.setPosition(minRatioOfGpsPointCar + "");
+            mNineteenPickLeft.setLat(minLat);
+            mNineteenPickLeft.setLon(minLon);
+            mNineteenPickRight.setPosition(maxRatioOfGpsPointCar + "");
+            mNineteenPickRight.setLat(maxLat);
+            mNineteenPickRight.setLon(maxLon);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_point);
         setSystemUIVisible(false);
-        mRelative = findViewById(R.id.relative);
-        mDelete = findViewById(R.id.delete_btn);
-        mXiningbeimap = findViewById(R.id.xiningbeimap);
-        mChangfengmap = findViewById(R.id.changfengmap);
-        mOneparkcar = findViewById(R.id.oneparkcar);
-        mTwoparkcar = findViewById(R.id.twoparkcar);
-        mThreeparkcar = findViewById(R.id.threeparkcar);
-        mFourparkcar = findViewById(R.id.fourparkcar);
-        mFiveparkcar = findViewById(R.id.fiveparkcar);
-        //mSixparkcar = findViewById(R.id.sixparkcar);
-        mEightparkcar = findViewById(R.id.eightparkcar);
-        mTenparkcar = findViewById(R.id.tenparkcar);
-        mBailimap = findViewById(R.id.bailimap);
-        mTrain = findViewById(R.id.drawtop);
-        mPointText = findViewById(R.id.point_text);
-        mBtn = findViewById(R.id.taotao_btn);
-        mBtn1 = findViewById(R.id.taotao_btn1);
-        mJuli = findViewById(R.id.juli);
-        mJwd = findViewById(R.id.lat);
-        mLat1 = findViewById(R.id.lat1);
-        mLat2 = findViewById(R.id.lat2);
-        mTransferpeople = findViewById(R.id.transferpeople);
-        mPeopleOne = findViewById(R.id.peopleone);
-        mPeopletwo = findViewById(R.id.peopletwo);
-        mPeoplethree = findViewById(R.id.peoplethree);
-        mPeoplefour = findViewById(R.id.peoplefour);
 
+        initView();
         addLoc();
-
+        getSp();
+        getCustom();
         //if (mJump.equals("false")) {
         /*Intent intent = new Intent(PointActivity.this, ChannelActivity.class);
         startActivity(intent);*/
@@ -6341,20 +8602,7 @@ public class PointActivity extends SerialPortActivity {
         mGpsDao = new GPSDao(getApplicationContext());
         //mGpsDao.add("36.659485000000004", "101.768762");
 
-        //6道
-        mSixParkCar = new SixParkCar(PointActivity.this);
-        //7道
-        mSevenParkCar = new SevenParkCar(PointActivity.this);
-        //9道
-        mNineParkCar = new NineParkCar(PointActivity.this);
-        //11道
-        mElevenParkCar = new ElevenParkCar(PointActivity.this);
-        //12道
-        mTwelveParkCar = new TwelveParkCar(PointActivity.this);
-        //13道
-        mThirteenParkCar = new ThirteenParkCar(PointActivity.this);
-        //14道
-        mFourteenParkCar = new FourteenParkCar(PointActivity.this);
+
 
         /*//摘钩
         mPickDao = new PickDao(getApplicationContext());
@@ -6374,205 +8622,6 @@ public class PointActivity extends SerialPortActivity {
 
         /*mTrain.setX(384 - transverse);
         mTrain.setY(500 - disparity);*/
-        //控制三个布局
-        //站内图
-        mMain = new SpUtil(getApplicationContext(), "main");
-
-        mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
-
-        //dmr控制推进信令
-        mAdvancedmr = new SpUtil(getApplicationContext(), "advancedmr");
-
-        //1道停留车左点
-        mOnePickLeft = new SpUtil(getApplicationContext(), "onepickleft");
-        //mOnePickLeft.setPosition("0");
-        //1道停留车右点
-        mOnepickright = new SpUtil(getApplicationContext(), "onepickright");
-        //mOnepickright.setPosition("0");
-        //控制1道是否有停留车
-        mControlOnePick = new SpUtil(getApplicationContext(), "controlonepick");
-        //2道停留车左点
-        mTwoPickLeft = new SpUtil(getApplicationContext(), "twopickleft");
-        //mTwoPickLeft.setPosition("0");
-        //2道停留车右点
-        mTwopickright = new SpUtil(getApplicationContext(), "twopickright");
-        //mTwopickright.setPosition("0");
-        //控制2道是否有停留车
-        mControlTwoPick = new SpUtil(getApplicationContext(), "controltwopick");
-        //3道停留车左点
-        mThreePickLeft = new SpUtil(getApplicationContext(), "threepickleft");
-        //mThreePickLeft.setPosition("0");
-        //3道停留车右点
-        mThreepickright = new SpUtil(getApplicationContext(), "threepickright");
-        //mThreepickright.setPosition("0");
-        //控制3道是否有停留车
-        mControlThreePick = new SpUtil(getApplicationContext(), "controlthreepick");
-        //4道停留车左点
-        mFourPickLeft = new SpUtil(getApplicationContext(), "fourpickleft");
-        //mFourPickLeft.setPosition("0");
-        //4道停留车右点
-        mFourpickright = new SpUtil(getApplicationContext(), "fourpickright");
-        //mFourpickright.setPosition("0");
-        //控制4道是否有停留车
-        mControlFourPick = new SpUtil(getApplicationContext(), "controlfourpick");
-        //5道停留车左点
-        mFivePickLeft = new SpUtil(getApplicationContext(), "fivepickleft");
-        //mFivePickLeft.setPosition("0");
-        //5道停留车右点
-        mFivepickright = new SpUtil(getApplicationContext(), "fivepickright");
-        //mFivepickright.setPosition("0");
-        //控制5道是否有停留车
-        mControlFivePick = new SpUtil(getApplicationContext(), "controlfivepick");
-        //6道停留车左点
-        mSixPickLeft = new SpUtil(getApplicationContext(), "sixpickleft");
-        //mFivePickLeft.setPosition("0");
-        //6道停留车右点
-        mSixpickright = new SpUtil(getApplicationContext(), "sixpickright");
-        //mFivepickright.setPosition("0");
-        //控制6道是否有停留车
-        mControlSixPick = new SpUtil(getApplicationContext(), "controlsixpick");
-
-        mSixParkDataDao = new SixParkDataDao(getApplicationContext());
-        mSixParkDataDao.add("0", "0", "0", "0", "0");
-
-        //7道停留车左点
-        mSevenPickLeft = new SpUtil(getApplicationContext(), "sevenpickleft");
-        //mFivePickLeft.setPosition("0");
-        //7道停留车右点
-        mSevenpickright = new SpUtil(getApplicationContext(), "sevenpickright");
-        //mFivepickright.setPosition("0");
-        //控制7道是否有停留车
-        mControlSevenPick = new SpUtil(getApplicationContext(), "controlsevenpick");
-
-        mSevenParkDataDao = new SevenParkDataDao(getApplicationContext());
-        mSevenParkDataDao.add("0", "0", "0", "0", "0");
-
-        //8道停留车左点
-        mEightPickLeft = new SpUtil(getApplicationContext(), "eightpickleft");
-        //mEightPickLeft.setPosition("0");
-        //8道停留车右点
-        mEightpickright = new SpUtil(getApplicationContext(), "eightpickright");
-        //mEightpickright.setPosition("0");
-        //控制8道是否有停留车
-        mControlEightPick = new SpUtil(getApplicationContext(), "controleightpick");
-
-        //9道停留车左点
-        mNinePickLeft = new SpUtil(getApplicationContext(), "ninepickleft");
-        //mNinePickLeft.setPosition("0");
-        //9道停留车右点
-        mNinepickright = new SpUtil(getApplicationContext(), "ninepickright");
-        //mNinepickright.setPosition("0");
-        //控制9道是否有停留车
-        mControlNinePick = new SpUtil(getApplicationContext(), "controlninepick");
-
-        mNineParkDataDao = new NineParkDataDao(getApplicationContext());
-        mNineParkDataDao.add("0", "0", "0", "0", "0");
-
-        //10道停留车左点
-        mTenPickLeft = new SpUtil(getApplicationContext(), "tenpickleft");
-        //mTenPickLeft.setPosition("0");
-        //10道停留车右点
-        mTenpickright = new SpUtil(getApplicationContext(), "tenpickright");
-        //mTenpickright.setPosition("0");
-        //控制10道是否有停留车
-        mControlTenPick = new SpUtil(getApplicationContext(), "controltenpick");
-
-        //11道停留车左点
-        mElevenpickleft = new SpUtil(getApplicationContext(), "elevenpickleft");
-        //mElevenpickleft.setPosition("0");
-        //11道停留车右点
-        mElevenpickright = new SpUtil(getApplicationContext(), "elevenpickright");
-        //mElevenpickright.setPosition("0");
-        //控制11道是否有停留车
-        mControlElevenPick = new SpUtil(getApplicationContext(), "controlelevenpick");
-
-        mElevenParkDataDao = new ElevenParkDataDao(getApplicationContext());
-        mElevenParkDataDao.add("0", "0", "0", "0", "0");
-
-        //12道停留车左点
-        mTwelvePickLeft = new SpUtil(getApplicationContext(), "twelvepickleft");
-        //mTwelvePickLeft.setPosition("0");
-        //12道停留车右点
-        mTwelvepickright = new SpUtil(getApplicationContext(), "twelvepickright");
-        //mTwelvepickright.setPosition("0");
-        //控制12道是否有停留车
-        mControlTwelvePick = new SpUtil(getApplicationContext(), "controltwelvepick");
-
-        mTwelveParkDataDao = new TwelveParkDataDao(getApplicationContext());
-        mTwelveParkDataDao.add("0", "0", "0", "0", "0");
-
-        //13道停留车左点
-        mThirteenPickLeft = new SpUtil(getApplicationContext(), "thirteenpickleft");
-        //mThirteenPickLeft.setPosition("0");
-        //13道停留车右点
-        mThirteenpickright = new SpUtil(getApplicationContext(), "thirteenpickright");
-        //mThirteenpickright.setPosition("0");
-        //控制13道是否有停留车
-        mControlThirteenPick = new SpUtil(getApplicationContext(), "controlthirteenpick");
-
-        mThirteenParkDataDao = new ThirteenParkDataDao(getApplicationContext());
-        mThirteenParkDataDao.add("0", "0", "0", "0", "0");
-
-        //14道停留车左点
-        mFourteenPickLeft = new SpUtil(getApplicationContext(), "fourteenpickleft");
-        //mFourteenPickLeft.setPosition("0");
-        //14道停留车右点
-        mFourteenpickright = new SpUtil(getApplicationContext(), "fourteenpickright");
-        //mFourteenpickright.setPosition("0");
-        //控制14道是否有停留车
-        mControlFourteenPick = new SpUtil(getApplicationContext(), "controlfourteenpick");
-
-        mFourteenParkDataDao = new FourteenParkDataDao(getApplicationContext());
-        mFourteenParkDataDao.add("0", "0", "0", "0", "0");
-
-        //15道停留车左点
-        mFifteenPickLeft = new SpUtil(getApplicationContext(), "fifteenpickleft");
-        //mFifteenPickLeft.setPosition("0");
-        //15道停留车右点
-        mFifteenPickRight = new SpUtil(getApplicationContext(), "fifteenpickright");
-        //mFifteenPickRight.setPosition("0");
-        //控制15道是否有停留车
-        mControlFifteenPick = new SpUtil(getApplicationContext(), "controlfifteenpick");
-        //16道停留车左点
-        mSixteenPickLeft = new SpUtil(getApplicationContext(), "sixteenpickleft");
-        //mSixteenPickLeft.setPosition("0");
-        //16道停留车右点
-        mSixteenPickRight = new SpUtil(getApplicationContext(), "sixteenpickright");
-        //mSixteenPickRight.setPosition("0");
-        //控制16道是否有停留车
-        mControlSixteenPick = new SpUtil(getApplicationContext(), "controlsixteenpick");
-        //17道停留车左点
-        mSeventeenPickLeft = new SpUtil(getApplicationContext(), "seventeenpickleft");
-        //mSeventeenPickLeft.setPosition("0");
-        //17道停留车右点
-        mSeventeenPickRight = new SpUtil(getApplicationContext(), "seventeenpickright");
-        //mSeventeenPickRight.setPosition("0");
-        //控制17道是否有停留车
-        mControlSeventeenPick = new SpUtil(getApplicationContext(), "controlseventeenpick");
-        //18道停留车左点
-        mEighteennPickLeft = new SpUtil(getApplicationContext(), "eighteenpickleft");
-        //mEighteennPickLeft.setPosition("0");
-        //18道停留车右点
-        mEighteenPickRight = new SpUtil(getApplicationContext(), "eighteenpickright");
-        //mEighteenPickRight.setPosition("0");
-        //控制18道是否有停留车
-        mControlEighteenPick = new SpUtil(getApplicationContext(), "controleighteenpick");
-        //19道停留车左点
-        mNineteenPickLeft = new SpUtil(getApplicationContext(), "nineteenpickleft");
-        //mNineteenPickLeft.setPosition("0");
-        //19道停留车右点
-        mNineteenPickRight = new SpUtil(getApplicationContext(), "nineteenpickright");
-        //mNineteenPickRight.setPosition("0");
-        //控制19道是否有停留车
-        mControlNineteenPick = new SpUtil(getApplicationContext(), "controlnineteenpick");
-
-        //领车
-        mLeadcar = new SpUtil(getApplicationContext(), "leadcar");
-
-        //停车后查看机车位置，为了绑定摘挂钩时候的人员位置与机车位置
-        mStopcar = new SpUtil(getApplicationContext(), "stopcar");
-        //查看机车位置
-        mCarLocation = new SpUtil(getApplicationContext(), "carlocation");
 
         //调车长开机后通知是否是调车长领车还是几号制动员领车
         String name = mFirstInto.getName();
@@ -6606,65 +8655,14 @@ public class PointActivity extends SerialPortActivity {
         }
 
         //new TimeThread().start(); //启动新的线程
-
-        mReceive1 = new SpUtil(getApplicationContext(), "receive1");
-        mReceive2 = new SpUtil(getApplicationContext(), "receive2");
-        mReceive3 = new SpUtil(getApplicationContext(), "receive3");
-        qgs = new SpUtil(getApplicationContext(), "qgs");
-
         //发送机车、检测人员位置
-
         mHandler.postDelayed(mRunnable, 1500);
-        mCqncast = new SpUtil(getApplicationContext(), "cqncast");
-        mInstructions = new SpUtil(getApplicationContext(), "instructions");
-        mControlCar = new SpUtil(getApplicationContext(), "controlcar");
-        //根据制动员解锁状态来判断调车长是否启动
-        mControlshuntinghunting = new SpUtil(getApplicationContext(), "controlshunting");
-        //mControlshuntinghunting.setName("unlock");
-        //注意十车五车三车一车
-        mControlTuiJin = new SpUtil(getApplicationContext(), "controltuijin");
-        //控制停车
-        //mDataTransmission = new SpUtil(getApplicationContext(), "datatransmission");
-        //mDataTransmission.setName("false");
-        //人员号5
-        mPeople5 = new SpUtil(getApplicationContext(), "people5");
-        //人员号6
-        mPeople6 = new SpUtil(getApplicationContext(), "people6");
-        //人员号7
-        mPeople7 = new SpUtil(getApplicationContext(), "people7");
-        //人员号8
-        mPeople8 = new SpUtil(getApplicationContext(), "people8");
-        //人员号9
-        mPeople9 = new SpUtil(getApplicationContext(), "people9");
 
-        mMap1 = new SpUtil(getApplicationContext(), "map1");
-        mMap2 = new SpUtil(getApplicationContext(), "map2");
-        mMap3 = new SpUtil(getApplicationContext(), "map3");
-        /*mMap1.setName("visible");
-        mMap2.setName("gone");
-        mMap3.setName("gone");*/
-        mLeftCar = new SpUtil(getApplicationContext(), "leftcar");
-        mLeftCar.setName("000000");
-        mRightCar = new SpUtil(getApplicationContext(), "rightcar");
-        mRightCar.setName("000000");
-        mBtn.setText("平调系统");
         mFiveDataDao = new FiveDataDao(getApplicationContext());
         mSixDataDao = new SixDataDao(getApplicationContext());
         mSevenDataDao = new SevenDataDao(getApplicationContext());
         mEightDataDao = new EightDataDao(getApplicationContext());
         mNineDataDao = new NineDataDao(getApplicationContext());
-        mDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPickDao.del("zhaigouGPS");
-                mGpsDao.del("Gps");
-                mFiveDataDao.del("fiveperson");
-                mSixDataDao.del("sixperson");
-                mSevenDataDao.del("sevenperson");
-                mEightDataDao.del("eightperson");
-                mNineDataDao.del("nineperson");
-            }
-        });
 
         /*mWanAsynTask = new WanAsynTask(getApplication());
         AssetsDatabaseManager db = AssetsDatabaseManager.getManager();
@@ -6725,6 +8723,334 @@ public class PointActivity extends SerialPortActivity {
         String lonsize = mGpsUsers.get(size - 1).getLon();
         Log.i("二宝size",""+latsize);
         Log.i("二宝size",""+lonsize);*/
+    }
+
+    private void getCustom() {
+        //6道
+        mSixParkCar = new SixParkCar(PointActivity.this);
+        //7道
+        mSevenParkCar = new SevenParkCar(PointActivity.this);
+        //9道
+        mNineParkCar = new NineParkCar(PointActivity.this);
+        //11道
+        mElevenParkCar = new ElevenParkCar(PointActivity.this);
+        //12道
+        mTwelveParkCar = new TwelveParkCar(PointActivity.this);
+        //13道
+        mThirteenParkCar = new ThirteenParkCar(PointActivity.this);
+        //14道
+        mFourteenParkCar = new FourteenParkCar(PointActivity.this);
+        //15道
+        mFifteenParkCar = new FifteenParkCar(PointActivity.this);
+        //16道
+        mSixteenParkCar = new SixteenParkCar(PointActivity.this);
+        //17道
+        mSeventeenParkCar = new SeventeenParkCar(PointActivity.this);
+        //18道
+        mEighteenParkCar = new EighteenParkCar(PointActivity.this);
+        //19道
+        mNineteenParkCar = new NineteenParkCar(PointActivity.this);
+    }
+
+    private void getSp() {
+        //控制三个布局
+        //站内图
+        mMain = new SpUtil(getApplicationContext(), "main");
+
+        mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
+
+        //dmr控制推进信令
+        mAdvancedmr = new SpUtil(getApplicationContext(), "advancedmr");
+
+        //1道停留车左点
+        mOnePickLeft = new SpUtil(getApplicationContext(), "onepickleft");
+        mOnePickLeft.setPosition("0");
+        //1道停留车右点
+        mOnepickright = new SpUtil(getApplicationContext(), "onepickright");
+        mOnepickright.setPosition("0");
+        //控制1道是否有停留车
+        mControlOnePick = new SpUtil(getApplicationContext(), "controlonepick");
+        //2道停留车左点
+        mTwoPickLeft = new SpUtil(getApplicationContext(), "twopickleft");
+        mTwoPickLeft.setPosition("0");
+        //2道停留车右点
+        mTwopickright = new SpUtil(getApplicationContext(), "twopickright");
+        mTwopickright.setPosition("0");
+        //控制2道是否有停留车
+        mControlTwoPick = new SpUtil(getApplicationContext(), "controltwopick");
+        //3道停留车左点
+        mThreePickLeft = new SpUtil(getApplicationContext(), "threepickleft");
+        mThreePickLeft.setPosition("0");
+        //3道停留车右点
+        mThreepickright = new SpUtil(getApplicationContext(), "threepickright");
+        mThreepickright.setPosition("0");
+        //控制3道是否有停留车
+        mControlThreePick = new SpUtil(getApplicationContext(), "controlthreepick");
+        //4道停留车左点
+        mFourPickLeft = new SpUtil(getApplicationContext(), "fourpickleft");
+        mFourPickLeft.setPosition("0");
+        //4道停留车右点
+        mFourpickright = new SpUtil(getApplicationContext(), "fourpickright");
+        mFourpickright.setPosition("0");
+        //控制4道是否有停留车
+        mControlFourPick = new SpUtil(getApplicationContext(), "controlfourpick");
+        //5道停留车左点
+        mFivePickLeft = new SpUtil(getApplicationContext(), "fivepickleft");
+        mFivePickLeft.setPosition("0");
+        //5道停留车右点
+        mFivepickright = new SpUtil(getApplicationContext(), "fivepickright");
+        mFivepickright.setPosition("0");
+        //控制5道是否有停留车
+        mControlFivePick = new SpUtil(getApplicationContext(), "controlfivepick");
+        //6道停留车左点
+        mSixPickLeft = new SpUtil(getApplicationContext(), "sixpickleft");
+        mSixPickLeft.setPosition("0");
+        //6道停留车右点
+        mSixpickright = new SpUtil(getApplicationContext(), "sixpickright");
+        mSixpickright.setPosition("0");
+        //控制6道是否有停留车
+        mControlSixPick = new SpUtil(getApplicationContext(), "controlsixpick");
+
+        mSixParkDataDao = new SixParkDataDao(getApplicationContext());
+        mSixParkDataDao.add("0", "0", "0", "0", "0");
+
+        //7道停留车左点
+        mSevenPickLeft = new SpUtil(getApplicationContext(), "sevenpickleft");
+        mSevenPickLeft.setPosition("0");
+        //7道停留车右点
+        mSevenpickright = new SpUtil(getApplicationContext(), "sevenpickright");
+        mSevenpickright.setPosition("0");
+        //控制7道是否有停留车
+        mControlSevenPick = new SpUtil(getApplicationContext(), "controlsevenpick");
+
+        mSevenParkDataDao = new SevenParkDataDao(getApplicationContext());
+        mSevenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //8道停留车左点
+        mEightPickLeft = new SpUtil(getApplicationContext(), "eightpickleft");
+        mEightPickLeft.setPosition("0");
+        //8道停留车右点
+        mEightpickright = new SpUtil(getApplicationContext(), "eightpickright");
+        mEightpickright.setPosition("0");
+        //控制8道是否有停留车
+        mControlEightPick = new SpUtil(getApplicationContext(), "controleightpick");
+
+        //9道停留车左点
+        mNinePickLeft = new SpUtil(getApplicationContext(), "ninepickleft");
+        mNinePickLeft.setPosition("0");
+        //9道停留车右点
+        mNinepickright = new SpUtil(getApplicationContext(), "ninepickright");
+        mNinepickright.setPosition("0");
+        //控制9道是否有停留车
+        mControlNinePick = new SpUtil(getApplicationContext(), "controlninepick");
+
+        mNineParkDataDao = new NineParkDataDao(getApplicationContext());
+        mNineParkDataDao.add("0", "0", "0", "0", "0");
+
+        //10道停留车左点
+        mTenPickLeft = new SpUtil(getApplicationContext(), "tenpickleft");
+        mTenPickLeft.setPosition("0");
+        //10道停留车右点
+        mTenpickright = new SpUtil(getApplicationContext(), "tenpickright");
+        mTenpickright.setPosition("0");
+        //控制10道是否有停留车
+        mControlTenPick = new SpUtil(getApplicationContext(), "controltenpick");
+
+        //11道停留车左点
+        mElevenpickleft = new SpUtil(getApplicationContext(), "elevenpickleft");
+        mElevenpickleft.setPosition("0");
+        //11道停留车右点
+        mElevenpickright = new SpUtil(getApplicationContext(), "elevenpickright");
+        mElevenpickright.setPosition("0");
+        //控制11道是否有停留车
+        mControlElevenPick = new SpUtil(getApplicationContext(), "controlelevenpick");
+
+        mElevenParkDataDao = new ElevenParkDataDao(getApplicationContext());
+        mElevenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //12道停留车左点
+        mTwelvePickLeft = new SpUtil(getApplicationContext(), "twelvepickleft");
+        mTwelvePickLeft.setPosition("0");
+        //12道停留车右点
+        mTwelvepickright = new SpUtil(getApplicationContext(), "twelvepickright");
+        mTwelvepickright.setPosition("0");
+        //控制12道是否有停留车
+        mControlTwelvePick = new SpUtil(getApplicationContext(), "controltwelvepick");
+
+        mTwelveParkDataDao = new TwelveParkDataDao(getApplicationContext());
+        mTwelveParkDataDao.add("0", "0", "0", "0", "0");
+
+        //13道停留车左点
+        mThirteenPickLeft = new SpUtil(getApplicationContext(), "thirteenpickleft");
+        mThirteenPickLeft.setPosition("0");
+        //13道停留车右点
+        mThirteenpickright = new SpUtil(getApplicationContext(), "thirteenpickright");
+        mThirteenpickright.setPosition("0");
+        //控制13道是否有停留车
+        mControlThirteenPick = new SpUtil(getApplicationContext(), "controlthirteenpick");
+
+        mThirteenParkDataDao = new ThirteenParkDataDao(getApplicationContext());
+        mThirteenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //14道停留车左点
+        mFourteenPickLeft = new SpUtil(getApplicationContext(), "fourteenpickleft");
+        mFourteenPickLeft.setPosition("0");
+        //14道停留车右点
+        mFourteenpickright = new SpUtil(getApplicationContext(), "fourteenpickright");
+        mFourteenpickright.setPosition("0");
+        //控制14道是否有停留车
+        mControlFourteenPick = new SpUtil(getApplicationContext(), "controlfourteenpick");
+
+        mFourteenParkDataDao = new FourteenParkDataDao(getApplicationContext());
+        mFourteenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //15道停留车左点
+        mFifteenPickLeft = new SpUtil(getApplicationContext(), "fifteenpickleft");
+        mFifteenPickLeft.setPosition("0");
+        //15道停留车右点
+        mFifteenPickRight = new SpUtil(getApplicationContext(), "fifteenpickright");
+        mFifteenPickRight.setPosition("0");
+        //控制15道是否有停留车
+        mControlFifteenPick = new SpUtil(getApplicationContext(), "controlfifteenpick");
+
+        mFifteenParkDataDao = new FifteenParkDataDao(getApplicationContext());
+        mFifteenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //16道停留车左点
+        mSixteenPickLeft = new SpUtil(getApplicationContext(), "sixteenpickleft");
+        mSixteenPickLeft.setPosition("0");
+        //16道停留车右点
+        mSixteenPickRight = new SpUtil(getApplicationContext(), "sixteenpickright");
+        mSixteenPickRight.setPosition("0");
+        //控制16道是否有停留车
+        mControlSixteenPick = new SpUtil(getApplicationContext(), "controlsixteenpick");
+
+        mSixteenParkDataDao = new SixteenParkDataDao(getApplicationContext());
+        mSixteenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //17道停留车左点
+        mSeventeenPickLeft = new SpUtil(getApplicationContext(), "seventeenpickleft");
+        mSeventeenPickLeft.setPosition("0");
+        //17道停留车右点
+        mSeventeenPickRight = new SpUtil(getApplicationContext(), "seventeenpickright");
+        mSeventeenPickRight.setPosition("0");
+        //控制17道是否有停留车
+        mControlSeventeenPick = new SpUtil(getApplicationContext(), "controlseventeenpick");
+
+        mSeventeenParkDataDao = new SeventeenParkDataDao(getApplicationContext());
+        mSeventeenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //18道停留车左点
+        mEighteenPickLeft = new SpUtil(getApplicationContext(), "eighteenpickleft");
+        mEighteenPickLeft.setPosition("0");
+        //18道停留车右点
+        mEighteenPickRight = new SpUtil(getApplicationContext(), "eighteenpickright");
+        mEighteenPickRight.setPosition("0");
+        //控制18道是否有停留车
+        mControlEighteenPick = new SpUtil(getApplicationContext(), "controleighteenpick");
+
+        mEighteenParkDataDao = new EighteenParkDataDao(getApplicationContext());
+        mEighteenParkDataDao.add("0", "0", "0", "0", "0");
+
+        //19道停留车左点
+        mNineteenPickLeft = new SpUtil(getApplicationContext(), "nineteenpickleft");
+        mNineteenPickLeft.setPosition("0");
+        //19道停留车右点
+        mNineteenPickRight = new SpUtil(getApplicationContext(), "nineteenpickright");
+        mNineteenPickRight.setPosition("0");
+        //控制19道是否有停留车
+        mControlNineteenPick = new SpUtil(getApplicationContext(), "controlnineteenpick");
+
+        mNineteenParkDataDao = new NineteenParkDataDao(getApplicationContext());
+        mNineteenParkDataDao.add("0", "0", "0", "0", "0");
+
+
+        //领车
+        mLeadcar = new SpUtil(getApplicationContext(), "leadcar");
+
+        //停车后查看机车位置，为了绑定摘挂钩时候的人员位置与机车位置
+        mStopcar = new SpUtil(getApplicationContext(), "stopcar");
+        //查看机车位置
+        mCarLocation = new SpUtil(getApplicationContext(), "carlocation");
+        mReceive1 = new SpUtil(getApplicationContext(), "receive1");
+        mReceive2 = new SpUtil(getApplicationContext(), "receive2");
+        mReceive3 = new SpUtil(getApplicationContext(), "receive3");
+        qgs = new SpUtil(getApplicationContext(), "qgs");
+        mCqncast = new SpUtil(getApplicationContext(), "cqncast");
+        mInstructions = new SpUtil(getApplicationContext(), "instructions");
+        mControlCar = new SpUtil(getApplicationContext(), "controlcar");
+        //根据制动员解锁状态来判断调车长是否启动
+        mControlshuntinghunting = new SpUtil(getApplicationContext(), "controlshunting");
+        //mControlshuntinghunting.setName("unlock");
+        //注意十车五车三车一车
+        mControlTuiJin = new SpUtil(getApplicationContext(), "controltuijin");
+        //控制停车
+        //mDataTransmission = new SpUtil(getApplicationContext(), "datatransmission");
+        //mDataTransmission.setName("false");
+        //人员号5
+        mPeople5 = new SpUtil(getApplicationContext(), "people5");
+        //人员号6
+        mPeople6 = new SpUtil(getApplicationContext(), "people6");
+        //人员号7
+        mPeople7 = new SpUtil(getApplicationContext(), "people7");
+        //人员号8
+        mPeople8 = new SpUtil(getApplicationContext(), "people8");
+        //人员号9
+        mPeople9 = new SpUtil(getApplicationContext(), "people9");
+
+        mMap1 = new SpUtil(getApplicationContext(), "map1");
+        mMap2 = new SpUtil(getApplicationContext(), "map2");
+        mMap3 = new SpUtil(getApplicationContext(), "map3");
+        /*mMap1.setName("visible");
+        mMap2.setName("gone");
+        mMap3.setName("gone");*/
+        mLeftCar = new SpUtil(getApplicationContext(), "leftcar");
+        mLeftCar.setName("000000");
+        mRightCar = new SpUtil(getApplicationContext(), "rightcar");
+        mRightCar.setName("000000");
+    }
+
+    private void initView() {
+        mRelative = findViewById(R.id.relative);
+        mDelete = findViewById(R.id.delete_btn);
+        mXiningbeimap = findViewById(R.id.xiningbeimap);
+        mChangfengmap = findViewById(R.id.changfengmap);
+        mOneparkcar = findViewById(R.id.oneparkcar);
+        mTwoparkcar = findViewById(R.id.twoparkcar);
+        mThreeparkcar = findViewById(R.id.threeparkcar);
+        mFourparkcar = findViewById(R.id.fourparkcar);
+        mFiveparkcar = findViewById(R.id.fiveparkcar);
+        //mSixparkcar = findViewById(R.id.sixparkcar);
+        mEightparkcar = findViewById(R.id.eightparkcar);
+        mTenparkcar = findViewById(R.id.tenparkcar);
+        mBailimap = findViewById(R.id.bailimap);
+        mTrain = findViewById(R.id.drawtop);
+        mPointText = findViewById(R.id.point_text);
+        mBtn = findViewById(R.id.taotao_btn);
+        mBtn1 = findViewById(R.id.taotao_btn1);
+        mJuli = findViewById(R.id.juli);
+        mJwd = findViewById(R.id.lat);
+        mLat1 = findViewById(R.id.lat1);
+        mLat2 = findViewById(R.id.lat2);
+        mTransferpeople = findViewById(R.id.transferpeople);
+        mPeopleOne = findViewById(R.id.peopleone);
+        mPeopletwo = findViewById(R.id.peopletwo);
+        mPeoplethree = findViewById(R.id.peoplethree);
+        mPeoplefour = findViewById(R.id.peoplefour);
+
+        mBtn.setText("平调系统");
+        mDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPickDao.del("zhaigouGPS");
+                mGpsDao.del("Gps");
+                mFiveDataDao.del("fiveperson");
+                mSixDataDao.del("sixperson");
+                mSevenDataDao.del("sevenperson");
+                mEightDataDao.del("eightperson");
+                mNineDataDao.del("nineperson");
+            }
+        });
     }
 
     private void oneLeft(String mGpsPistance2, String mLat21, String mLon21, String mGetGudaoOfGpsPoint2) {

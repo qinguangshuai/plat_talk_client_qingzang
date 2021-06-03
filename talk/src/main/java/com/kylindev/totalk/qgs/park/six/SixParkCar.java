@@ -80,26 +80,5 @@ public class SixParkCar extends View {
                 }
             }
         }
-        /*//1道停留车左点
-        SpUtil mFivePickLeft = new SpUtil(getContext(), "fivepickleft");
-        String nameLeft = mFivePickLeft.getPosition();
-        //1道停留车右点
-        SpUtil mFivepickrightight = new SpUtil(getContext(), "fivepickright");
-        String nameRight = mFivepickrightight.getPosition();
-        if (nameLeft != null && nameRight != null){
-            if (!nameLeft.equals("0") && !nameRight.equals("0")){
-                Float left = Float.valueOf(nameLeft);
-                Float right = Float.valueOf(nameRight);
-                if (left < 6 && right > 93) {
-                    canvas.drawLine((384 + (6 - 6) * 2.94f), 300, (384 + (93 - 6) * 2.94f), 300, mPaint);
-                }else if (left < 6 && right <= 93) {
-                    canvas.drawLine((384 + (6 - 6) * 2.94f), 300, (384 + (right - 6) * 2.94f), 300, mPaint);
-                }else if (left >= 6 && right > 93){
-                    canvas.drawLine((384 + (left - 6) * 2.94f), 300, (384 + (93 - 6) * 2.94f), 300, mPaint);
-                }else {
-                    canvas.drawLine((384 + (left - 6) * 2.94f), 300, (384 + (right - 6) * 2.94f), 300, mPaint);
-                }
-            }
-        }*/
     }
 }

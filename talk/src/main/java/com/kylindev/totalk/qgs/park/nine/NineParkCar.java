@@ -73,11 +73,13 @@ public class NineParkCar extends View {
                 Float aDoubleRatioOfGpsPointCar1 = Float.valueOf(ratioOfGpsPointCar1);
                 if (aDoubleRatioOfGpsPointCar < 43 && aDoubleRatioOfGpsPointCar1 > 81){
                     canvas.drawLine((50 + 43 * 8.65f), 400, (50 + 81 * 8.65f), 400, mPaint);
-                }else if (aDoubleRatioOfGpsPointCar < 43 && aDoubleRatioOfGpsPointCar1 < 81){
+                }else if (aDoubleRatioOfGpsPointCar < 43 && aDoubleRatioOfGpsPointCar1 < 81 && aDoubleRatioOfGpsPointCar1 >= 43){
                     canvas.drawLine((50 + 43 * 8.65f), 400, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 400, mPaint);
-                }else if (aDoubleRatioOfGpsPointCar > 43 && aDoubleRatioOfGpsPointCar1 > 81){
+                }else if (aDoubleRatioOfGpsPointCar < 43 && aDoubleRatioOfGpsPointCar1 < 43){
+                    canvas.drawLine((50 + 43 * 8.65f), 400, (50 + 43 * 8.65f), 400, mPaint);
+                }else if (aDoubleRatioOfGpsPointCar >= 43 && aDoubleRatioOfGpsPointCar1 > 81){
                     canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 400, (50 + 81 * 8.65f), 400, mPaint);
-                }else {
+                }else if (aDoubleRatioOfGpsPointCar >= 43 && aDoubleRatioOfGpsPointCar1 < 81&& aDoubleRatioOfGpsPointCar1 >= 43){
                     canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 400, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 400, mPaint);
                 }
             }
