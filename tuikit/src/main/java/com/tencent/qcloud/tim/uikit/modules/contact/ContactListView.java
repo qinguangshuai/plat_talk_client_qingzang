@@ -2,7 +2,8 @@ package com.tencent.qcloud.tim.uikit.modules.contact;
 
 import android.content.Context;
 import androidx.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;

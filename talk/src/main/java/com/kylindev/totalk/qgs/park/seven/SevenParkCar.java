@@ -20,9 +20,6 @@ import java.util.List;
 public class SevenParkCar extends View {
 
     private Paint mPaint;
-    private Bitmap mBitmap;
-    private Canvas mCanvas1;
-    private Bitmap mBitmap1;
 
     public SevenParkCar(Context context) {
         this(context, null);
@@ -42,10 +39,6 @@ public class SevenParkCar extends View {
 
         //创建一个画笔
         mPaint = new Paint(Paint.DITHER_FLAG);
-        //设置位图的宽高
-        mBitmap = Bitmap.createBitmap(1280, 800, Bitmap.Config.RGB_565);
-        //绘制内容保存到Bitmap
-        mCanvas1 = new Canvas(mBitmap);
         //设置非填充
         mPaint.setStyle(Paint.Style.STROKE);
         //笔宽5像素
@@ -72,11 +65,11 @@ public class SevenParkCar extends View {
                 String ratioOfGpsPointCar1 = dataUsers.get(i + 1).getRatioOfGpsPointCar();
                 Float aDoubleRatioOfGpsPointCar1 = Float.valueOf(ratioOfGpsPointCar1);
                 if (aDoubleRatioOfGpsPointCar < 83 && aDoubleRatioOfGpsPointCar1 < 83) {
-                    canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 250, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 250, mPaint);
+                    canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 150, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 150, mPaint);
                 } else if (aDoubleRatioOfGpsPointCar > 83 && aDoubleRatioOfGpsPointCar1 < 83) {
-                    canvas.drawLine((50 + 83 * 8.65f), 250, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 250, mPaint);
+                    canvas.drawLine((50 + 83 * 8.65f), 150, (50 + aDoubleRatioOfGpsPointCar1 * 8.65f), 150, mPaint);
                 } else if (aDoubleRatioOfGpsPointCar < 83 && aDoubleRatioOfGpsPointCar1 > 83) {
-                    canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 250, (50 + 83 * 8.65f), 250, mPaint);
+                    canvas.drawLine((50 + aDoubleRatioOfGpsPointCar * 8.65f), 150, (50 + 83 * 8.65f), 150, mPaint);
                 }
             }
         }

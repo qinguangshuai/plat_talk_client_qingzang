@@ -125,10 +125,10 @@ public class NineParkDataDao {
         return personLists;
     }
 
-    public int updaeUser(String info, String gd, String lat, String lon, int n) {
+    public int updaeUser(String info, String gd, String lat, String lon, String ratioOfGpsPointCar, int n) {
         SQLiteDatabase db = helper.getWritableDatabase();
         //db.update("zhaigouGPS",null);
-        db.execSQL("update " + info + " set gd=" + gd + " , lat=" + lat + " , lon=" + lon + " where num=" + n);
+        db.execSQL("update " + info + " set gd=" + gd + " , lat=" + lat + " , lon=" + lon + " , ratioOfGpsPointCar=" + ratioOfGpsPointCar + " where num=" + n);
         db.close();
         return 0;
     }

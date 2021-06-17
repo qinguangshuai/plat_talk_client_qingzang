@@ -104,4 +104,6 @@ dependencies {
     implementation project(path: ':SerialportLibrary')
     implementation "io.github.prototypez:app-joint-core:1.6"
 // implementation project(':tuikit')
+    implementation files('libs/MiPush_SDK_Client_3_6_12.jar')
+    implementation files('libs/vivo_pushsdk_v2.3.1.jar')
 }

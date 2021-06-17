@@ -1,7 +1,8 @@
 package com.tencent.qcloud.tim.uikit.modules.chat.layout.message;
 
 import androidx.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.ViewGroup;
 
 import com.tencent.qcloud.tim.uikit.modules.chat.interfaces.IChatProvider;

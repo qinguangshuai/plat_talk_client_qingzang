@@ -17,6 +17,7 @@ public class SpUtil {
     public SpUtil(Context context, String file) {
         sp = context.getSharedPreferences(file, context.MODE_PRIVATE);
         editor = sp.edit();
+        editor.commit();
     }
 
     /**
@@ -211,11 +212,29 @@ public class SpUtil {
         editor.commit();
     }
 
+    public String getLon1() {
+        return sp.getString("lon", "");
+    }
+
+    public void setLon1(String lon) {
+        editor.putString("lon", lon);
+        editor.commit();
+    }
+
     public String getLat() {
         return sp.getString("lat", "");
     }
 
     public void setLat(String lat) {
+        editor.putString("lat", lat);
+        editor.commit();
+    }
+
+    public String getLat1() {
+        return sp.getString("lat", "");
+    }
+
+    public void setLat1(String lat) {
         editor.putString("lat", lat);
         editor.commit();
     }

@@ -1,10 +1,12 @@
 package com.tencent.qcloud.tim.uikit.modules.chat.layout.message;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.AttributeSet;
 
 import com.tencent.qcloud.tim.uikit.component.action.PopMenuAction;
@@ -15,6 +17,8 @@ import com.tencent.qcloud.tim.uikit.utils.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.security.AccessController.getContext;
 
 public abstract class MessageLayoutUI extends RecyclerView implements IMessageLayout {
 
@@ -42,6 +46,7 @@ public abstract class MessageLayoutUI extends RecyclerView implements IMessageLa
         init();
     }
 
+    @SuppressLint("WrongConstant")
     private void init() {
         setLayoutFrozen(false);
         setItemViewCacheSize(0);

@@ -126,10 +126,10 @@ public class SixParkDataDao {
         return personLists;
     }
 
-    public int updaeUser(String info, String gd, String lat, String lon, int n) {
+    public int updaeUser(String info, String gd, String lat, String lon, String ratioOfGpsPointCar, int n) {
         SQLiteDatabase db = helper.getWritableDatabase();
         //db.update("zhaigouGPS",null);
-        db.execSQL("update " + info + " set gd=" + gd + " , lat=" + lat + " , lon=" + lon + " where num=" + n);
+        db.execSQL("update " + info + " set gd=" + gd + " , lat=" + lat + " , lon=" + lon + " , ratioOfGpsPointCar=" + ratioOfGpsPointCar + " where num=" + n);
         db.close();
         return 0;
     }
@@ -137,7 +137,7 @@ public class SixParkDataDao {
     public int updateData(String info, String num, int n) {
         SQLiteDatabase db = helper.getWritableDatabase();
         //db.update("zhaigouGPS",null);
-        db.execSQL("update " + info + " set num=" + num + " where num=" + n);
+        db.execSQL("update " + info + " set num=" + num + " where num=" + String.valueOf(n));
         db.close();
         return 0;
     }

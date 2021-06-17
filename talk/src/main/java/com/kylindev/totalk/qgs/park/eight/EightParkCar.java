@@ -17,9 +17,6 @@ import com.kylindev.totalk.bjxt.SpUtil;
 public class EightParkCar extends View {
 
     private Paint mPaint;
-    private Bitmap mBitmap;
-    private Canvas mCanvas1;
-    private Bitmap mBitmap1;
 
     public EightParkCar(Context context) {
         this(context, null);
@@ -39,10 +36,6 @@ public class EightParkCar extends View {
 
         //创建一个画笔
         mPaint = new Paint(Paint.DITHER_FLAG);
-        //设置位图的宽高
-        mBitmap = Bitmap.createBitmap(1280, 800, Bitmap.Config.RGB_565);
-        //绘制内容保存到Bitmap
-        mCanvas1 = new Canvas(mBitmap);
         //设置非填充
         mPaint.setStyle(Paint.Style.STROKE);
         //笔宽5像素
@@ -60,10 +53,10 @@ public class EightParkCar extends View {
         int width = canvas.getWidth();
 
         //1道停留车左点
-        SpUtil mEightPickLeft = new SpUtil(getContext(), "Eightpickleft");
+        SpUtil mEightPickLeft = new SpUtil(getContext(), "eightpickleft");
         String nameLeft = mEightPickLeft.getPosition();
         //1道停留车右点
-        SpUtil mEightpickrightight = new SpUtil(getContext(), "Eightpickright");
+        SpUtil mEightpickrightight = new SpUtil(getContext(), "eightpickright");
         String nameRight = mEightpickrightight.getPosition();
         if (nameLeft != null && nameRight != null){
             if (!nameLeft.equals("0") && !nameRight.equals("0")){

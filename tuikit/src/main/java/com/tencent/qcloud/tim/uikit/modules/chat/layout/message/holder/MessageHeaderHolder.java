@@ -1,8 +1,9 @@
 package com.tencent.qcloud.tim.uikit.modules.chat.layout.message.holder;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.qcloud.tim.uikit.modules.message.MessageInfo;
 

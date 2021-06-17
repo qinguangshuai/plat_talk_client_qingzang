@@ -107,6 +107,7 @@ class XiNingBeiMap(context: Context?, attrs: AttributeSet?) : View(context, attr
                     height.toFloat() / 12 * 5,
                     mPaint
             )
+            Log.e("qgs3", (height.toFloat() / 12 * 5).toString())
             //右斜线
             canvas?.drawLine(
                     canvas.width.toFloat() / 8 * 6,

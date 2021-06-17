@@ -142,7 +142,7 @@ public class SendActivity extends BaseActivity {
         TextView tv_diaohao = findViewById(R.id.tv_diaohao);
         tv_diaohao.setText("调号: " + diaohao);
         TextView tv_benji = findViewById(R.id.tv_benji);
-        tv_benji.setText("本机号码: 1001017");
+        tv_benji.setText("本机号码: 1001023");
         receive = findViewById(R.id.tv_receive_sendactivity);
         bt_refrash_send = findViewById(R.id.bt_refrash_send);
         bt_refrash_send.setOnClickListener(new View.OnClickListener() {

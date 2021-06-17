@@ -1,5 +1,6 @@
 package com.tencent.qcloud.tim.demo;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 
 import androidx.multidex.MultiDexApplication;
@@ -30,7 +31,6 @@ import com.huawei.android.hms.agent.HMSAgent;
 import com.kylindev.totalk.bjxt.SiveDao;
 import com.kylindev.totalk.bjxt.SpUtil;
 import com.kylindev.totalk.bjxt.SuoData;
-import com.kylindev.totalk.qgs.PointActivity;
 import com.kylindev.totalk.qgs.database.eight.EightDataDao;
 import com.kylindev.totalk.qgs.database.eleven.ElevenDataDao;
 import com.kylindev.totalk.qgs.database.five.FiveDataDao;
@@ -57,14 +57,15 @@ import com.tencent.imsdk.TIMTextElem;
 import com.tencent.imsdk.TIMValueCallBack;
 import com.tencent.imsdk.session.SessionWrapper;
 import com.tencent.imsdk.utils.IMFunc;
-import com.tencent.openqq.protocol.imsdk.msg;
 import com.tencent.qcloud.tim.demo.Database.Diaodan;
 import com.tencent.qcloud.tim.demo.Database.DiaodanDatabase;
+import com.tencent.qcloud.tim.demo.bjxt.CrashHandler;
 import com.tencent.qcloud.tim.demo.bjxt.sqlite.ReceiveDao;
 import com.tencent.qcloud.tim.demo.bjxt.sqlite.SendDao;
 import com.tencent.qcloud.tim.demo.helper.ConfigHelper;
 import com.tencent.qcloud.tim.demo.helper.CustomAVCallUIController;
 import com.tencent.qcloud.tim.demo.helper.CustomMessage;
+import com.tencent.qcloud.tim.demo.main.MainActivity;
 import com.tencent.qcloud.tim.demo.qingzang.SendActivity;
 import com.tencent.qcloud.tim.demo.signature.GenerateTestUserSig;
 import com.tencent.qcloud.tim.demo.thirdpush.ThirdPushTokenMgr;
@@ -118,7 +119,7 @@ public class DemoApplication extends MultiDexApplication implements TestService 
     private SpUtil mControlTuiJin;
     private SpUtil mCon;
     private SpUtil mControlLingChe;
-    private String mConversationId = "01";
+    private String mConversationId = "02";
 
     public static DemoApplication instance() {
         return instance;
@@ -150,6 +151,7 @@ public class DemoApplication extends MultiDexApplication implements TestService 
 
     public Handler handler = new Handler();
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onCreate() {
         DemoLog.i(TAG, "onCreate");
@@ -158,6 +160,8 @@ public class DemoApplication extends MultiDexApplication implements TestService 
 
         context = this;
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 1);
+        //使用自定义全局异常捕获类
+        CrashHandler.getInstance().init(context);
 
         db = Room.databaseBuilder(context,
                 DiaodanDatabase.class, "Diaodan_Database")

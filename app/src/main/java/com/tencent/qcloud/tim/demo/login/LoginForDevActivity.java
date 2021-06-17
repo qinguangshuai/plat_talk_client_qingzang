@@ -110,7 +110,7 @@ public class LoginForDevActivity extends Activity {
         // 用户名可以是任意非空字符，但是前提需要按照下面文档修改代码里的 SDKAPPID 与 PRIVATEKEY
         // https://github.com/tencentyun/TIMSDK/tree/master/Android
         mUserAccount = findViewById(R.id.login_user);
-        mUserAccount.setText("1001017");
+        mUserAccount.setText("1001023");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         checkPermission(this);
         mLoginView.setOnClickListener(new View.OnClickListener() {
@@ -248,5 +248,4 @@ public class LoginForDevActivity extends Activity {
             }
         });
     }
-
 }
