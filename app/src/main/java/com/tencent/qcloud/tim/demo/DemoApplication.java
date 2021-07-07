@@ -119,7 +119,7 @@ public class DemoApplication extends MultiDexApplication implements TestService 
     private SpUtil mControlTuiJin;
     private SpUtil mCon;
     private SpUtil mControlLingChe;
-    private String mConversationId = "02";
+    private String mConversationId = "01";
 
     public static DemoApplication instance() {
         return instance;
@@ -584,66 +584,83 @@ public class DemoApplication extends MultiDexApplication implements TestService 
                             Log.i("111111",longitude);
                             switch (personNumber) {
                                 case "20":
-                                    FiveDataDao fiveDataDao = new FiveDataDao(getApplicationContext());
-                                    fiveDataDao.add(latitude,longitude);
+                                    /*FiveDataDao fiveDataDao = new FiveDataDao(getApplicationContext());
+                                    fiveDataDao.add(latitude,longitude);*/
                                     SpUtil people5 = new SpUtil(getApplicationContext(), "people5");
                                     people5.setName("true");
                                     people5.setLat(latitude);
                                     people5.setLon(longitude);
+
+                                    people5.setLat1(lat);
+                                    people5.setLon1(lon);
                                     break;
                                 case "01":
-                                    SixDataDao sixDataDao = new SixDataDao(getApplicationContext());
-                                    sixDataDao.add(latitude,longitude);
+                                    /*SixDataDao sixDataDao = new SixDataDao(getApplicationContext());
+                                    sixDataDao.add(latitude,longitude);*/
                                     SpUtil people6 = new SpUtil(getApplicationContext(), "people6");
                                     people6.setName("true");
                                     people6.setLat(latitude);
                                     people6.setLon(longitude);
+
+                                    people6.setLat1(lat);
+                                    people6.setLon1(lon);
                                     break;
                                 case "02":
-                                    SevenDataDao sevenDataDao = new SevenDataDao(getApplicationContext());
-                                    sevenDataDao.add(latitude,longitude);
+                                    /*SevenDataDao sevenDataDao = new SevenDataDao(getApplicationContext());
+                                    sevenDataDao.add(latitude,longitude);*/
                                     SpUtil people7 = new SpUtil(getApplicationContext(), "people7");
                                     people7.setName("true");
                                     people7.setLat(latitude);
                                     people7.setLon(longitude);
+
+                                    people7.setLat1(lat);
+                                    people7.setLon1(lon);
                                     break;
                                 case "03":
-                                    EightDataDao eightDataDao = new EightDataDao(getApplicationContext());
-                                    eightDataDao.add(latitude,longitude);
+                                    /*EightDataDao eightDataDao = new EightDataDao(getApplicationContext());
+                                    eightDataDao.add(latitude,longitude);*/
                                     SpUtil people8 = new SpUtil(getApplicationContext(), "people8");
                                     people8.setName("true");
                                     people8.setLat(latitude);
                                     people8.setLon(longitude);
+
+                                    people8.setLat1(lat);
+                                    people8.setLon1(lon);
                                     break;
                                 case "04":
-                                    NineDataDao nineDataDao = new NineDataDao(getApplicationContext());
-                                    nineDataDao.add(latitude,longitude);
+                                    /*NineDataDao nineDataDao = new NineDataDao(getApplicationContext());
+                                    nineDataDao.add(latitude,longitude);*/
                                     SpUtil people9 = new SpUtil(getApplicationContext(), "people9");
                                     people9.setName("true");
                                     people9.setLat(latitude);
                                     people9.setLon(longitude);
-                                    break;
-                                case "05":
-                                    TenDataDao tenDataDao = new TenDataDao(getApplicationContext());
-                                    tenDataDao.add(latitude,longitude);
-                                    break;
-                                case "06":
-                                    ElevenDataDao elevenDataDao = new ElevenDataDao(getApplicationContext());
-                                    elevenDataDao.add(latitude,longitude);
-                                    break;
-                                case "07":
-                                    TwelveDataDao twelveDataDao = new TwelveDataDao(getApplicationContext());
-                                    twelveDataDao.add(latitude,longitude);
-                                    break;
-                                case "08":
-                                    ThirteenDataDao thirteenDataDao = new ThirteenDataDao(getApplicationContext());
-                                    thirteenDataDao.add(latitude,longitude);
-                                    break;
-                                case "09":
-                                    FourteenDataDao fourteenDataDao = new FourteenDataDao(getApplicationContext());
-                                    fourteenDataDao.add(latitude,longitude);
+
+                                    people9.setLat1(lat);
+                                    people9.setLon1(lon);
                                     break;
                             }
+                        }else if (str.indexOf("机车GPS") != -1) {
+                            //获取人员号
+                            String personNumber = str.substring(0, 2);
+                            String GPSlength = str.substring(str.indexOf("-") + 1, str.indexOf("-", str.indexOf("-") + 1));
+                            int length1 = GPSlength.length();
+                            String GPSTotal = str.substring(str.indexOf("机车GPS-", str.indexOf(",") + 1) + length1 + 1, str.length());
+                            String lat = GPSTotal.substring(0, GPSTotal.indexOf("-"));
+                            String lon = GPSTotal.substring(GPSTotal.indexOf("-") + 1, GPSTotal.length());
+                            //纬度
+                            String latitude = "36." + lat;
+                            //经度
+                            String longitude = "101." + lon;
+                            Log.i("111111",latitude);
+                            Log.i("111111",longitude);
+
+                            SpUtil car = new SpUtil(getApplicationContext(), "copycar");
+                            car.setName("true");
+                            car.setLat(latitude);
+                            car.setLon(longitude);
+
+                            car.setLat1(lat);
+                            car.setLon1(lon);
                         }
                     } else {
                         switch (str) {

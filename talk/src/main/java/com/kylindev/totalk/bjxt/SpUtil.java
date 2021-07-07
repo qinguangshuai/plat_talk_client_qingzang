@@ -213,11 +213,11 @@ public class SpUtil {
     }
 
     public String getLon1() {
-        return sp.getString("lon", "");
+        return sp.getString("lon1", "");
     }
 
-    public void setLon1(String lon) {
-        editor.putString("lon", lon);
+    public void setLon1(String lon1) {
+        editor.putString("lon1", lon1);
         editor.commit();
     }
 
@@ -231,11 +231,11 @@ public class SpUtil {
     }
 
     public String getLat1() {
-        return sp.getString("lat", "");
+        return sp.getString("lat1", "");
     }
 
-    public void setLat1(String lat) {
-        editor.putString("lat", lat);
+    public void setLat1(String lat1) {
+        editor.putString("lat1", lat1);
         editor.commit();
     }
 

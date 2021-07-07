@@ -531,7 +531,7 @@ public class ControlMove {
                         animator1.setDuration(mTime);
                         animator1.start();
                     } else if (mGpsPistanceCar >= 0 && mGpsPistanceCar < 43) {
-                        v.setY(700 - disparity);
+                        v.setY(500 - disparity);
                         ObjectAnimator animator
                                 = ObjectAnimator.ofFloat(v, "translationX", (float) (700 - transverse - (43 - mGpsPistanceCar) * 4.76f));
                         animator.setDuration(mTime);
@@ -555,7 +555,7 @@ public class ControlMove {
                         animator1.setDuration(mTime);
                         animator1.start();
                     } else if (mGpsPistanceCar >= 0 && mGpsPistanceCar < 43) {
-                        v.setY(700 - disparity);
+                        v.setY(500 - disparity);
                         ObjectAnimator animator
                                 = ObjectAnimator.ofFloat(v, "translationX", (float) (700 - transverse - (43 - mGpsPistanceCar) * 4.76f));
                         animator.setDuration(mTime);

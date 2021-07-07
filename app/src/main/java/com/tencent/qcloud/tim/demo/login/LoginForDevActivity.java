@@ -22,6 +22,7 @@ import android.widget.EditText;
 
 import com.example.testposition.GpsUtils;
 import com.kylindev.totalk.app.LoginActivity;
+import com.kylindev.totalk.bjxt.SpUtil;
 import com.kylindev.totalk.qgs.PointActivity;
 import com.tencent.imsdk.TIMCallBack;
 import com.tencent.imsdk.TIMConversation;
@@ -56,6 +57,7 @@ public class LoginForDevActivity extends Activity {
     private Button mLoginView;
     private EditText mUserAccount;
     private String account;
+    private SpUtil mSpUtil;
 
     //权限检查
     public static boolean checkPermission(Activity activity) {
@@ -91,10 +93,11 @@ public class LoginForDevActivity extends Activity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GpsUtils.initLocation(this);
+        //GpsUtils.initLocation(this);
         setContentView(R.layout.login_for_dev_layout);
         final Intent intent=new Intent(this, LoginActivity.class);
 
+        mSpUtil = new SpUtil(getApplication(),"controluncaughtException");
         /*Button bt_test=findViewById(R.id.test_pos);
         bt_test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,12 +143,23 @@ public class LoginForDevActivity extends Activity {
                         editor.putBoolean(Constants.AUTO_LOGIN, true);
                         editor.commit();
 
-                        Intent intent = new Intent(LoginForDevActivity.this, LoginActivity.class);
-                        //Intent intent = new Intent(LoginForDevActivity.this, PointActivity.class);
+                        String name = mSpUtil.getName();
+                        if (name.equals("1")) {
+                            Intent intent = new Intent(LoginForDevActivity.this, PointActivity.class);
+                            //Intent intent = new Intent(LoginForDevActivity.this, PointActivity.class);
 //                        MainApp.setLevel(mUserAccount.getText().toString().substring(0,1));
-                        String account=mUserAccount.getText().toString();
-                        intent.putExtra("account",account);
-                        startActivity(intent);
+                            String account=mUserAccount.getText().toString();
+                            intent.putExtra("account",account);
+                            startActivity(intent);
+                        }else {
+                            Intent intent = new Intent(LoginForDevActivity.this, LoginActivity.class);
+                            //Intent intent = new Intent(LoginForDevActivity.this, PointActivity.class);
+//                        MainApp.setLevel(mUserAccount.getText().toString().substring(0,1));
+                            String account=mUserAccount.getText().toString();
+                            intent.putExtra("account",account);
+                            startActivity(intent);
+                        }
+
 
                         finish();
                     }

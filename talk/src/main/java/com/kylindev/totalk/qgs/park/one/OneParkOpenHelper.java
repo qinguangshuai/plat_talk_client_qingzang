@@ -28,7 +28,7 @@ public class OneParkOpenHelper extends SQLiteOpenHelper {
 
         System.out.println("oncreate");
         //创建一个教info的表里面的字段有 id(android官方建议前面加下划线_) integer类型 主键  自动增长
-        db.execSQL("create table oneparkcar(id integer primary key autoincrement,gd varchar(60),lat varchar(60),lon varchar(60),ratioOfGpsPointCar varchar(60))");
+        db.execSQL("create table oneparkcar(id integer primary key autoincrement,gd varchar(60),lat varchar(60),lon varchar(60),ratioOfGpsPointCar varchar(60),num varchar(60))");
 
     }
 

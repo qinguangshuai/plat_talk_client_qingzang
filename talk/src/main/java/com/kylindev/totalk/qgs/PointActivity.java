@@ -36,6 +36,7 @@ import com.kylindev.totalk.qgs.database.nine.NineDataDao;
 import com.kylindev.totalk.qgs.database.seven.SevenDataDao;
 import com.kylindev.totalk.qgs.database.six.SixDataDao;
 import com.kylindev.totalk.qgs.move.ControlMove;
+import com.kylindev.totalk.qgs.move.ControlTranslation;
 import com.kylindev.totalk.qgs.park.DataUser;
 import com.kylindev.totalk.qgs.park.eight.EightParkCar;
 import com.kylindev.totalk.qgs.park.eight.EightParkDataDao;
@@ -109,7 +110,7 @@ public class PointActivity extends SerialPortActivity {
     private String receive = "";
     private boolean flag = false;
     private String TAG = "PointActivity.class";
-    private GPSDao mGpsDao;
+    //private GPSDao mGpsDao;
     private Button mBtn, mBtn1;
     private PickDao mPickDao;
     List<Double> mList = new ArrayList<>();
@@ -127,7 +128,7 @@ public class PointActivity extends SerialPortActivity {
     private SQLiteDatabase mMDatabase;
     private WanAsynTask mWanAsynTask;
     private double mDistance;
-    private String mConversationId = "02";
+    private String mConversationId = "01";
     private boolean qiehuan = false;
     //private boolean firstInto = false;
     HashMap<Integer, ArrayList<Point3d>> gps = new HashMap<>();
@@ -165,8 +166,8 @@ public class PointActivity extends SerialPortActivity {
     private boolean isSixTrack = true;
 
     private SpUtil mFirstInto;
-    private String mReceiveHead, mRatioOfGpsTrack, mRatioOfGpsTrack2, mRatioOfGpsTrack3, mRatioOfGpsTrack4, mRatioOfGpsTrack5, mRatioOfGpsTrackCar, mTime1;
-    private Double mLat3, mLon3, mGpsPistance, mGpsPistance2, mGpsPistance3, mGpsPistance4, mGpsPistance5, mLatLeadCar20, mLonLeadCar20, mGpsPistanceCar;
+    private String mReceiveHead, mRatioOfGpsTrackCar1,mRatioOfGpsTrack, mRatioOfGpsTrack2, mRatioOfGpsTrack3, mRatioOfGpsTrack4, mRatioOfGpsTrack5, mRatioOfGpsTrackCar, mTime1;
+    private Double mLat3, mLon3, mGpsPistanceCar1,mGpsPistance, mGpsPistance2, mGpsPistance3, mGpsPistance4, mGpsPistance5, mLatLeadCar20, mLonLeadCar20, mGpsPistanceCar;
     private TransferPeople mTransferpeople;
     private TransferPeopleOne mPeopleOne;
     private SpUtil mPeople5, mPeople6, mPeople7, mPeople8, mPeople9;
@@ -186,11 +187,6 @@ public class PointActivity extends SerialPortActivity {
     private ChangFengMap mChangfengmap;
     private BaiLiMap mBailimap;
     private Button mDelete;
-    private FiveDataDao mFiveDataDao;
-    private SixDataDao mSixDataDao;
-    private SevenDataDao mSevenDataDao;
-    private EightDataDao mEightDataDao;
-    private NineDataDao mNineDataDao;
     private SpUtil mLeftCar, mRightCar, mLeadcar, mStopcar, mCarLocation, mMain;
     private int mGetGudaoOfGpsPoint;
     private String mStopcar1, mLeadcar1, mRatioOfGpsTrackCar2;
@@ -246,6 +242,16 @@ public class PointActivity extends SerialPortActivity {
     private SpUtil mControlTrack;
     private String mGpsPoint2;
     private String mControlTrackName;
+    private SpUtil mControlMap;
+    private String mMControlMapName;
+    private SpUtil mPeople0, mPeople1, mPeople2, mPeople3, mPeople4;
+    private OneDataDao mOneDataDao;
+    private String mLat6, mLat61;
+    private String mLon6, mLon61;
+    private int mMinIndex;
+    private int mMaxIndex;
+    String maxString = "";
+    private SpUtil mCopyCar;
 
     void sendMessage(String uid, String s) {
 
@@ -278,16 +284,32 @@ public class PointActivity extends SerialPortActivity {
                     String name1 = mMap1.getName();
                     String name2 = mMap2.getName();
                     String name3 = mMap3.getName();
+                    mMControlMapName = mControlMap.getName();
+                    if (mMControlMapName.equals("zheng")) {
+                        mXiningbeimap.setVisibility(View.VISIBLE);
+                        mChangfengmap.setVisibility(View.GONE);
+                        mBailimap.setVisibility(View.GONE);
+                        mMain.setName("main");
+                    } else if (mMControlMapName.equals("cf")) {
+                        mChangfengmap.setVisibility(View.VISIBLE);
+                        mXiningbeimap.setVisibility(View.GONE);
+                        mBailimap.setVisibility(View.GONE);
+                        mMain.setName("changfeng");
+                    } else if (mMControlMapName.equals("bl")) {
+                        mBailimap.setVisibility(View.VISIBLE);
+                        mChangfengmap.setVisibility(View.GONE);
+                        mXiningbeimap.setVisibility(View.GONE);
+                        mMain.setName("baili");
+                    }
                         /*mMap1.setName("visible");
                         mMap2.setName("gone");
                         mMap3.setName("gone");*/
-                    if (name1.equals("visible")) {
+                    /*if (name1.equals("visible")) {
                         mXiningbeimap.setVisibility(View.VISIBLE);
                         mChangfengmap.setVisibility(View.GONE);
                         mBailimap.setVisibility(View.GONE);
                         mMain.setName("main");
                         mainPicture();
-
                     }
                     if (name2.equals("visible")) {
                         mChangfengmap.setVisibility(View.VISIBLE);
@@ -302,7 +324,7 @@ public class PointActivity extends SerialPortActivity {
                         mXiningbeimap.setVisibility(View.GONE);
                         mMain.setName("baili");
                         bailiPicture();
-                    }
+                    }*/
 
                     if (mEncodeHexStr.length() >= 12) {
                         mHead = mEncodeHexStr.substring(0, 12);
@@ -395,7 +417,7 @@ public class PointActivity extends SerialPortActivity {
                                                 mRightCar.setName(lonCar + "");
                                                 mCar.setLat(latCar + "");
                                                 mCar.setLon(lonCar + "");
-                                                mGpsDao.add(a2, b2);
+                                                //mGpsDao.add(a2, b2);
 
                                                 //股道号
                                                 mGetGudaoOfGpsPoint = GetGudaoOfGpsPoint(b1, a1);
@@ -421,8 +443,8 @@ public class PointActivity extends SerialPortActivity {
                                                 //mJwd.setText(ratioOfGpsPoint + "");
                                                 //mLat1.setText(mGetRatioOfGpsPointCar + "");
                                                 //mLat2.setText(gpsPoint);
-
-                                                proplrMove();
+                                                ControlTranslation.proplrMove1(mControlMap, mTrain, mRatioOfGpsTrackCar, mGpsPistanceCar, transverse, disparity);
+                                                //proplrMove();
 
                                                     /*String onePickLeftName = mOnePickLeft.getName();
                                                     String onepickrightightName = mOnepickright.getName();
@@ -537,682 +559,101 @@ public class PointActivity extends SerialPortActivity {
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日   HH:mm:ss");
                     Date curDate = new Date(System.currentTimeMillis());
                     mTime1 = formatter.format(curDate);
-                    DataDao232 dataDao232 = new DataDao232(getApplicationContext());
-                    dataDao232.add(mTime1, mEncodeHexStr);
+                    /*DataDao232 dataDao232 = new DataDao232(getApplicationContext());
+                    dataDao232.add(mTime1, mEncodeHexStr);*/
 
-                    //调号
-                    String signature = mEncodeHexStr.substring(2, 4);
-                    //人员号
-                    mPeopleId2 = mEncodeHexStr.substring(4, 6);
-                    String function2 = mEncodeHexStr.substring(6, 8);
-                    String totalDmr = mPeopleId2 + signature + function2 + "03";
-                    sendMessage(mConversationId, totalDmr);
-                    switch (function2) {
-                        //摘钩
-                        case "59":
-                            PickDao pickDao = new PickDao(getApplication());
-                            pickDao.add(mTime1, mEncodeHexStr);
-                            zhaigou();
-                            break;
-                        //挂钩
-                        case "5A":
-                            //
-                            HangDao hangDao = new HangDao(getApplication());
-                            hangDao.add(mTime1, mEncodeHexStr);
-                                /*String hookTotal = mControlonepickright.getName();
-                                mControlonepickright.setName(hookTotal + "挂钩");*/
-                            switch (mPeopleId2) {
-                                //1号调车员
-                                case "01":
-                                    List<PersonDataUser> personDataUsers1 = mSixDataDao.find();
-                                    int size2 = personDataUsers1.size();
-                                    String lat2 = personDataUsers1.get(size2 - 1).getLat();
-                                    String lon2 = personDataUsers1.get(size2 - 1).getLon();
-                                    String lat12 = lat2.substring(lat2.indexOf(".") + 1, lat2.length());
-                                    String lon12 = lon2.substring(lon2.indexOf(".") + 1, lon2.length());
-                                    String total2 = "01-挂钩GPS-" + lat12 + "-" + lon12;
-                                    sendMessage(mConversationId, total2);
-
-                                    sixPerson();
-                                    String hookTotal = mControlOnePick.getName();
-                                    switch (mGetGudaoOfGpsPoint2) {
-                                        case 1:
-                                            mControlOnePick.setName(hookTotal + "挂钩");
-                                            mControlOnePick.setTrack(mRatioOfGpsTrackCar2);
-                                            mControlOnePick.setLat(mLat21);
-                                            mControlOnePick.setLon(mLon21);
-                                            break;
-                                        case 2:
-                                            mControlTwoPick.setName(hookTotal + "挂钩");
-                                            break;
-                                        case 3:
-                                            mControlThreePick.setName(hookTotal + "挂钩");
-                                            break;
-                                        case 4:
-                                            mControlFourPick.setName(hookTotal + "挂钩");
-                                            break;
-                                        case 5:
-                                            mControlFivePick.setName(hookTotal + "挂钩");
-                                            break;
-                                        case 6:
-                                            mControlSixPick.setName(hookTotal + "挂钩");
-                                            mControlSixPick.setLat(mLat21);
-                                            mControlSixPick.setLon(mLon21);
-                                            //股道
-                                            mControlSixPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlSixPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 7:
-                                            mControlSevenPick.setName(hookTotal + "挂钩");
-                                            mControlSevenPick.setLat(mLat21);
-                                            mControlSevenPick.setLon(mLon21);
-                                            //股道
-                                            mControlSevenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlSevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 8:
-                                            mControlEightPick.setName(hookTotal + "挂钩");
-                                            break;
-                                        case 9:
-                                            mControlNinePick.setName(hookTotal + "挂钩");
-                                            mControlNinePick.setLat(mLat21);
-                                            mControlNinePick.setLon(mLon21);
-                                            //股道
-                                            mControlNinePick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlNinePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 10:
-                                            mControlTenPick.setName(hookTotal + "挂钩");
-                                            break;
-                                        case 11:
-                                            mControlElevenPick.setName(hookTotal + "挂钩");
-                                            mControlElevenPick.setLat(mLat21);
-                                            mControlElevenPick.setLon(mLon21);
-                                            //股道
-                                            mControlElevenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlElevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 12:
-                                            mControlTwelvePick.setName(hookTotal + "挂钩");
-                                            mControlTwelvePick.setLat(mLat21);
-                                            mControlTwelvePick.setLon(mLon21);
-                                            //股道
-                                            mControlTwelvePick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlTwelvePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 13:
-                                            mControlThirteenPick.setName(hookTotal + "挂钩");
-                                            mControlThirteenPick.setLat(mLat21);
-                                            mControlThirteenPick.setLon(mLon21);
-                                            //股道
-                                            mControlThirteenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlThirteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 14:
-                                            mControlFourteenPick.setName(hookTotal + "挂钩");
-                                            mControlFourteenPick.setLat(mLat21);
-                                            mControlFourteenPick.setLon(mLon21);
-                                            //股道
-                                            mControlFourteenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlFourteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 15:
-                                            mControlFifteenPick.setName(hookTotal + "挂钩");
-                                            mControlFifteenPick.setLat(mLat21);
-                                            mControlFifteenPick.setLon(mLon21);
-                                            //股道
-                                            mControlFifteenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlFifteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 16:
-                                            mControlSixteenPick.setName(hookTotal + "挂钩");
-                                            mControlSixteenPick.setLat(mLat21);
-                                            mControlSixteenPick.setLon(mLon21);
-                                            //股道
-                                            mControlSixteenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlSixteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 17:
-                                            mControlSeventeenPick.setName(hookTotal + "挂钩");
-                                            mControlSeventeenPick.setLat(mLat21);
-                                            mControlSeventeenPick.setLon(mLon21);
-                                            //股道
-                                            mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlSeventeenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 18:
-                                            mControlEighteenPick.setName(hookTotal + "挂钩");
-                                            mControlEighteenPick.setLat(mLat21);
-                                            mControlEighteenPick.setLon(mLon21);
-                                            //股道
-                                            mControlEighteenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlEighteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 19:
-                                            mControlNineteenPick.setName(hookTotal + "挂钩");
-                                            mControlNineteenPick.setLat(mLat21);
-                                            mControlNineteenPick.setLon(mLon21);
-                                            //股道
-                                            mControlNineteenPick.setTrack(mRatioOfGpsTrackCar2);
-                                            //位置
-                                            mControlNineteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
+                    if (mEncodeHexStr.substring(0,2).equals("A5")) {
+                        if (mEncodeHexStr != null && mEncodeHexStr.length() >= 8) {
+                            //调号
+                            String signature = mEncodeHexStr.substring(2, 4);
+                            //人员号
+                            mPeopleId2 = mEncodeHexStr.substring(4, 6);
+                            String function2 = mEncodeHexStr.substring(6, 8);
+                            String totalDmr = mPeopleId2 + signature + function2 + "03";
+                    /*if (function2.equals("59")) {
+                        String totalDmr = mPeopleId2 + signature + function2 + "03";
+                        sendMessage(mConversationId, totalDmr);
+                    } else if (function2.equals("5A")) {
+                        String totalDmr = mPeopleId2 + signature + function2 + "03";
+                        sendMessage(mConversationId, totalDmr);
+                    } else {
+                        String totalDmr = mPeopleId2 + signature + function2 + "03";
+                        sendMessage(mConversationId, totalDmr);
+                    }*/
+                            switch (function2) {
+                                //摘钩
+                                case "59":
+                            /*PickDao pickDao = new PickDao(getApplication());
+                            pickDao.add(mTime1, mEncodeHexStr);*/
+                                    String zhen = mEncodeHexStr.substring(8, 10);
+                                    if (zhen.equals("01")) {
+                                        sendMessage(mConversationId, totalDmr);
+                                        //zhaigou();
                                     }
                                     break;
-                                case "02":
-                                    List<PersonDataUser> personDataUsers2 = mSevenDataDao.find();
-                                    int size3 = personDataUsers2.size();
-                                    String lat3 = personDataUsers2.get(size3 - 1).getLat();
-                                    String lon3 = personDataUsers2.get(size3 - 1).getLon();
-                                    String lat13 = lat3.substring(lat3.indexOf(".") + 1, lat3.length());
-                                    String lon13 = lon3.substring(lon3.indexOf(".") + 1, lon3.length());
-                                    String total3 = "02-挂钩GPS-" + lat13 + "-" + lon13;
-                                    sendMessage(mConversationId, total3);
-
-                                    sevenPerson();
-                                    String hookTotal2 = mControlOnePick.getName();
-                                    switch (mGetGudaoOfGpsPoint3) {
-                                        case 1:
-                                            mControlOnePick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 2:
-                                            mControlTwoPick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 3:
-                                            mControlThreePick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 4:
-                                            mControlFourPick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 5:
-                                            mControlFivePick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 6:
-                                            mControlSixPick.setName(hookTotal2 + "挂钩");
-                                            mControlSixPick.setLat(mLat31);
-                                            mControlSixPick.setLon(mLon31);
-                                            //股道
-                                            mControlSixPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlSixPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 7:
-                                            mControlSevenPick.setName(hookTotal2 + "挂钩");
-                                            mControlSevenPick.setLat(mLat31);
-                                            mControlSevenPick.setLon(mLon31);
-                                            //股道
-                                            mControlSevenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlSevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 8:
-                                            mControlEightPick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 9:
-                                            mControlNinePick.setName(hookTotal2 + "挂钩");
-                                            mControlNinePick.setLat(mLat31);
-                                            mControlNinePick.setLon(mLon31);
-                                            //股道
-                                            mControlNinePick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlNinePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 10:
-                                            mControlTenPick.setName(hookTotal2 + "挂钩");
-                                            break;
-                                        case 11:
-                                            mControlElevenPick.setName(hookTotal2 + "挂钩");
-                                            mControlElevenPick.setLat(mLat31);
-                                            mControlElevenPick.setLon(mLon31);
-                                            //股道
-                                            mControlElevenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlElevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 12:
-                                            mControlTwelvePick.setName(hookTotal2 + "挂钩");
-                                            mControlTwelvePick.setLat(mLat31);
-                                            mControlTwelvePick.setLon(mLon31);
-                                            //股道
-                                            mControlTwelvePick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlTwelvePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 13:
-                                            mControlThirteenPick.setName(hookTotal2 + "挂钩");
-                                            mControlThirteenPick.setLat(mLat31);
-                                            mControlThirteenPick.setLon(mLon31);
-                                            //股道
-                                            mControlThirteenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlThirteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 14:
-                                            mControlFourteenPick.setName(hookTotal2 + "挂钩");
-                                            mControlFourteenPick.setLat(mLat31);
-                                            mControlFourteenPick.setLon(mLon31);
-                                            //股道
-                                            mControlFourteenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlFourteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 15:
-                                            mControlFifteenPick.setName(hookTotal2 + "挂钩");
-                                            mControlFifteenPick.setLat(mLat31);
-                                            mControlFifteenPick.setLon(mLon31);
-                                            //股道
-                                            mControlFifteenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlFifteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 16:
-                                            mControlSixteenPick.setName(hookTotal2 + "挂钩");
-                                            mControlSixteenPick.setLat(mLat31);
-                                            mControlSixteenPick.setLon(mLon31);
-                                            //股道
-                                            mControlSixteenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlSixteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 17:
-                                            mControlSeventeenPick.setName(hookTotal2 + "挂钩");
-                                            mControlSeventeenPick.setLat(mLat31);
-                                            mControlSeventeenPick.setLon(mLon31);
-                                            //股道
-                                            mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlSeventeenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 18:
-                                            mControlEighteenPick.setName(hookTotal2 + "挂钩");
-                                            mControlEighteenPick.setLat(mLat31);
-                                            mControlEighteenPick.setLon(mLon31);
-                                            //股道
-                                            mControlEighteenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlEighteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 19:
-                                            mControlNineteenPick.setName(hookTotal2 + "挂钩");
-                                            mControlNineteenPick.setLat(mLat31);
-                                            mControlNineteenPick.setLon(mLon31);
-                                            //股道
-                                            mControlNineteenPick.setTrack(mRatioOfGpsTrackCar3);
-                                            //位置
-                                            mControlNineteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
+                                //挂钩
+                                case "5A":
+                                    //
+                            /*HangDao hangDao = new HangDao(getApplication());
+                            hangDao.add(mTime1, mEncodeHexStr);*/
+                                    String zhen5A = mEncodeHexStr.substring(8, 10);
+                                    if (zhen5A.equals("01")) {
+                                        sendMessage(mConversationId, totalDmr);
+                                        //guagou();
                                     }
                                     break;
-                                case "03":
-                                    List<PersonDataUser> personDataUsers3 = mEightDataDao.find();
-                                    int size4 = personDataUsers3.size();
-                                    String lat4 = personDataUsers3.get(size4 - 1).getLat();
-                                    String lon4 = personDataUsers3.get(size4 - 1).getLon();
-                                    String lat14 = lat4.substring(lat4.indexOf(".") + 1, lat4.length());
-                                    String lon14 = lon4.substring(lon4.indexOf(".") + 1, lon4.length());
-                                    String total4 = "03-挂钩GPS-" + lat14 + "-" + lon14;
-                                    sendMessage(mConversationId, total4);
-
-                                    eightPerson();
-                                    String hookTotal3 = mControlOnePick.getName();
-                                    switch (mGetGudaoOfGpsPoint4) {
-                                        case 1:
-                                            mControlOnePick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 2:
-                                            mControlTwoPick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 3:
-                                            mControlThreePick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 4:
-                                            mControlFourPick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 5:
-                                            mControlFivePick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 6:
-                                            mControlSixPick.setName(hookTotal3 + "挂钩");
-                                            mControlSixPick.setLat(mLat4);
-                                            mControlSixPick.setLon(mLon4);
-                                            //股道
-                                            mControlSixPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlSixPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 7:
-                                            mControlSevenPick.setName(hookTotal3 + "挂钩");
-                                            mControlSevenPick.setLat(mLat4);
-                                            mControlSevenPick.setLon(mLon4);
-                                            //股道
-                                            mControlSevenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlSevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 8:
-                                            mControlEightPick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 9:
-                                            mControlNinePick.setName(hookTotal3 + "挂钩");
-                                            mControlNinePick.setLat(mLat4);
-                                            mControlNinePick.setLon(mLon4);
-                                            //股道
-                                            mControlNinePick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlNinePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 10:
-                                            mControlTenPick.setName(hookTotal3 + "挂钩");
-                                            break;
-                                        case 11:
-                                            mControlElevenPick.setName(hookTotal3 + "挂钩");
-                                            mControlElevenPick.setLat(mLat4);
-                                            mControlElevenPick.setLon(mLon4);
-                                            //股道
-                                            mControlElevenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlElevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 12:
-                                            mControlTwelvePick.setName(hookTotal3 + "挂钩");
-                                            mControlTwelvePick.setLat(mLat4);
-                                            mControlTwelvePick.setLon(mLon4);
-                                            //股道
-                                            mControlTwelvePick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlTwelvePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 13:
-                                            mControlThirteenPick.setName(hookTotal3 + "挂钩");
-                                            mControlThirteenPick.setLat(mLat4);
-                                            mControlThirteenPick.setLon(mLon4);
-                                            //股道
-                                            mControlThirteenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlThirteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 14:
-                                            mControlFourteenPick.setName(hookTotal3 + "挂钩");
-                                            mControlFourteenPick.setLat(mLat4);
-                                            mControlFourteenPick.setLon(mLon4);
-                                            //股道
-                                            mControlFourteenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlFourteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 15:
-                                            mControlFifteenPick.setName(hookTotal3 + "挂钩");
-                                            mControlFifteenPick.setLat(mLat4);
-                                            mControlFifteenPick.setLon(mLon4);
-                                            //股道
-                                            mControlFifteenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlFifteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 16:
-                                            mControlSixteenPick.setName(hookTotal3 + "挂钩");
-                                            mControlSixteenPick.setLat(mLat4);
-                                            mControlSixteenPick.setLon(mLon4);
-                                            //股道
-                                            mControlSixteenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlSixteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 17:
-                                            mControlSeventeenPick.setName(hookTotal3 + "挂钩");
-                                            mControlSeventeenPick.setLat(mLat4);
-                                            mControlSeventeenPick.setLon(mLon4);
-                                            //股道
-                                            mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlSeventeenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 18:
-                                            mControlEighteenPick.setName(hookTotal3 + "挂钩");
-                                            mControlEighteenPick.setLat(mLat4);
-                                            mControlEighteenPick.setLon(mLon4);
-                                            //股道
-                                            mControlEighteenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlEighteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 19:
-                                            mControlNineteenPick.setName(hookTotal3 + "挂钩");
-                                            mControlNineteenPick.setLat(mLat4);
-                                            mControlNineteenPick.setLon(mLon4);
-                                            //股道
-                                            mControlNineteenPick.setTrack(mRatioOfGpsTrackCar4);
-                                            //位置
-                                            mControlNineteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                    }
+                                //启动
+                                case "41":
+                                    sendMessage(mConversationId, totalDmr);
+                                    //qidong();
                                     break;
-                                case "04":
-                                    List<PersonDataUser> personDataUsers4 = mNineDataDao.find();
-                                    int size5 = personDataUsers4.size();
-                                    String lat5 = personDataUsers4.get(size5 - 1).getLat();
-                                    String lon5 = personDataUsers4.get(size5 - 1).getLon();
-                                    String lat15 = lat5.substring(lat5.indexOf(".") + 1, lat5.length());
-                                    String lon15 = lon5.substring(lon5.indexOf(".") + 1, lon5.length());
-                                    String total5 = "04-挂钩GPS-" + lat15 + "-" + lon15;
-                                    sendMessage(mConversationId, total5);
+                                //推进
+                                case "43":
+                                    sendMessage(mConversationId, totalDmr);
+                                    //tuijin();
+                                    break;
+                                case "71":
+                                    sendMessage(mConversationId, totalDmr);
+                                    mAdvancedmr.setName("false");
+                                    //停车
+                                    san = false;
+                                    wu = false;
+                                    shi = false;
+                                    yi = false;
+                                    break;
+                                case "98"://领车
+                                    sendMessage(mConversationId, totalDmr);
+                                    break;
+                                case "9A"://领车完毕
+                                    sendMessage(mConversationId, totalDmr);
+                                    //收到领车指令后计算领车员与机车的经纬度差
+                                    //紧急停车
+                                    //停车股道号
+                                    break;
+                                case "73":
+                                    sendMessage(mConversationId, totalDmr);
+                                    //紧急停车
+                                    //停车股道号
+                                    //mStopcar1 = mStopcar.getName();
+                                    //mLeadcar.setName(mPeopleId2);
+                                    //获取机车的股道
+                                    //mTrackCar = mStopcar.getTrack();
+                                    //获取机车的经纬度
+                                    //mLatCar = mStopcar.getLat();
+                                    //mLonCar = mStopcar.getLon();
+                                    //获取机车的位置
+                                    //mPositionCar = mStopcar.getPosition();
+                                    //mPositionCar1 = Double.valueOf(mPositionCar);
 
-                                    ninePerson();
-                                    String hookTotal4 = mControlOnePick.getName();
-                                    switch (mGetGudaoOfGpsPoint4) {
-                                        case 1:
-                                            mControlOnePick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 2:
-                                            mControlTwoPick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 3:
-                                            mControlThreePick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 4:
-                                            mControlFourPick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 5:
-                                            mControlFivePick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 6:
-                                            mControlSixPick.setName(hookTotal4 + "挂钩");
-                                            mControlSixPick.setLat(mLat5);
-                                            mControlSixPick.setLon(mLon5);
-                                            //股道
-                                            mControlSixPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlSixPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 7:
-                                            mControlSevenPick.setName(hookTotal4 + "挂钩");
-                                            mControlSevenPick.setLat(mLat5);
-                                            mControlSevenPick.setLon(mLon5);
-                                            //股道
-                                            mControlSevenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlSevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 8:
-                                            mControlEightPick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 9:
-                                            mControlNinePick.setName(hookTotal4 + "挂钩");
-                                            mControlNinePick.setLat(mLat5);
-                                            mControlNinePick.setLon(mLon5);
-                                            //股道
-                                            mControlNinePick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlNinePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 10:
-                                            mControlTenPick.setName(hookTotal4 + "挂钩");
-                                            break;
-                                        case 11:
-                                            mControlElevenPick.setName(hookTotal4 + "挂钩");
-                                            mControlElevenPick.setLat(mLat5);
-                                            mControlElevenPick.setLon(mLon5);
-                                            //股道
-                                            mControlElevenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlElevenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 12:
-                                            mControlTwelvePick.setName(hookTotal4 + "挂钩");
-                                            mControlTwelvePick.setLat(mLat5);
-                                            mControlTwelvePick.setLon(mLon5);
-                                            //股道
-                                            mControlTwelvePick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlTwelvePick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 13:
-                                            mControlThirteenPick.setName(hookTotal4 + "挂钩");
-                                            mControlThirteenPick.setLat(mLat5);
-                                            mControlThirteenPick.setLon(mLon5);
-                                            //股道
-                                            mControlThirteenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlThirteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 14:
-                                            mControlFourteenPick.setName(hookTotal4 + "挂钩");
-                                            mControlFourteenPick.setLat(mLat5);
-                                            mControlFourteenPick.setLon(mLon5);
-                                            //股道
-                                            mControlFourteenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlFourteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 15:
-                                            mControlFifteenPick.setName(hookTotal4 + "挂钩");
-                                            mControlFifteenPick.setLat(mLat5);
-                                            mControlFifteenPick.setLon(mLon5);
-                                            //股道
-                                            mControlFifteenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlFifteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 16:
-                                            mControlSixteenPick.setName(hookTotal4 + "挂钩");
-                                            mControlSixteenPick.setLat(mLat5);
-                                            mControlSixteenPick.setLon(mLon5);
-                                            //股道
-                                            mControlSixteenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlSixteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 17:
-                                            mControlSeventeenPick.setName(hookTotal4 + "挂钩");
-                                            mControlSeventeenPick.setLat(mLat5);
-                                            mControlSeventeenPick.setLon(mLon5);
-                                            //股道
-                                            mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlSeventeenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 18:
-                                            mControlEighteenPick.setName(hookTotal4 + "挂钩");
-                                            mControlEighteenPick.setLat(mLat5);
-                                            mControlEighteenPick.setLon(mLon5);
-                                            //股道
-                                            mControlEighteenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlEighteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                        case 19:
-                                            mControlNineteenPick.setName(hookTotal4 + "挂钩");
-                                            mControlNineteenPick.setLat(mLat5);
-                                            mControlNineteenPick.setLon(mLon5);
-                                            //股道
-                                            mControlNineteenPick.setTrack(mRatioOfGpsTrackCar5);
-                                            //位置
-                                            mControlNineteenPick.setPosition(mGpsPoint2 + "");
-                                            break;
-                                    }
+                                    //jinjitingche();
+                                    break;
+                                default:
+                                    sendMessage(mConversationId, totalDmr);
                                     break;
                             }
-                            break;
-                        //启动
-                        case "41":
-                            qidong();
-                            break;
-                        //推进
-                        case "43":
-                            tuijin();
-                            break;
-                        case "71":
-                            mAdvancedmr.setName("false");
-                            //停车
-                            san = false;
-                            wu = false;
-                            shi = false;
-                            yi = false;
-                            /*mControlOnePick.setName("0");
-                            mOneparkcar.invalidate();
-                            mControlTwoPick.setName("0");
-                            mTwoparkcar.invalidate();
-                            mControlThreePick.setName("0");
-                            mThreeparkcar.invalidate();
-                            mControlFourPick.setName("0");
-                            mFourparkcar.invalidate();
-                            mControlFivePick.setName("0");
-                            mFiveparkcar.invalidate();*/
-                            /*mControlEightPick.setName("0");
-                            mEightparkcar.invalidate();
-                            mControlTenPick.setName("0");
-                            mTenparkcar.invalidate();*/
-                                /*String stopcar = mStopcar.getName();
-                                String leadcar = mLeadcar.getName();*/
-                            break;
-                        case "9A"://领车
-                            //收到领车指令后计算领车员与机车的经纬度差
-                            mLeadcar.setName(mPeopleId2);
-                            switch (mPeopleId2) {
-                                case "20":
-                                    List<PersonDataUser> personDataUsers = mFiveDataDao.find();
-                                    int size1 = personDataUsers.size();
-                                    String lat = personDataUsers.get(size1 - 1).getLat();
-                                    String lon = personDataUsers.get(size1 - 1).getLon();
-                                    mLatLeadCar20 = Double.valueOf(lat);
-                                    mLonLeadCar20 = Double.valueOf(lon);
-
-                                    List<GPSUser> gpsUsers = mGpsDao.find();
-                                    int gpsSize = gpsUsers.size();
-                                    String gpsLat = gpsUsers.get(gpsSize - 1).getLat();
-                                    String gpsLon = gpsUsers.get(gpsSize - 1).getLon();
-                                    break;
-                            }
-                            break;
-                        case "73":
-                            //紧急停车
-                            //停车股道号
-                            mStopcar1 = mStopcar.getName();
-                            mLeadcar.setName(mPeopleId2);
-                            //获取机车的股道
-                            mTrackCar = mStopcar.getTrack();
-                            //获取机车的经纬度
-                            mLatCar = mStopcar.getLat();
-                            mLonCar = mStopcar.getLon();
-                            //获取机车的位置
-                            mPositionCar = mStopcar.getPosition();
-                            mPositionCar1 = Double.valueOf(mPositionCar);
-
-                            jinjitingche();
-                            break;
+                            //mTotal = "2001" + function + "02";
+                        }
                     }
-                    //mTotal = "2001" + function + "02";
                 }
                 /*} catch (Exception e) {
                     Log.e("数据异常", "数据异常：" + e);
@@ -1263,10 +704,8 @@ public class PointActivity extends SerialPortActivity {
             mSixpickright.setLon(maxLon);
 
             //mControlTrackName
-            dataSum = "0"+mControlTrackName + "-停留车-" + data;
+            dataSum = "0" + mControlTrackName + "-停留车-" + data;
             sendMessage(mConversationId, dataSum);
-            data = "";
-            dataSum = "";
         } else {
             mSixPickLeft.setPosition("0");
             mSixPickLeft.setLat("0");
@@ -1274,11 +713,11 @@ public class PointActivity extends SerialPortActivity {
             mSixpickright.setPosition("0");
             mSixpickright.setLat("0");
             mSixpickright.setLon("0");
-            dataSum = "0"+mControlTrackName + "-停留车-" +"(0,0)(0,0)";
+            dataSum = "0" + mControlTrackName + "-停留车-" + "(000000,000000)(000000,000000)";
             sendMessage(mConversationId, dataSum);
-            data = "";
-            dataSum = "";
         }
+        data = "";
+        dataSum = "";
     }
 
     private void getSevenNum() {
@@ -1316,7 +755,7 @@ public class PointActivity extends SerialPortActivity {
             mSevenpickright.setLat(maxLat);
             mSevenpickright.setLon(maxLon);
 
-            dataSum = "0"+mControlTrackName + "-停留车-" + data;
+            dataSum = "0" + mControlTrackName + "-停留车-" + data;
             sendMessage(mConversationId, dataSum);
             data = "";
             dataSum = "";
@@ -1328,7 +767,7 @@ public class PointActivity extends SerialPortActivity {
             mSevenpickright.setLat("0");
             mSevenpickright.setLon("0");
 
-            dataSum = "0"+mControlTrackName + "-停留车-" + "(0,0)(0,0)";
+            dataSum = "0" + mControlTrackName + "-停留车-" + "(0,0)(0,0)";
             sendMessage(mConversationId, dataSum);
             data = "";
             dataSum = "";
@@ -1370,7 +809,7 @@ public class PointActivity extends SerialPortActivity {
             mNinepickright.setLat(maxLat);
             mNinepickright.setLon(maxLon);
 
-            dataSum = "0"+mControlTrackName + "-停留车-" + data;
+            dataSum = "0" + mControlTrackName + "-停留车-" + data;
             sendMessage(mConversationId, dataSum);
             data = "";
             dataSum = "";
@@ -1382,7 +821,7 @@ public class PointActivity extends SerialPortActivity {
             mNinepickright.setLat("0");
             mNinepickright.setLon("0");
 
-            dataSum = "0"+mControlTrackName + "-停留车-" + "(0,0)(0,0)";
+            dataSum = "0" + mControlTrackName + "-停留车-" + "(0,0)(0,0)";
             sendMessage(mConversationId, dataSum);
             data = "";
             dataSum = "";
@@ -1875,11 +1314,12 @@ public class PointActivity extends SerialPortActivity {
 
         mAppService = AppJoint.service(TestService.class);
 
-        mGpsDao = new GPSDao(getApplicationContext());
+        //mGpsDao = new GPSDao(getApplicationContext());
         //mGpsDao.add("36.659485000000004", "101.768762");
 
 
-
+        SpUtil spUtil = new SpUtil(getApplicationContext(), "controluncaughtException");
+        spUtil.setName("0");
         /*//摘钩
         mPickDao = new PickDao(getApplicationContext());
         //mPickDao.add("133438", "463264");
@@ -1934,22 +1374,22 @@ public class PointActivity extends SerialPortActivity {
         //发送机车、检测人员位置
         mHandler.postDelayed(mRunnable, 1500);
 
-        mFiveDataDao = new FiveDataDao(getApplicationContext());
+        /*mFiveDataDao = new FiveDataDao(getApplicationContext());
         mSixDataDao = new SixDataDao(getApplicationContext());
         mSevenDataDao = new SevenDataDao(getApplicationContext());
         mEightDataDao = new EightDataDao(getApplicationContext());
-        mNineDataDao = new NineDataDao(getApplicationContext());
+        mNineDataDao = new NineDataDao(getApplicationContext());*/
 
         /*mWanAsynTask = new WanAsynTask(getApplication());
         AssetsDatabaseManager db = AssetsDatabaseManager.getManager();
         mMDatabase = db.getDatabase("wandian.db");*/
 
-        /*int getGudaoOfGpsPoint = GetGudaoOfGpsPoint(101.765343, 36.670503);
+        /*int getGudaoOfGpsPoint = GetGudaoOfGpsPoint(101.766023, 36.666956);
         //mJuli.setText(getGudaoOfGpsPoint + "");
         mRatioOfGpsTrackCar = String.valueOf(getGudaoOfGpsPoint);
         Point3d point3d = new Point3d();
-        point3d.setX(101.765343);
-        point3d.setY(36.670503);
+        point3d.setX(101.766023);
+        point3d.setY(36.666956);
         mGetRatioOfGpsPointCar = GetRatioOfGpsPoint(point3d, getGudaoOfGpsPoint);
 
         DecimalFormat df1 = new DecimalFormat("#####0.00%");
@@ -1963,13 +1403,13 @@ public class PointActivity extends SerialPortActivity {
         Log.i("TAG", "mGpsPistanceCar" + mGpsPistanceCar);
 
         mStopcar.setTrack(getGudaoOfGpsPoint + "");
-        mStopcar.setLat("101.765343");
-        mStopcar.setLon("36.670503");
+        mStopcar.setLat("101.766023");
+        mStopcar.setLon("36.666956");
         mStopcar.setPosition(mGpsPistanceCar + "");
-        mStopcar.setName("股道" + getGudaoOfGpsPoint + "纬度" + "101.765343" + "经度" + "36.670503" + "位置" + mGpsPistanceCar);
+        mStopcar.setName("股道" + getGudaoOfGpsPoint + "纬度" + "101.766023" + "经度" + "36.666956" + "位置" + mGpsPistanceCar);
 
+        ControlTranslation.proplrMove1(mControlMap, mTrain, mRatioOfGpsTrackCar, mGpsPistanceCar, transverse, disparity);*/
 
-        ControlMove.proplrMove0(mMap1, mMap2, mMap1, mTrain, getGudaoOfGpsPoint + "", mGpsPistanceCar, transverse, disparity, mTime);*/
         //proplrMove();
 
         /*DecimalFormat df = new DecimalFormat("#.000000");
@@ -2064,10 +1504,13 @@ public class PointActivity extends SerialPortActivity {
     private void getSp() {
 
         mControlTrack = new SpUtil(getApplicationContext(), "controltrack");
-
+        mCopyCar = new SpUtil(getApplicationContext(), "copycar");
+        //mControlTrack.setName(1 + "");
         //控制三个布局
         //站内图
         mMain = new SpUtil(getApplicationContext(), "main");
+
+        mControlMap = new SpUtil(getApplicationContext(), "controlmap");
 
         mFirstInto = new SpUtil(getApplicationContext(), "firstinto");
 
@@ -2080,9 +1523,11 @@ public class PointActivity extends SerialPortActivity {
         mOnepickright = new SpUtil(getApplicationContext(), "onepickright");
         //控制1道是否有停留车
         mControlOnePick = new SpUtil(getApplicationContext(), "controlonepick");
+
+        mOneDataDao = new OneDataDao(getApplicationContext());
+
         //2道停留车左点
         mTwoPickLeft = new SpUtil(getApplicationContext(), "twopickleft");
-
         //2道停留车右点
         mTwopickright = new SpUtil(getApplicationContext(), "twopickright");
         //控制2道是否有停留车
@@ -2251,6 +1696,14 @@ public class PointActivity extends SerialPortActivity {
         //控制停车
         //mDataTransmission = new SpUtil(getApplicationContext(), "datatransmission");
         //mDataTransmission.setName("false");
+
+        //控制人员显示
+        mPeople0 = new SpUtil(getApplicationContext(), "people0");
+        mPeople1 = new SpUtil(getApplicationContext(), "people1");
+        mPeople2 = new SpUtil(getApplicationContext(), "people2");
+        mPeople3 = new SpUtil(getApplicationContext(), "people3");
+        mPeople4 = new SpUtil(getApplicationContext(), "people4");
+
         //人员号5
         mPeople5 = new SpUtil(getApplicationContext(), "people5");
         //人员号6
@@ -2266,9 +1719,13 @@ public class PointActivity extends SerialPortActivity {
         mMap2 = new SpUtil(getApplicationContext(), "map2");
         mMap3 = new SpUtil(getApplicationContext(), "map3");
         mCar = new SpUtil(getApplicationContext(), "car");
-
+        /*mStopcar.setLat("000000");
+        mStopcar.setLon("000000");
+        mCar.setLat("000000");
+        mCar.setLon("000000");*/
         mLeftCar = new SpUtil(getApplicationContext(), "leftcar");
         mRightCar = new SpUtil(getApplicationContext(), "rightcar");
+        /*mOneDataDao.add("0", "0", "0", "0", "0");
         mStopcar.setLat("000000");
         mStopcar.setLon("000000");
         mMap1.setName("visible");
@@ -2351,7 +1808,7 @@ public class PointActivity extends SerialPortActivity {
         mNineteenPickLeft.setPosition("0");
         mNineteenPickRight.setPosition("0");
         mControlNineteenPick.setName("0");
-        mNineteenParkDataDao.add("0", "0", "0", "0", "0");
+        mNineteenParkDataDao.add("0", "0", "0", "0", "0");*/
     }
 
     private void initView() {
@@ -2385,13 +1842,13 @@ public class PointActivity extends SerialPortActivity {
         mDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPickDao.del("zhaigouGPS");
-                mGpsDao.del("Gps");
-                mFiveDataDao.del("fiveperson");
+                //mPickDao.del("zhaigouGPS");
+                //mGpsDao.del("Gps");
+                /*mFiveDataDao.del("fiveperson");
                 mSixDataDao.del("sixperson");
                 mSevenDataDao.del("sevenperson");
                 mEightDataDao.del("eightperson");
-                mNineDataDao.del("nineperson");
+                mNineDataDao.del("nineperson");*/
             }
         });
     }
@@ -2495,17 +1952,22 @@ public class PointActivity extends SerialPortActivity {
     }
 
     private void sixPerson() {
-        String lat = mPeople6.getLat();
-        String lon = mPeople6.getLon();
-        List<PersonDataUser> personDataUsers1 = mSixDataDao.find();
+        mLat6 = mPeople6.getLat();
+        mLon6 = mPeople6.getLon();
+        /*List<PersonDataUser> personDataUsers1 = mSixDataDao.find();
         int size2 = personDataUsers1.size();
         mLat21 = personDataUsers1.get(size2 - 1).getLat();
         mLon21 = personDataUsers1.get(size2 - 1).getLon();
         mLatStopCar01 = Double.valueOf(mLat21);
-        mLonStopCar01 = Double.valueOf(mLon21);
+        mLonStopCar01 = Double.valueOf(mLon21);*/
 
-        mLatSp = Double.valueOf(lat);
-        mLonSp = Double.valueOf(lon);
+        mLat61 = mPeople6.getLat1();
+        mLon61 = mPeople6.getLon1();
+        /*String total2 = "01-摘钩GPS-" + mLat61 + "-" + mLon61;
+        sendMessage(mConversationId, total2);*/
+
+        mLatSp = Double.valueOf(mLat6);
+        mLonSp = Double.valueOf(mLon6);
 
         //获取股道号
         mGetGudaoOfGpsPoint2 = GetGudaoOfGpsPoint(mLonSp, mLatSp);
@@ -2529,12 +1991,16 @@ public class PointActivity extends SerialPortActivity {
     private void sevenPerson() {
         String lat = mPeople7.getLat();
         String lon = mPeople7.getLon();
-        List<PersonDataUser> personDataUsers2 = mSevenDataDao.find();
+        /*List<PersonDataUser> personDataUsers2 = mSevenDataDao.find();
         int size3 = personDataUsers2.size();
-        mLat31 = personDataUsers2.get(size3).getLat();
-        mLon31 = personDataUsers2.get(size3).getLon();
+        mLat31 = personDataUsers2.get(size3 - 1).getLat();
+        mLon31 = personDataUsers2.get(size3 - 1).getLon();
         mLatStopCar02 = Double.valueOf(mLat31);
-        mLonStopCar02 = Double.valueOf(mLon31);
+        mLonStopCar02 = Double.valueOf(mLon31);*/
+        mLat61 = mPeople7.getLat1();
+        mLon61 = mPeople7.getLon1();
+        /*String total2 = "02-摘钩GPS-" + mLat61 + "-" + mLon61;
+        sendMessage(mConversationId, total2);*/
 
         mLatSp = Double.valueOf(lat);
         mLonSp = Double.valueOf(lon);
@@ -2560,12 +2026,16 @@ public class PointActivity extends SerialPortActivity {
     private void eightPerson() {
         String lat = mPeople8.getLat();
         String lon = mPeople8.getLon();
-        List<PersonDataUser> personDataUsers3 = mEightDataDao.find();
+        /*List<PersonDataUser> personDataUsers3 = mEightDataDao.find();
         int size4 = personDataUsers3.size();
-        mLat4 = personDataUsers3.get(size4).getLat();
-        mLon4 = personDataUsers3.get(size4).getLon();
+        mLat4 = personDataUsers3.get(size4 - 1).getLat();
+        mLon4 = personDataUsers3.get(size4 - 1).getLon();
         mLatStopCar03 = Double.valueOf(mLat4);
-        mLonStopCar03 = Double.valueOf(mLon4);
+        mLonStopCar03 = Double.valueOf(mLon4);*/
+        mLat61 = mPeople8.getLat1();
+        mLon61 = mPeople8.getLon1();
+        /*String total2 = "03-摘钩GPS-" + mLat61 + "-" + mLon61;
+        sendMessage(mConversationId, total2);*/
 
         mLatSp = Double.valueOf(lat);
         mLonSp = Double.valueOf(lon);
@@ -2591,12 +2061,16 @@ public class PointActivity extends SerialPortActivity {
     private void ninePerson() {
         String lat = mPeople9.getLat();
         String lon = mPeople9.getLon();
-        List<PersonDataUser> personDataUsers4 = mNineDataDao.find();
+        /*List<PersonDataUser> personDataUsers4 = mNineDataDao.find();
         int size5 = personDataUsers4.size();
-        mLat5 = personDataUsers4.get(size5).getLat();
-        mLon5 = personDataUsers4.get(size5).getLon();
+        mLat5 = personDataUsers4.get(size5 - 1).getLat();
+        mLon5 = personDataUsers4.get(size5 - 1).getLon();
         mLatStopCar04 = Double.valueOf(mLat5);
-        mLonStopCar04 = Double.valueOf(mLon5);
+        mLonStopCar04 = Double.valueOf(mLon5);*/
+        mLat61 = mPeople9.getLat1();
+        mLon61 = mPeople9.getLon1();
+        /*String total2 = "04-摘钩GPS-" + mLat61 + "-" + mLon61;
+        sendMessage(mConversationId, total2);*/
 
         mLatSp = Double.valueOf(lat);
         mLonSp = Double.valueOf(lon);
@@ -2718,23 +2192,78 @@ public class PointActivity extends SerialPortActivity {
                 String lat1 = df.format(Double.valueOf(carLat)).substring(df.format(Double.valueOf(carLat)).indexOf(".") + 1);
                 String lon1 = df.format(Double.valueOf(carLon)).substring(df.format(Double.valueOf(carLon)).indexOf(".") + 1);
                 String total = "0A-机车GPS-" + lat1 + "-" + lon1;
-                //sendMessage(mConversationId, total);
-                //Log.i("秦广帅1000", total);//0A-机车GPS-667636-768050
+                sendMessage(mConversationId, total);
+                Log.i("秦广帅1000", total);//0A-机车GPS-667636-768050
             }
-            //mTrain.invalidate();
+            mTrain.invalidate();
+
+            /*String carName = mCopyCar.getName();
+            if (carName != null) {
+                switch (carName) {
+                    case "true":
+                        String lat = mCopyCar.getLat();
+                        String lon = mCopyCar.getLon();
+                        Double lat1 = Double.valueOf(lat);
+                        Double lon1 = Double.valueOf(lon);
+
+                        int getGudaoOfGpsPoint = GetGudaoOfGpsPoint(lon1, lat1);
+                        //mJuli.setText(getGudaoOfGpsPoint + "");
+                        mRatioOfGpsTrackCar1 = String.valueOf(getGudaoOfGpsPoint);
+                        Point3d point3d = new Point3d();
+                        point3d.setX(lon1);
+                        point3d.setY(lat1);
+                        double getRatioOfGpsPoint = GetRatioOfGpsPoint(point3d, getGudaoOfGpsPoint);
+                        DecimalFormat df1 = new DecimalFormat("#####0.00%");
+                        DecimalFormatSymbols symbols1 = new DecimalFormatSymbols();
+                        df1.setDecimalFormatSymbols(symbols1);
+                        String ratioOfGpsPoint = df1.format(getRatioOfGpsPoint);
+                        String gpsPoint = ratioOfGpsPoint.substring(0, ratioOfGpsPoint.indexOf("."));
+                        mGpsPistanceCar1 = Double.valueOf(gpsPoint);
+                        //mJwd.setText(ratioOfGpsPoint + "");
+                        //mLat1.setText(getRatioOfGpsPoint + "");
+                        //mLat2.setText(gpsPoint);
+                        //proplrMove0();
+                        ControlTranslation.proplrMove1(mControlMap, mTrain, mRatioOfGpsTrackCar1, mGpsPistanceCar1, transverse1, disparity);
+                        break;
+                }
+
+                mMControlMapName = mControlMap.getName();
+                if (mMControlMapName.equals("zheng")) {
+                    mXiningbeimap.setVisibility(View.VISIBLE);
+                    mChangfengmap.setVisibility(View.GONE);
+                    mBailimap.setVisibility(View.GONE);
+                    mMain.setName("main");
+                } else if (mMControlMapName.equals("cf")) {
+                    mChangfengmap.setVisibility(View.VISIBLE);
+                    mXiningbeimap.setVisibility(View.GONE);
+                    mBailimap.setVisibility(View.GONE);
+                    mMain.setName("changfeng");
+                } else if (mMControlMapName.equals("bl")) {
+                    mBailimap.setVisibility(View.VISIBLE);
+                    mChangfengmap.setVisibility(View.GONE);
+                    mXiningbeimap.setVisibility(View.GONE);
+                    mMain.setName("baili");
+                }
+            }*/
 
             //调车长
             String name = mPeople5.getName();
             if (name != null) {
                 switch (name) {
                     case "true":
-                        FiveDataDao fiveDataDao = new FiveDataDao(getApplicationContext());
+                        /*FiveDataDao fiveDataDao = new FiveDataDao(getApplicationContext());
                         List<PersonDataUser> fiveDataUsers = fiveDataDao.find();
                         int size0 = fiveDataUsers.size();
                         String lat = fiveDataUsers.get(size0 - 1).getLat();
                         String lon = fiveDataUsers.get(size0 - 1).getLon();
                         Double lat1 = Double.valueOf(lat);
+                        Double lon1 = Double.valueOf(lon);*/
+
+                        String lat = mPeople5.getLat();
+                        String lon = mPeople5.getLon();
+                        Double lat1 = Double.valueOf(lat);
                         Double lon1 = Double.valueOf(lon);
+
                         int getGudaoOfGpsPoint = GetGudaoOfGpsPoint(lon1, lat1);
                         //mJuli.setText(getGudaoOfGpsPoint + "");
                         mRatioOfGpsTrack = String.valueOf(getGudaoOfGpsPoint);
@@ -2751,7 +2280,14 @@ public class PointActivity extends SerialPortActivity {
                         //mJwd.setText(ratioOfGpsPoint + "");
                         //mLat1.setText(getRatioOfGpsPoint + "");
                         //mLat2.setText(gpsPoint);
-                        proplrMove0();
+                        //proplrMove0();
+                        ControlTranslation.proplrMove1(mPeople0, mTransferpeople, mRatioOfGpsTrack, mGpsPistance, transverse1, disparity);
+                        mMControlMapName = mControlMap.getName();
+                        if (mPeople0.getName().equals(mMControlMapName)) {
+                            mTransferpeople.setVisibility(View.VISIBLE);
+                        } else {
+                            mTransferpeople.setVisibility(View.GONE);
+                        }
                         break;
                 }
             }
@@ -2761,13 +2297,19 @@ public class PointActivity extends SerialPortActivity {
             if (name21 != null) {
                 switch (name21) {
                     case "true":
-                        SixDataDao sixDataDao = new SixDataDao(getApplicationContext());
+                        /*SixDataDao sixDataDao = new SixDataDao(getApplicationContext());
                         List<PersonDataUser> sixDataUsers = sixDataDao.find();
                         int size1 = sixDataUsers.size();
                         String lat2 = sixDataUsers.get(size1 - 1).getLat();
                         String lon2 = sixDataUsers.get(size1 - 1).getLon();
                         Double lat12 = Double.valueOf(lat2);
-                        Double lon12 = Double.valueOf(lon2);
+                        Double lon12 = Double.valueOf(lon2);*/
+
+                        String lat = mPeople6.getLat();
+                        String lon = mPeople6.getLon();
+                        Double lat12 = Double.valueOf(lat);
+                        Double lon12 = Double.valueOf(lon);
+
                         int getGudaoOfGpsPoint2 = GetGudaoOfGpsPoint(lon12, lat12);
                         //mJuli.setText(getGudaoOfGpsPoint + "");
                         mRatioOfGpsTrack2 = String.valueOf(getGudaoOfGpsPoint2);
@@ -2784,7 +2326,15 @@ public class PointActivity extends SerialPortActivity {
                         mJwd.setText(getGudaoOfGpsPoint2 + "");
                         mLat1.setText(getRatioOfGpsPoint2 + "");
                         mLat2.setText(mGpsPistance2 + "");
-                        proplrMove1();
+                        Log.e("秦广帅", mRatioOfGpsTrack2 + "    " + mGpsPistance2 + "    ");
+                        //proplrMove1();
+                        ControlTranslation.proplrMove1(mPeople1, mPeopleOne, mRatioOfGpsTrack2, mGpsPistance2, transverse1, disparity);
+                        mMControlMapName = mControlMap.getName();
+                        if (mPeople1.getName().equals(mMControlMapName)) {
+                            mPeopleOne.setVisibility(View.VISIBLE);
+                        } else {
+                            mPeopleOne.setVisibility(View.GONE);
+                        }
                         break;
                 }
             }
@@ -2794,13 +2344,18 @@ public class PointActivity extends SerialPortActivity {
             if (name31 != null) {
                 switch (name31) {
                     case "true":
-                        SevenDataDao sevenDataDao = new SevenDataDao(getApplicationContext());
+                        /*SevenDataDao sevenDataDao = new SevenDataDao(getApplicationContext());
                         List<PersonDataUser> sevenDataUsers = sevenDataDao.find();
                         int size1 = sevenDataUsers.size();
                         String lat2 = sevenDataUsers.get(size1 - 1).getLat();
                         String lon2 = sevenDataUsers.get(size1 - 1).getLon();
                         Double lat12 = Double.valueOf(lat2);
-                        Double lon12 = Double.valueOf(lon2);
+                        Double lon12 = Double.valueOf(lon2);*/
+                        String lat = mPeople7.getLat();
+                        String lon = mPeople7.getLon();
+                        Double lat12 = Double.valueOf(lat);
+                        Double lon12 = Double.valueOf(lon);
+
                         int getGudaoOfGpsPoint2 = GetGudaoOfGpsPoint(lon12, lat12);
                         //mJuli.setText(getGudaoOfGpsPoint + "");
                         mRatioOfGpsTrack3 = String.valueOf(getGudaoOfGpsPoint2);
@@ -2817,7 +2372,14 @@ public class PointActivity extends SerialPortActivity {
                         //mJwd.setText(ratioOfGpsPoint + "");
                         //mLat1.setText(getRatioOfGpsPoint + "");
                         //mLat2.setText(gpsPoint);
-                        proplrMove2();
+                        //proplrMove2();
+                        ControlTranslation.proplrMove1(mPeople2, mPeopletwo, mRatioOfGpsTrack3, mGpsPistance3, transverse1, disparity);
+                        mMControlMapName = mControlMap.getName();
+                        if (mPeople2.getName().equals(mMControlMapName)) {
+                            mPeopletwo.setVisibility(View.VISIBLE);
+                        } else {
+                            mPeopletwo.setVisibility(View.GONE);
+                        }
                         break;
                 }
             }
@@ -2827,13 +2389,19 @@ public class PointActivity extends SerialPortActivity {
             if (name4 != null) {
                 switch (name4) {
                     case "true":
-                        EightDataDao eightDataDao = new EightDataDao(getApplicationContext());
+                        /*EightDataDao eightDataDao = new EightDataDao(getApplicationContext());
                         List<PersonDataUser> eightDataUsers = eightDataDao.find();
                         int size1 = eightDataUsers.size();
                         String lat2 = eightDataUsers.get(size1 - 1).getLat();
                         String lon2 = eightDataUsers.get(size1 - 1).getLon();
                         Double lat12 = Double.valueOf(lat2);
-                        Double lon12 = Double.valueOf(lon2);
+                        Double lon12 = Double.valueOf(lon2);*/
+
+                        String lat = mPeople8.getLat();
+                        String lon = mPeople8.getLon();
+                        Double lat12 = Double.valueOf(lat);
+                        Double lon12 = Double.valueOf(lon);
+
                         int getGudaoOfGpsPoint2 = GetGudaoOfGpsPoint(lon12, lat12);
                         //mJuli.setText(getGudaoOfGpsPoint + "");
                         mRatioOfGpsTrack4 = String.valueOf(getGudaoOfGpsPoint2);
@@ -2850,7 +2418,14 @@ public class PointActivity extends SerialPortActivity {
                         //mJwd.setText(ratioOfGpsPoint + "");
                         //mLat1.setText(getRatioOfGpsPoint + "");
                         //mLat2.setText(gpsPoint);
-                        proplrMove3();
+                        //proplrMove3();
+                        ControlTranslation.proplrMove1(mPeople3, mPeoplethree, mRatioOfGpsTrack4, mGpsPistance4, transverse1, disparity);
+                        mMControlMapName = mControlMap.getName();
+                        if (mPeople3.getName().equals(mMControlMapName)) {
+                            mPeoplethree.setVisibility(View.VISIBLE);
+                        } else {
+                            mPeoplethree.setVisibility(View.GONE);
+                        }
                         break;
                 }
             }
@@ -2860,13 +2435,19 @@ public class PointActivity extends SerialPortActivity {
             if (name5 != null) {
                 switch (name5) {
                     case "true":
-                        NineDataDao nineDataDao = new NineDataDao(getApplicationContext());
+                        /*NineDataDao nineDataDao = new NineDataDao(getApplicationContext());
                         List<PersonDataUser> nineDataUsers = nineDataDao.find();
                         int size1 = nineDataUsers.size();
                         String lat2 = nineDataUsers.get(size1 - 1).getLat();
                         String lon2 = nineDataUsers.get(size1 - 1).getLon();
                         Double lat12 = Double.valueOf(lat2);
-                        Double lon12 = Double.valueOf(lon2);
+                        Double lon12 = Double.valueOf(lon2);*/
+
+                        String lat = mPeople9.getLat();
+                        String lon = mPeople9.getLon();
+                        Double lat12 = Double.valueOf(lat);
+                        Double lon12 = Double.valueOf(lon);
+
                         int getGudaoOfGpsPoint2 = GetGudaoOfGpsPoint(lon12, lat12);
                         //mJuli.setText(getGudaoOfGpsPoint + "");
                         mRatioOfGpsTrack5 = String.valueOf(getGudaoOfGpsPoint2);
@@ -2883,7 +2464,14 @@ public class PointActivity extends SerialPortActivity {
                         //mJwd.setText(ratioOfGpsPoint + "");
                         //mLat1.setText(getRatioOfGpsPoint + "");
                         //mLat2.setText(gpsPoint);
-                        proplrMove4();
+                        //proplrMove4();
+                        ControlTranslation.proplrMove1(mPeople4, mPeoplefour, mRatioOfGpsTrack5, mGpsPistance5, transverse1, disparity);
+                        mMControlMapName = mControlMap.getName();
+                        if (mPeople4.getName().equals(mMControlMapName)) {
+                            mPeoplefour.setVisibility(View.VISIBLE);
+                        } else {
+                            mPeoplefour.setVisibility(View.GONE);
+                        }
                         break;
                 }
             }
@@ -3143,5620 +2731,6 @@ public class PointActivity extends SerialPortActivity {
         return max;
     }
 
-    //机车
-    private void proplrMove() {
-        switch (mRatioOfGpsTrackCar) {
-            case "1":
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                if (oneTrack == false) {
-                    mTrain.setX(320 - transverse);
-                    mTrain.setY(450 - disparity);
-                    oneTrack = true;
-                    if (mGpsPistanceCar <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (320 - transverse + mGpsPistanceCar * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (450 - disparity + mGpsPistanceCar * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 5 && mGpsPistanceCar <= 94) {
-                        mTrain.setY(500 - disparity);
-                        //setStraightLine(340, mGpsPistanceCar - 5, 2.88f);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (384 - transverse + (mGpsPistanceCar - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (640 - transverse + (mGpsPistanceCar - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (500 - disparity + (mGpsPistanceCar - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (320 - transverse + mGpsPistanceCar * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (450 - disparity + mGpsPistanceCar * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 5 && mGpsPistanceCar <= 94) {
-                        mTrain.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (384 - transverse + (mGpsPistanceCar - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (640 - transverse + (mGpsPistanceCar - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (500 - disparity + (mGpsPistanceCar - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "2":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (twoTrack == false) {
-                    mTrain.setX(50 - transverse);
-                    mTrain.setY(450 - disparity);
-                    twoTrack = true;
-                    if (mGpsPistanceCar <= 87) {
-                        mTrain.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (50 - transverse + mGpsPistanceCar * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (768 - transverse + (mGpsPistanceCar - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (450 - disparity + (mGpsPistanceCar - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 87) {
-                        mTrain.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (50 - transverse + mGpsPistanceCar * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (768 - transverse + (mGpsPistanceCar - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (450 - disparity + (mGpsPistanceCar - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "3":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                twoTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (threeTrack == false) {
-                    mTrain.setX(128 - transverse);
-                    mTrain.setY(400 - disparity);
-                    threeTrack = true;
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (128 - transverse + mGpsPistanceCar * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTrain.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (128 - transverse + mGpsPistanceCar * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "4":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fourTrack == false) {
-                    mTrain.setX(256 - transverse);
-                    mTrain.setY(400 - disparity);
-                    fourTrack = true;
-                    if (mGpsPistanceCar <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (256 - transverse + mGpsPistanceCar * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity - mGpsPistanceCar * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 6 && mGpsPistanceCar <= 94) {
-                        mTrain.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (320 - transverse + (mGpsPistanceCar - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (704 - transverse + (mGpsPistanceCar - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity + (mGpsPistanceCar - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (256 - transverse + mGpsPistanceCar * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity - mGpsPistanceCar * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 6 && mGpsPistanceCar <= 94) {
-                        mTrain.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (320 - transverse + (mGpsPistanceCar - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (704 - transverse + (mGpsPistanceCar - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity + (mGpsPistanceCar - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "5":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fiveTrack == false) {
-                    mTrain.setX(320 - transverse);
-                    mTrain.setY(350 - disparity);
-                    fiveTrack = true;
-                    if (mGpsPistanceCar <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (320 - transverse + mGpsPistanceCar * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity - mGpsPistanceCar * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 6 && mGpsPistanceCar <= 93) {
-                        mTrain.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (384 - transverse + (mGpsPistanceCar - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (640 - transverse + (mGpsPistanceCar - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (300 - disparity + (mGpsPistanceCar - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (320 - transverse + mGpsPistanceCar * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity - mGpsPistanceCar * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 6 && mGpsPistanceCar <= 93) {
-                        mTrain.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (384 - transverse + (mGpsPistanceCar - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (640 - transverse + (mGpsPistanceCar - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (300 - disparity + (mGpsPistanceCar - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "6":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (sixTrack == false) {
-                    mTrain.setX(50 - transverse);
-                    mTrain.setY(250 - disparity);
-                    sixTrack = true;
-                    if (mGpsPistanceCar <= 83) {
-                        mTrain.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (50 - transverse + mGpsPistanceCar * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (768 - transverse + (mGpsPistanceCar - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (250 - disparity + (mGpsPistanceCar - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 83) {
-                        mTrain.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (50 - transverse + mGpsPistanceCar * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (768 - transverse + (mGpsPistanceCar - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (250 - disparity + (mGpsPistanceCar - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "7":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                eightTrack = false;
-                if (sevenTrack == false) {
-                    mTrain.setX(128 - transverse);
-                    mTrain.setY(250 - disparity);
-                    sevenTrack = true;
-                    if (mGpsPistanceCar <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (128 - transverse + mGpsPistanceCar * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (250 - disparity - mGpsPistanceCar * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 20 && mGpsPistanceCar <= 78) {
-                        mTrain.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (205 - transverse + (mGpsPistanceCar - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (768 - transverse + (mGpsPistanceCar - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (150 - disparity + (mGpsPistanceCar - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (128 - transverse + mGpsPistanceCar * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (250 - disparity - mGpsPistanceCar * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 20 && mGpsPistanceCar <= 78) {
-                        mTrain.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (205 - transverse + (mGpsPistanceCar - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (768 - transverse + (mGpsPistanceCar - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (150 - disparity + (mGpsPistanceCar - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "8":
-                mMap1.setName("visible");
-                mMap2.setName("gone");
-                mMap3.setName("gone");
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                if (eightTrack == false) {
-                    mTrain.setX(230 - transverse1);
-                    mTrain.setY(150 - disparity);
-                    eightTrack = true;
-                    if (mGpsPistanceCar <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (230 - transverse + mGpsPistanceCar * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (150 - disparity - mGpsPistanceCar * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 21 && mGpsPistanceCar <= 76) {
-                        mTrain.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (307 - transverse + (mGpsPistanceCar - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (640 - transverse + (mGpsPistanceCar - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (50 - disparity + (mGpsPistanceCar - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (230 - transverse + mGpsPistanceCar * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (150 - disparity - mGpsPistanceCar * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 21 && mGpsPistanceCar <= 76) {
-                        mTrain.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (307 - transverse + (mGpsPistanceCar - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (640 - transverse + (mGpsPistanceCar - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (50 - disparity + (mGpsPistanceCar - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "9":
-                mMap2.setName("visible");
-                mMap1.setName("gone");
-                mMap3.setName("gone");
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (nine == false) {
-                    nine = true;
-                    mTrain.setX(1000 - transverse1);
-                    mTrain.setY(400 - disparity);
-                    if (mGpsPistanceCar >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (1000 - transverse - (100 - mGpsPistanceCar) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistanceCar >= 43 && mGpsPistanceCar < 81) {
-                        mTrain.setX(800 - transverse1);
-                        mTrain.setY(400 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (800 - transverse - (81 - mGpsPistanceCar) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity + (81 - mGpsPistanceCar) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar >= 0 && mGpsPistanceCar < 43) {
-                        mTrain.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (700 - transverse - (43 - mGpsPistanceCar) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (1000 - transverse - (100 - mGpsPistanceCar) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistanceCar >= 43 && mGpsPistanceCar < 81) {
-                        mTrain.setX(800 - transverse1);
-                        mTrain.setY(400 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (800 - transverse - (81 - mGpsPistanceCar) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity + (81 - mGpsPistanceCar) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar >= 0 && mGpsPistanceCar < 43) {
-                        mTrain.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (700 - transverse - (43 - mGpsPistanceCar) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "10":
-                mMap2.setName("visible");
-                mMap1.setName("gone");
-                mMap3.setName("gone");
-                nine = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (ten == false) {
-                    ten = true;
-                    mTrain.setX(700 - transverse1);
-                    mTrain.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (700 - transverse + mGpsPistanceCar * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTrain.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (700 - transverse + mGpsPistanceCar * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "11":
-                mMap2.setName("visible");
-                mMap1.setName("gone");
-                mMap3.setName("gone");
-                nine = false;
-                ten = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (eleven == false) {
-                    eleven = true;
-                    mTrain.setX(600 - transverse1);
-                    mTrain.setY(400 - disparity);
-                    if (mGpsPistanceCar >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (600 - transverse - (100 - mGpsPistanceCar) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity - (100 - mGpsPistanceCar) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (550 - transverse - (76 - mGpsPistanceCar) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (600 - transverse - (100 - mGpsPistanceCar) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity - (100 - mGpsPistanceCar) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (550 - transverse - (76 - mGpsPistanceCar) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "12":
-                mMap2.setName("visible");
-                mMap1.setName("gone");
-                mMap3.setName("gone");
-                nine = false;
-                ten = false;
-                eleven = false;
-                thirteen = false;
-                fourteen = false;
-                if (twelve == false) {
-                    twelve = true;
-                    mTrain.setX(500 - transverse1);
-                    mTrain.setY(300 - disparity);
-                    if (mGpsPistanceCar >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (500 - transverse - (100 - mGpsPistanceCar) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (300 - disparity - (100 - mGpsPistanceCar) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar >= 26 && mGpsPistanceCar < 76) {
-                        mTrain.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (450 - transverse - (75 - mGpsPistanceCar) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (150 - transverse + (25 - mGpsPistanceCar) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (200 - disparity - (25 - mGpsPistanceCar) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (500 - transverse - (100 - mGpsPistanceCar) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (300 - disparity - (100 - mGpsPistanceCar) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar >= 26 && mGpsPistanceCar < 76) {
-                        mTrain.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (450 - transverse - (75 - mGpsPistanceCar) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (150 - transverse + (25 - mGpsPistanceCar) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (200 - disparity - (25 - mGpsPistanceCar) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "13":
-                mMap2.setName("visible");
-                mMap1.setName("gone");
-                mMap3.setName("gone");
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                fourteen = false;
-                if (thirteen == false) {
-                    thirteen = true;
-                    mTrain.setX(800 - transverse1);
-                    mTrain.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (800 - transverse - (100 - mGpsPistanceCar) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTrain.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (800 - transverse - (100 - mGpsPistanceCar) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "14":
-                mMap2.setName("visible");
-                mMap1.setName("gone");
-                mMap3.setName("gone");
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                if (fourteen == false) {
-                    fourteen = true;
-                    mTrain.setX(450 - transverse1);
-                    mTrain.setY(400 - disparity);
-                    if (mGpsPistanceCar >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (450 - transverse - (100 - mGpsPistanceCar) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity + (100 - mGpsPistanceCar) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (350 - transverse - (46 - mGpsPistanceCar) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (450 - transverse - (100 - mGpsPistanceCar) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (400 - disparity + (100 - mGpsPistanceCar) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (350 - transverse - (46 - mGpsPistanceCar) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "15":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (fifteen == false) {
-                    fifteen = true;
-                    mTrain.setX(50 - transverse1);
-                    mTrain.setY(300 - disparity);
-                    if (mGpsPistanceCar <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (50 - transverse + mGpsPistanceCar * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (300 - disparity + mGpsPistanceCar * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setX(500 - transverse1);
-                        mTrain.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (500 - transverse + (mGpsPistanceCar - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (50 - transverse + mGpsPistanceCar * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (300 - disparity + mGpsPistanceCar * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (500 - transverse + (mGpsPistanceCar - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "16":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (sixteen == false) {
-                    sixteen = true;
-                    mTrain.setX(450 - transverse1);
-                    mTrain.setY(350 - disparity);
-                    if (mGpsPistanceCar <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (450 - transverse + mGpsPistanceCar * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity + mGpsPistanceCar * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (550 - transverse + (mGpsPistanceCar - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (450 - transverse + mGpsPistanceCar * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity + mGpsPistanceCar * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (550 - transverse + (mGpsPistanceCar - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "17":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                eighteen = false;
-                nineteen = false;
-                if (seventeen == false) {
-                    seventeen = true;
-                    mTrain.setX(150 - transverse1);
-                    mTrain.setY(150 - disparity);
-                    if (mGpsPistanceCar <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (150 - transverse + mGpsPistanceCar * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (150 - disparity + mGpsPistanceCar * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setX(400 - transverse1);
-                        mTrain.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (400 - transverse + (mGpsPistanceCar - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (150 - transverse + mGpsPistanceCar * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (150 - disparity + mGpsPistanceCar * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTrain.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (400 - transverse + (mGpsPistanceCar - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "18":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (eighteen == false) {
-                    eighteen = true;
-                    mTrain.setX(500 - transverse1);
-                    mTrain.setY(350 - disparity);
-                    if (mGpsPistanceCar <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (500 - transverse + mGpsPistanceCar * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity - mGpsPistanceCar * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 8 && mGpsPistanceCar <= 79) {
-                        mTrain.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (550 - transverse + (mGpsPistanceCar - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (750 - transverse + (mGpsPistanceCar - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (250 - disparity + (mGpsPistanceCar - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistanceCar <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (500 - transverse + mGpsPistanceCar * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (350 - disparity - mGpsPistanceCar * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistanceCar > 8 && mGpsPistanceCar <= 79) {
-                        mTrain.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (550 - transverse + (mGpsPistanceCar - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (750 - transverse + (mGpsPistanceCar - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTrain, "translationY", (float) (250 - disparity + (mGpsPistanceCar - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "19":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                if (nineteen == false) {
-                    nineteen = true;
-                    mTrain.setX(800 - transverse1);
-                    mTrain.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (800 - transverse + mGpsPistanceCar * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTrain.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTrain, "translationX", (float) (800 - transverse + mGpsPistanceCar * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-        }
-    }
-
-    //调车长
-    private void proplrMove0() {
-        switch (mRatioOfGpsTrack) {
-            case "1":
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (oneTrack == false) {
-                    mTransferpeople.setX(320 - transverse1);
-                    mTransferpeople.setY(450 - disparity);
-                    oneTrack = true;
-                    if (mGpsPistance <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (320 - transverse1 + mGpsPistance * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (450 - disparity + mGpsPistance * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 5 && mGpsPistance <= 94) {
-                        //setStraightLine(340, mGpsPistance - 5, 2.88f);
-                        mTransferpeople.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (384 - transverse1 + (mGpsPistance - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (640 - transverse1 + (mGpsPistance - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (500 - disparity + (mGpsPistance - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (320 - transverse1 + mGpsPistance * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (450 - disparity + mGpsPistance * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 5 && mGpsPistance <= 94) {
-                        mTransferpeople.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (384 - transverse1 + (mGpsPistance - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (640 - transverse1 + (mGpsPistance - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (500 - disparity + (mGpsPistance - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "2":
-                oneTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (twoTrack == false) {
-                    mTransferpeople.setX(50 - transverse1);
-                    mTransferpeople.setY(450 - disparity);
-                    twoTrack = true;
-                    if (mGpsPistance <= 87) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (50 - transverse1 + mGpsPistance * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (768 - transverse1 + (mGpsPistance - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (450 - disparity + (mGpsPistance - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 87) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (50 - transverse1 + mGpsPistance * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (768 - transverse1 + (mGpsPistance - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (450 - disparity + (mGpsPistance - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "3":
-                oneTrack = false;
-                twoTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (threeTrack == false) {
-                    mTransferpeople.setX(128 - transverse1);
-                    mTransferpeople.setY(400 - disparity);
-                    threeTrack = true;
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (128 - transverse1 + mGpsPistance * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTransferpeople.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (128 - transverse1 + mGpsPistance * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "4":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fourTrack == false) {
-                    mTransferpeople.setX(256 - transverse1);
-                    mTransferpeople.setY(400 - disparity);
-                    fourTrack = true;
-                    if (mGpsPistance <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (256 - transverse1 + mGpsPistance * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity - mGpsPistance * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 6 && mGpsPistance <= 94) {
-                        mTransferpeople.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (320 - transverse1 + (mGpsPistance - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (704 - transverse1 + (mGpsPistance - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity + (mGpsPistance - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (256 - transverse1 + mGpsPistance * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity - mGpsPistance * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 6 && mGpsPistance <= 94) {
-                        mTransferpeople.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (320 - transverse1 + (mGpsPistance - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (704 - transverse1 + (mGpsPistance - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity + (mGpsPistance - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "5":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fiveTrack == false) {
-                    mTransferpeople.setX(320 - transverse);
-                    mTransferpeople.setY(350 - disparity);
-                    fiveTrack = true;
-                    if (mGpsPistance <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (320 - transverse1 + mGpsPistance * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity - mGpsPistance * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 6 && mGpsPistance <= 93) {
-                        mTransferpeople.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (384 - transverse1 + (mGpsPistance - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (640 - transverse1 + (mGpsPistance - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (300 - disparity + (mGpsPistance - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (320 - transverse1 + mGpsPistance * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity - mGpsPistance * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 6 && mGpsPistance <= 93) {
-                        mTransferpeople.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (384 - transverse1 + (mGpsPistance - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (640 - transverse1 + (mGpsPistance - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (300 - disparity + (mGpsPistance - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "6":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (sixTrack == false) {
-                    mTransferpeople.setX(50 - transverse1);
-                    mTransferpeople.setY(250 - disparity);
-                    sixTrack = true;
-                    if (mGpsPistance <= 83) {
-                        mTransferpeople.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (50 - transverse1 + mGpsPistance * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (768 - transverse1 + (mGpsPistance - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (250 - disparity + (mGpsPistance - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 83) {
-                        mTransferpeople.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (50 - transverse1 + mGpsPistance * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (768 - transverse1 + (mGpsPistance - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (250 - disparity + (mGpsPistance - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "7":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                eightTrack = false;
-                if (sevenTrack == false) {
-                    mTransferpeople.setX(128 - transverse);
-                    mTransferpeople.setY(250 - disparity);
-                    sevenTrack = true;
-                    if (mGpsPistance <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (128 - transverse1 + mGpsPistance * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (250 - disparity - mGpsPistance * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 20 && mGpsPistance <= 78) {
-                        mTransferpeople.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (205 - transverse1 + (mGpsPistance - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (768 - transverse1 + (mGpsPistance - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (150 - disparity + (mGpsPistance - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (128 - transverse1 + mGpsPistance * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (250 - disparity - mGpsPistance * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 20 && mGpsPistance <= 78) {
-                        mTransferpeople.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (205 - transverse1 + (mGpsPistance - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (768 - transverse1 + (mGpsPistance - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (150 - disparity + (mGpsPistance - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "8":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                if (eightTrack == false) {
-                    mTransferpeople.setX(230 - transverse1);
-                    mTransferpeople.setY(150 - disparity);
-                    eightTrack = true;
-                    if (mGpsPistance <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (230 - transverse1 + mGpsPistance * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (150 - disparity - mGpsPistance * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 21 && mGpsPistance <= 76) {
-                        mTransferpeople.setY(50 - transverse1);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (307 - transverse1 + (mGpsPistance - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (640 - transverse1 + (mGpsPistance - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (50 - disparity + (mGpsPistance - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (230 - transverse1 + mGpsPistance * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (150 - disparity - mGpsPistance * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 21 && mGpsPistance <= 76) {
-                        mTransferpeople.setY(50 - transverse1);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (307 - transverse1 + (mGpsPistance - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (640 - transverse1 + (mGpsPistance - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (50 - disparity + (mGpsPistance - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "9":
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (nine == false) {
-                    nine = true;
-                    mTransferpeople.setX(1000 - transverse1);
-                    mTransferpeople.setY(400 - disparity);
-                    if (mGpsPistance >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance >= 43 && mGpsPistance < 81) {
-                        /*mTransferpeople.setX(800 - transverse1);
-                        mTransferpeople.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity + (81 - mGpsPistance) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance >= 43 && mGpsPistance < 81) {
-                        /*mTransferpeople.setX(800 - transverse1);
-                        mTransferpeople.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity + (81 - mGpsPistance) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance >= 0 && mGpsPistance < 43) {
-                        mTransferpeople.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "10":
-                nine = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (ten == false) {
-                    ten = true;
-                    mTransferpeople.setX(700 - transverse1);
-                    mTransferpeople.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (700 - transverse1 + mGpsPistance * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTransferpeople.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (700 - transverse1 + mGpsPistance * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "11":
-                nine = false;
-                ten = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (eleven == false) {
-                    eleven = true;
-                    mTransferpeople.setX(600 - transverse1);
-                    mTransferpeople.setY(400 - disparity);
-                    if (mGpsPistance >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity - (100 - mGpsPistance) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity - (100 - mGpsPistance) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "12":
-                nine = false;
-                ten = false;
-                eleven = false;
-                thirteen = false;
-                fourteen = false;
-                if (twelve == false) {
-                    twelve = true;
-                    mTransferpeople.setX(500 - transverse1);
-                    mTransferpeople.setY(300 - disparity);
-                    if (mGpsPistance >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (300 - disparity - (100 - mGpsPistance) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance >= 26 && mGpsPistance < 76) {
-                        mTransferpeople.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (200 - disparity - (25 - mGpsPistance) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (300 - disparity - (100 - mGpsPistance) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance >= 26 && mGpsPistance < 76) {
-                        mTransferpeople.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (200 - disparity - (25 - mGpsPistance) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "13":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                fourteen = false;
-                if (thirteen == false) {
-                    thirteen = true;
-                    mTransferpeople.setX(800 - transverse1);
-                    mTransferpeople.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (800 - transverse - (100 - mGpsPistance) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTransferpeople.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (800 - transverse - (100 - mGpsPistance) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "14":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                if (fourteen == false) {
-                    fourteen = true;
-                    mTransferpeople.setX(450 - transverse1);
-                    mTransferpeople.setY(400 - disparity);
-                    if (mGpsPistance >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity + (100 - mGpsPistance) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (400 - disparity + (100 - mGpsPistance) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "15":
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (fifteen == false) {
-                    fifteen = true;
-                    mTransferpeople.setX(50 - transverse1);
-                    mTransferpeople.setY(300 - disparity);
-                    if (mGpsPistance <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (50 - transverse1 + mGpsPistance * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (300 - disparity + mGpsPistance * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setX(500 - transverse1);
-                        mTransferpeople.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (500 - transverse1 + (mGpsPistance - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (50 - transverse1 + mGpsPistance * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (300 - disparity + mGpsPistance * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (500 - transverse1 + (mGpsPistance - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "16":
-                fifteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (sixteen == false) {
-                    sixteen = true;
-                    mTransferpeople.setX(450 - transverse1);
-                    mTransferpeople.setY(350 - disparity);
-                    if (mGpsPistance <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (450 - transverse1 + mGpsPistance * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity + mGpsPistance * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (550 - transverse1 + (mGpsPistance - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (450 - transverse1 + mGpsPistance * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity + mGpsPistance * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (550 - transverse1 + (mGpsPistance - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "17":
-                fifteen = false;
-                sixteen = false;
-                eighteen = false;
-                nineteen = false;
-                if (seventeen == false) {
-                    seventeen = true;
-                    mTransferpeople.setX(150 - transverse1);
-                    mTransferpeople.setY(150 - disparity);
-                    if (mGpsPistance <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (150 - transverse1 + mGpsPistance * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (150 - disparity + mGpsPistance * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setX(400 - transverse1);
-                        mTransferpeople.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (400 - transverse1 + (mGpsPistance - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (150 - transverse1 + mGpsPistance * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (150 - disparity + mGpsPistance * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mTransferpeople.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (400 - transverse1 + (mGpsPistance - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "18":
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (eighteen == false) {
-                    eighteen = true;
-                    mTransferpeople.setX(500 - transverse1);
-                    mTransferpeople.setY(350 - disparity);
-                    if (mGpsPistance <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (500 - transverse1 + mGpsPistance * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity - mGpsPistance * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 8 && mGpsPistance <= 79) {
-                        mTransferpeople.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (550 - transverse1 + (mGpsPistance - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (750 - transverse1 + (mGpsPistance - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (250 - disparity + (mGpsPistance - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (500 - transverse1 + mGpsPistance * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (350 - disparity - mGpsPistance * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance > 8 && mGpsPistance <= 79) {
-                        mTransferpeople.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (550 - transverse1 + (mGpsPistance - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (750 - transverse1 + (mGpsPistance - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mTransferpeople, "translationY", (float) (250 - disparity + (mGpsPistance - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "19":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                if (nineteen == false) {
-                    nineteen = true;
-                    mTransferpeople.setX(800 - transverse1);
-                    mTransferpeople.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (800 - transverse1 + mGpsPistance * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mTransferpeople.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mTransferpeople, "translationX", (float) (800 - transverse1 + mGpsPistance * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-        }
-    }
-
-    //制动员6
-    private void proplrMove1() {
-        switch (mRatioOfGpsTrack2) {
-            case "1":
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (oneTrack == false) {
-                    mPeopleOne.setX(320 - transverse1);
-                    mPeopleOne.setY(450 - disparity);
-                    oneTrack = true;
-                    if (mGpsPistance2 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (320 - transverse1 + mGpsPistance2 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (450 - disparity + mGpsPistance2 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 5 && mGpsPistance2 <= 94) {
-                        //setStraightLine(340, mGpsPistance2 - 5, 2.88f);
-                        mPeopleOne.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (384 - transverse1 + (mGpsPistance2 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (640 - transverse1 + (mGpsPistance2 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (500 - disparity + (mGpsPistance2 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (320 - transverse1 + mGpsPistance2 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (450 - disparity + mGpsPistance2 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 5 && mGpsPistance2 <= 94) {
-                        mPeopleOne.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (384 - transverse1 + (mGpsPistance2 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (640 - transverse1 + (mGpsPistance2 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (500 - disparity + (mGpsPistance2 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "2":
-                oneTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (twoTrack == false) {
-                    mPeopleOne.setX(50 - transverse1);
-                    mPeopleOne.setY(450 - disparity);
-                    twoTrack = true;
-                    if (mGpsPistance2 <= 87) {
-                        mPeopleOne.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (50 - transverse1 + mGpsPistance2 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (768 - transverse1 + (mGpsPistance2 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (450 - disparity + (mGpsPistance2 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 87) {
-                        mPeopleOne.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (50 - transverse1 + mGpsPistance2 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (768 - transverse1 + (mGpsPistance2 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (450 - disparity + (mGpsPistance2 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "3":
-                oneTrack = false;
-                twoTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (threeTrack == false) {
-                    mPeopleOne.setX(128 - transverse1);
-                    mPeopleOne.setY(400 - disparity);
-                    threeTrack = true;
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (128 - transverse1 + mGpsPistance2 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopleOne.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (128 - transverse1 + mGpsPistance2 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "4":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fourTrack == false) {
-                    mPeopleOne.setX(256 - transverse1);
-                    mPeopleOne.setY(400 - disparity);
-                    fourTrack = true;
-                    if (mGpsPistance2 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (256 - transverse1 + mGpsPistance2 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity - mGpsPistance2 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 6 && mGpsPistance2 <= 94) {
-                        mPeopleOne.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (320 - transverse1 + (mGpsPistance2 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (704 - transverse1 + (mGpsPistance2 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity + (mGpsPistance2 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (256 - transverse1 + mGpsPistance2 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity - mGpsPistance2 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 6 && mGpsPistance2 <= 94) {
-                        mPeopleOne.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (320 - transverse1 + (mGpsPistance2 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (704 - transverse1 + (mGpsPistance2 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity + (mGpsPistance2 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "5":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fiveTrack == false) {
-                    mPeopleOne.setX(320 - transverse);
-                    mPeopleOne.setY(350 - disparity);
-                    fiveTrack = true;
-                    if (mGpsPistance2 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (320 - transverse1 + mGpsPistance2 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity - mGpsPistance2 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 6 && mGpsPistance2 <= 93) {
-                        mPeopleOne.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (384 - transverse1 + (mGpsPistance2 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (640 - transverse1 + (mGpsPistance2 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (300 - disparity + (mGpsPistance2 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (320 - transverse1 + mGpsPistance2 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity - mGpsPistance2 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 6 && mGpsPistance2 <= 93) {
-                        mPeopleOne.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (384 - transverse1 + (mGpsPistance2 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (640 - transverse1 + (mGpsPistance2 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (300 - disparity + (mGpsPistance2 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "6":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (sixTrack == false) {
-                    mPeopleOne.setX(50 - transverse1);
-                    mPeopleOne.setY(250 - disparity);
-                    sixTrack = true;
-                    if (mGpsPistance2 <= 83) {
-                        mPeopleOne.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (50 - transverse1 + mGpsPistance2 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (768 - transverse1 + (mGpsPistance2 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (250 - disparity + (mGpsPistance2 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 83) {
-                        mPeopleOne.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (50 - transverse1 + mGpsPistance2 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (768 - transverse1 + (mGpsPistance2 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (250 - disparity + (mGpsPistance2 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "7":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                eightTrack = false;
-                if (sevenTrack == false) {
-                    mPeopleOne.setX(128 - transverse);
-                    mPeopleOne.setY(250 - disparity);
-                    sevenTrack = true;
-                    if (mGpsPistance2 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (128 - transverse1 + mGpsPistance2 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (250 - disparity - mGpsPistance2 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 20 && mGpsPistance2 <= 78) {
-                        mPeopleOne.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (205 - transverse1 + (mGpsPistance2 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (768 - transverse1 + (mGpsPistance2 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (150 - disparity + (mGpsPistance2 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (128 - transverse1 + mGpsPistance2 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (250 - disparity - mGpsPistance2 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 20 && mGpsPistance2 <= 78) {
-                        mPeopleOne.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (205 - transverse1 + (mGpsPistance2 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (768 - transverse1 + (mGpsPistance2 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (150 - disparity + (mGpsPistance2 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "8":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                if (eightTrack == false) {
-                    mPeopleOne.setX(230 - transverse1);
-                    mPeopleOne.setY(150 - disparity);
-                    eightTrack = true;
-                    if (mGpsPistance2 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (230 - transverse1 + mGpsPistance2 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (150 - disparity - mGpsPistance2 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 21 && mGpsPistance2 <= 76) {
-                        mPeopleOne.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (307 - transverse1 + (mGpsPistance2 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (640 - transverse1 + (mGpsPistance2 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (50 - disparity + (mGpsPistance2 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (230 - transverse1 + mGpsPistance2 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (150 - disparity - mGpsPistance2 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 21 && mGpsPistance2 <= 76) {
-                        mPeopleOne.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (307 - transverse1 + (mGpsPistance2 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (640 - transverse1 + (mGpsPistance2 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (50 - disparity + (mGpsPistance2 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "9":
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (nine == false) {
-                    nine = true;
-                    mPeopleOne.setX(1000 - transverse1);
-                    mPeopleOne.setY(400 - disparity);
-                    if (mGpsPistance2 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance2) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance2 >= 43 && mGpsPistance2 < 81) {
-                        /*mPeopleOne.setX(800 - transverse1);
-                        mPeopleOne.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance2) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity + (81 - mGpsPistance2) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance2) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance2 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance2) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance2 >= 43 && mGpsPistance2 < 81) {
-                        /*mPeopleOne.setX(800 - transverse1);
-                        mPeopleOne.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance2) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity + (81 - mGpsPistance2) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 >= 0 && mGpsPistance2 < 43) {
-                        mPeopleOne.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance2) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "10":
-                nine = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (ten == false) {
-                    ten = true;
-                    mPeopleOne.setX(700 - transverse1);
-                    mPeopleOne.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (700 - transverse1 + mGpsPistance2 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopleOne.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (700 - transverse1 + mGpsPistance2 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "11":
-                nine = false;
-                ten = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (eleven == false) {
-                    eleven = true;
-                    mPeopleOne.setX(600 - transverse1);
-                    mPeopleOne.setY(400 - disparity);
-                    if (mGpsPistance2 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance2) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity - (100 - mGpsPistance2) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance2) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance2 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance2) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity - (100 - mGpsPistance2) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance2) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "12":
-                nine = false;
-                ten = false;
-                eleven = false;
-                thirteen = false;
-                fourteen = false;
-                if (twelve == false) {
-                    twelve = true;
-                    mPeopleOne.setX(500 - transverse1);
-                    mPeopleOne.setY(300 - disparity);
-                    if (mGpsPistance2 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance2) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (300 - disparity - (100 - mGpsPistance2) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 >= 26 && mGpsPistance2 < 76) {
-                        mPeopleOne.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance2) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance2) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (200 - disparity - (25 - mGpsPistance2) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance2) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (300 - disparity - (100 - mGpsPistance2) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 >= 26 && mGpsPistance2 < 76) {
-                        mPeopleOne.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance2) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance2) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (200 - disparity - (25 - mGpsPistance2) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "13":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                fourteen = false;
-                if (thirteen == false) {
-                    thirteen = true;
-                    mPeopleOne.setX(800 - transverse1);
-                    mPeopleOne.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (800 - transverse - (100 - mGpsPistance2) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopleOne.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (800 - transverse - (100 - mGpsPistance2) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "14":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                if (fourteen == false) {
-                    fourteen = true;
-                    mPeopleOne.setX(450 - transverse1);
-                    mPeopleOne.setY(400 - disparity);
-                    if (mGpsPistance2 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance2) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity + (100 - mGpsPistance2) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance2) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance2 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance2) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (400 - disparity + (100 - mGpsPistance2) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance2) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "15":
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (fifteen == false) {
-                    fifteen = true;
-                    mPeopleOne.setX(50 - transverse1);
-                    mPeopleOne.setY(300 - disparity);
-                    if (mGpsPistance2 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (50 - transverse1 + mGpsPistance2 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (300 - disparity + mGpsPistance2 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setX(500 - transverse1);
-                        mPeopleOne.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (500 - transverse1 + (mGpsPistance2 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (50 - transverse1 + mGpsPistance2 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (300 - disparity + mGpsPistance2 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (500 - transverse1 + (mGpsPistance2 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "16":
-                fifteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (sixteen == false) {
-                    sixteen = true;
-                    mPeopleOne.setX(450 - transverse1);
-                    mPeopleOne.setY(350 - disparity);
-                    if (mGpsPistance2 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (450 - transverse1 + mGpsPistance2 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity + mGpsPistance2 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (550 - transverse1 + (mGpsPistance2 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (450 - transverse1 + mGpsPistance2 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity + mGpsPistance2 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (550 - transverse1 + (mGpsPistance2 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "17":
-                fifteen = false;
-                sixteen = false;
-                eighteen = false;
-                nineteen = false;
-                if (seventeen == false) {
-                    seventeen = true;
-                    mPeopleOne.setX(150 - transverse1);
-                    mPeopleOne.setY(150 - disparity);
-                    if (mGpsPistance2 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (150 - transverse1 + mGpsPistance2 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (150 - disparity + mGpsPistance2 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setX(400 - transverse1);
-                        mPeopleOne.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (400 - transverse1 + (mGpsPistance2 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (150 - transverse1 + mGpsPistance2 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (150 - disparity + mGpsPistance2 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopleOne.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (400 - transverse1 + (mGpsPistance2 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "18":
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (eighteen == false) {
-                    eighteen = true;
-                    mPeopleOne.setX(500 - transverse1);
-                    mPeopleOne.setY(350 - disparity);
-                    if (mGpsPistance2 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (500 - transverse1 + mGpsPistance2 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity - mGpsPistance2 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 8 && mGpsPistance2 <= 79) {
-                        mPeopleOne.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (550 - transverse1 + (mGpsPistance2 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (750 - transverse1 + (mGpsPistance2 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (250 - disparity + (mGpsPistance2 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance2 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (500 - transverse1 + mGpsPistance2 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (350 - disparity - mGpsPistance2 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance2 > 8 && mGpsPistance2 <= 79) {
-                        mPeopleOne.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (550 - transverse1 + (mGpsPistance2 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (750 - transverse1 + (mGpsPistance2 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopleOne, "translationY", (float) (250 - disparity + (mGpsPistance2 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "19":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                if (nineteen == false) {
-                    nineteen = true;
-                    mPeopleOne.setX(800 - transverse1);
-                    mPeopleOne.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (800 - transverse1 + mGpsPistance2 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopleOne.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopleOne, "translationX", (float) (800 - transverse1 + mGpsPistance2 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-        }
-    }
-
-    //制动员7
-    private void proplrMove2() {
-        switch (mRatioOfGpsTrack3) {
-            case "1":
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (oneTrack == false) {
-                    mPeopletwo.setX(320 - transverse1);
-                    mPeopletwo.setY(450 - disparity);
-                    oneTrack = true;
-                    if (mGpsPistance3 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (320 - transverse1 + mGpsPistance3 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (450 - disparity + mGpsPistance3 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 5 && mGpsPistance3 <= 94) {
-                        mPeopletwo.setY(500 - disparity);
-                        //setStraightLine(340, mGpsPistance3 - 5, 2.88f);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (384 - transverse1 + (mGpsPistance3 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (640 - transverse1 + (mGpsPistance3 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (500 - disparity + (mGpsPistance3 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (320 - transverse1 + mGpsPistance3 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (450 - disparity + mGpsPistance3 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 5 && mGpsPistance3 <= 94) {
-                        mPeopletwo.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (384 - transverse1 + (mGpsPistance3 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (640 - transverse1 + (mGpsPistance3 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (500 - disparity + (mGpsPistance3 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "2":
-                oneTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (twoTrack == false) {
-                    mPeopletwo.setX(50 - transverse1);
-                    mPeopletwo.setY(450 - disparity);
-                    twoTrack = true;
-                    if (mGpsPistance3 <= 87) {
-                        mPeopletwo.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (50 - transverse1 + mGpsPistance3 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (768 - transverse1 + (mGpsPistance3 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (450 - disparity + (mGpsPistance3 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 87) {
-                        mPeopletwo.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (50 - transverse1 + mGpsPistance3 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (768 - transverse1 + (mGpsPistance3 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (450 - disparity + (mGpsPistance3 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "3":
-                oneTrack = false;
-                twoTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (threeTrack == false) {
-                    mPeopletwo.setX(128 - transverse1);
-                    mPeopletwo.setY(400 - disparity);
-                    threeTrack = true;
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (128 - transverse1 + mGpsPistance3 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopletwo.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (128 - transverse1 + mGpsPistance3 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "4":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fourTrack == false) {
-                    mPeopletwo.setX(256 - transverse1);
-                    mPeopletwo.setY(400 - disparity);
-                    fourTrack = true;
-                    if (mGpsPistance3 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (256 - transverse1 + mGpsPistance3 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity - mGpsPistance3 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 6 && mGpsPistance3 <= 94) {
-                        mPeopletwo.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (320 - transverse1 + (mGpsPistance3 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (704 - transverse1 + (mGpsPistance3 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity + (mGpsPistance3 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (256 - transverse1 + mGpsPistance3 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity - mGpsPistance3 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 6 && mGpsPistance3 <= 94) {
-                        mPeopletwo.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (320 - transverse1 + (mGpsPistance3 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (704 - transverse1 + (mGpsPistance3 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity + (mGpsPistance3 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "5":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fiveTrack == false) {
-                    mPeopletwo.setX(320 - transverse1);
-                    mPeopletwo.setY(350 - disparity);
-                    fiveTrack = true;
-                    if (mGpsPistance3 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (320 - transverse1 + mGpsPistance3 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity - mGpsPistance3 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 6 && mGpsPistance3 <= 93) {
-                        mPeopletwo.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (384 - transverse1 + (mGpsPistance3 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (640 - transverse1 + (mGpsPistance3 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (300 - disparity + (mGpsPistance3 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (320 - transverse1 + mGpsPistance3 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity - mGpsPistance3 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 6 && mGpsPistance3 <= 93) {
-                        mPeopletwo.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (384 - transverse1 + (mGpsPistance3 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (640 - transverse1 + (mGpsPistance3 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (300 - disparity + (mGpsPistance3 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "6":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (sixTrack == false) {
-                    mPeopletwo.setX(50 - transverse1);
-                    mPeopletwo.setY(250 - disparity);
-                    sixTrack = true;
-                    if (mGpsPistance3 <= 83) {
-                        mPeopletwo.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (50 - transverse1 + mGpsPistance3 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (768 - transverse1 + (mGpsPistance3 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (250 - disparity + (mGpsPistance3 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 83) {
-                        mPeopletwo.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (50 - transverse1 + mGpsPistance3 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (768 - transverse1 + (mGpsPistance3 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (250 - disparity + (mGpsPistance3 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "7":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                eightTrack = false;
-                if (sevenTrack == false) {
-                    mPeopletwo.setX(128 - transverse);
-                    mPeopletwo.setY(250 - disparity);
-                    sevenTrack = true;
-                    if (mGpsPistance3 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (128 - transverse1 + mGpsPistance3 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (250 - disparity - mGpsPistance3 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 20 && mGpsPistance3 <= 78) {
-                        mPeopletwo.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (205 - transverse1 + (mGpsPistance3 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (768 - transverse1 + (mGpsPistance3 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (150 - disparity + (mGpsPistance3 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (128 - transverse1 + mGpsPistance3 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (250 - disparity - mGpsPistance3 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 20 && mGpsPistance3 <= 78) {
-                        mPeopletwo.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (205 - transverse1 + (mGpsPistance3 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (768 - transverse1 + (mGpsPistance3 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (150 - disparity + (mGpsPistance3 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "8":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                if (eightTrack == false) {
-                    mPeopletwo.setX(230 - transverse1);
-                    mPeopletwo.setY(150 - disparity);
-                    eightTrack = true;
-                    if (mGpsPistance3 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (230 - transverse1 + mGpsPistance3 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (150 - disparity - mGpsPistance3 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 21 && mGpsPistance3 <= 76) {
-                        mPeopletwo.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (307 - transverse1 + (mGpsPistance3 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (640 - transverse1 + (mGpsPistance3 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (50 - disparity + (mGpsPistance3 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (230 - transverse1 + mGpsPistance3 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (150 - disparity - mGpsPistance3 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 21 && mGpsPistance3 <= 76) {
-                        mPeopletwo.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (307 - transverse1 + (mGpsPistance3 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (640 - transverse1 + (mGpsPistance3 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (50 - disparity + (mGpsPistance3 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "9":
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (nine == false) {
-                    nine = true;
-                    mPeopletwo.setX(1000 - transverse1);
-                    mPeopletwo.setY(400 - disparity);
-                    if (mGpsPistance3 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance3) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance3 >= 43 && mGpsPistance3 < 81) {
-                        /*mPeopletwo.setX(800 - transverse1);
-                        mPeopletwo.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance3) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity + (81 - mGpsPistance3) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance3) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance3 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance3) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance3 >= 43 && mGpsPistance3 < 81) {
-                        /*mPeopletwo.setX(800 - transverse1);
-                        mPeopletwo.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance3) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity + (81 - mGpsPistance3) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 >= 0 && mGpsPistance3 < 43) {
-                        mPeopletwo.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance3) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "10":
-                nine = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (ten == false) {
-                    ten = true;
-                    mPeopletwo.setX(700 - transverse1);
-                    mPeopletwo.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (700 - transverse1 + mGpsPistance3 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopletwo.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (700 - transverse1 + mGpsPistance3 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "11":
-                nine = false;
-                ten = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (eleven == false) {
-                    eleven = true;
-                    mPeopletwo.setX(600 - transverse1);
-                    mPeopletwo.setY(400 - disparity);
-                    if (mGpsPistance3 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance3) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity - (100 - mGpsPistance3) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance3) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance3 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance3) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity - (100 - mGpsPistance3) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance3) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "12":
-                nine = false;
-                ten = false;
-                eleven = false;
-                thirteen = false;
-                fourteen = false;
-                if (twelve == false) {
-                    twelve = true;
-                    mPeopletwo.setX(500 - transverse1);
-                    mPeopletwo.setY(300 - disparity);
-                    if (mGpsPistance3 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance3) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (300 - disparity - (100 - mGpsPistance3) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 >= 26 && mGpsPistance3 < 76) {
-                        mPeopletwo.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance3) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance3) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (200 - disparity - (25 - mGpsPistance3) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance3) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (300 - disparity - (100 - mGpsPistance3) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 >= 26 && mGpsPistance3 < 76) {
-                        mPeopletwo.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance3) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance3) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (200 - disparity - (25 - mGpsPistance3) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "13":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                fourteen = false;
-                if (thirteen == false) {
-                    thirteen = true;
-                    mPeopletwo.setX(800 - transverse1);
-                    mPeopletwo.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (800 - transverse - (100 - mGpsPistance3) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopletwo.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (800 - transverse - (100 - mGpsPistance3) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "14":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                if (fourteen == false) {
-                    fourteen = true;
-                    mPeopletwo.setX(450 - transverse1);
-                    mPeopletwo.setY(400 - disparity);
-                    if (mGpsPistance3 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance3) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity + (100 - mGpsPistance3) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance3) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance3 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance3) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (400 - disparity + (100 - mGpsPistance3) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance3) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "15":
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (fifteen == false) {
-                    fifteen = true;
-                    mPeopletwo.setX(50 - transverse1);
-                    mPeopletwo.setY(300 - disparity);
-                    if (mGpsPistance3 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (50 - transverse1 + mGpsPistance3 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (300 - disparity + mGpsPistance3 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setX(500 - transverse1);
-                        mPeopletwo.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (500 - transverse1 + (mGpsPistance3 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (50 - transverse1 + mGpsPistance3 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (300 - disparity + mGpsPistance3 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (500 - transverse1 + (mGpsPistance3 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "16":
-                fifteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (sixteen == false) {
-                    sixteen = true;
-                    mPeopletwo.setX(450 - transverse1);
-                    mPeopletwo.setY(350 - disparity);
-                    if (mGpsPistance3 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (450 - transverse1 + mGpsPistance3 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity + mGpsPistance3 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (550 - transverse1 + (mGpsPistance3 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (450 - transverse1 + mGpsPistance3 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity + mGpsPistance3 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (550 - transverse1 + (mGpsPistance3 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "17":
-                fifteen = false;
-                sixteen = false;
-                eighteen = false;
-                nineteen = false;
-                if (seventeen == false) {
-                    seventeen = true;
-                    mPeopletwo.setX(150 - transverse1);
-                    mPeopletwo.setY(150 - disparity);
-                    if (mGpsPistance3 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (150 - transverse1 + mGpsPistance3 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (150 - disparity + mGpsPistance3 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setX(400 - transverse1);
-                        mPeopletwo.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (400 - transverse1 + (mGpsPistance3 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (150 - transverse1 + mGpsPistance3 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (150 - disparity + mGpsPistance3 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeopletwo.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (400 - transverse1 + (mGpsPistance3 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "18":
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (eighteen == false) {
-                    eighteen = true;
-                    mPeopletwo.setX(500 - transverse1);
-                    mPeopletwo.setY(350 - disparity);
-                    if (mGpsPistance3 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (500 - transverse1 + mGpsPistance3 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity - mGpsPistance3 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 8 && mGpsPistance3 <= 79) {
-                        mPeopletwo.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (550 - transverse1 + (mGpsPistance3 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (750 - transverse1 + (mGpsPistance3 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (250 - disparity + (mGpsPistance3 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance3 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (500 - transverse1 + mGpsPistance3 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (350 - disparity - mGpsPistance3 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance3 > 8 && mGpsPistance3 <= 79) {
-                        mPeopletwo.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (550 - transverse1 + (mGpsPistance3 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (750 - transverse1 + (mGpsPistance3 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeopletwo, "translationY", (float) (250 - disparity + (mGpsPistance3 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "19":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                if (nineteen == false) {
-                    nineteen = true;
-                    mPeopletwo.setX(800 - transverse1);
-                    mPeopletwo.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (800 - transverse1 + mGpsPistance3 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeopletwo.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeopletwo, "translationX", (float) (800 - transverse1 + mGpsPistance3 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-        }
-    }
-
-    //制动员8
-    private void proplrMove3() {
-        switch (mRatioOfGpsTrack4) {
-            case "1":
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (oneTrack == false) {
-                    mPeoplethree.setX(320 - transverse1);
-                    mPeoplethree.setY(450 - disparity);
-                    oneTrack = true;
-                    if (mGpsPistance4 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (320 - transverse1 + mGpsPistance4 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (450 - disparity + mGpsPistance4 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 5 && mGpsPistance4 <= 94) {
-                        mPeoplethree.setY(500 - disparity);
-                        //setStraightLine(340, mGpsPistance4 - 5, 2.88f);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (384 - transverse1 + (mGpsPistance4 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (640 - transverse1 + (mGpsPistance4 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (500 - disparity + (mGpsPistance4 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (320 - transverse1 + mGpsPistance4 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (450 - disparity + mGpsPistance4 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 5 && mGpsPistance4 <= 94) {
-                        mPeoplethree.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (384 - transverse1 + (mGpsPistance4 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (640 - transverse1 + (mGpsPistance4 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (500 - disparity + (mGpsPistance4 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "2":
-                oneTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (twoTrack == false) {
-                    mPeoplethree.setX(50 - transverse1);
-                    mPeoplethree.setY(450 - disparity);
-                    twoTrack = true;
-                    if (mGpsPistance4 <= 87) {
-                        mPeoplethree.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (50 - transverse1 + mGpsPistance4 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (768 - transverse1 + (mGpsPistance4 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (450 - disparity + (mGpsPistance4 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 87) {
-                        mPeoplethree.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (50 - transverse1 + mGpsPistance4 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (768 - transverse1 + (mGpsPistance4 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (450 - disparity + (mGpsPistance4 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "3":
-                oneTrack = false;
-                twoTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (threeTrack == false) {
-                    mPeoplethree.setX(128 - transverse1);
-                    mPeoplethree.setY(400 - disparity);
-                    threeTrack = true;
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (128 - transverse1 + mGpsPistance4 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplethree.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (128 - transverse1 + mGpsPistance4 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "4":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fourTrack == false) {
-                    mPeoplethree.setX(256 - transverse1);
-                    mPeoplethree.setY(400 - disparity);
-                    fourTrack = true;
-                    if (mGpsPistance4 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (256 - transverse1 + mGpsPistance4 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity - mGpsPistance4 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 6 && mGpsPistance4 <= 94) {
-                        mPeoplethree.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (320 - transverse1 + (mGpsPistance4 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (704 - transverse1 + (mGpsPistance4 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity + (mGpsPistance4 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (256 - transverse1 + mGpsPistance4 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity - mGpsPistance4 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 6 && mGpsPistance4 <= 94) {
-                        mPeoplethree.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (320 - transverse1 + (mGpsPistance4 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (704 - transverse1 + (mGpsPistance4 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity + (mGpsPistance4 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "5":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fiveTrack == false) {
-                    mPeoplethree.setX(320 - transverse1);
-                    mPeoplethree.setY(350 - disparity);
-                    fiveTrack = true;
-                    if (mGpsPistance4 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (320 - transverse1 + mGpsPistance4 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity - mGpsPistance4 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 6 && mGpsPistance4 <= 93) {
-                        mPeoplethree.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (384 - transverse1 + (mGpsPistance4 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (640 - transverse1 + (mGpsPistance4 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (300 - disparity + (mGpsPistance4 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (320 - transverse1 + mGpsPistance4 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity - mGpsPistance4 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 6 && mGpsPistance4 <= 93) {
-                        mPeoplethree.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (384 - transverse1 + (mGpsPistance4 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (640 - transverse1 + (mGpsPistance4 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (300 - disparity + (mGpsPistance4 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "6":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (sixTrack == false) {
-                    mPeoplethree.setX(50 - transverse1);
-                    mPeoplethree.setY(250 - disparity);
-                    sixTrack = true;
-                    if (mGpsPistance4 <= 83) {
-                        mPeoplethree.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (50 - transverse1 + mGpsPistance4 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (768 - transverse1 + (mGpsPistance4 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (250 - disparity + (mGpsPistance4 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 83) {
-                        mPeoplethree.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (50 - transverse1 + mGpsPistance4 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (768 - transverse1 + (mGpsPistance4 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (250 - disparity + (mGpsPistance4 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "7":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                eightTrack = false;
-                if (sevenTrack == false) {
-                    mPeoplethree.setX(128 - transverse);
-                    mPeoplethree.setY(250 - disparity);
-                    sevenTrack = true;
-                    if (mGpsPistance4 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (128 - transverse1 + mGpsPistance4 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (250 - disparity - mGpsPistance4 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 20 && mGpsPistance4 <= 78) {
-                        mPeoplethree.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (205 - transverse1 + (mGpsPistance4 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (768 - transverse1 + (mGpsPistance4 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (150 - disparity + (mGpsPistance4 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (128 - transverse1 + mGpsPistance4 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (250 - disparity - mGpsPistance4 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 20 && mGpsPistance4 <= 78) {
-                        mPeoplethree.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (205 - transverse1 + (mGpsPistance4 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (768 - transverse1 + (mGpsPistance4 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (150 - disparity + (mGpsPistance4 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "8":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                if (eightTrack == false) {
-                    mPeoplethree.setX(230 - transverse1);
-                    mPeoplethree.setY(150 - disparity);
-                    eightTrack = true;
-                    if (mGpsPistance4 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (230 - transverse1 + mGpsPistance4 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (150 - disparity - mGpsPistance4 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 21 && mGpsPistance4 <= 76) {
-                        mPeoplethree.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (307 - transverse1 + (mGpsPistance4 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (640 - transverse1 + (mGpsPistance4 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (50 - disparity + (mGpsPistance4 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (230 - transverse1 + mGpsPistance4 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (150 - disparity - mGpsPistance4 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 21 && mGpsPistance4 <= 76) {
-                        mPeoplethree.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (307 - transverse1 + (mGpsPistance4 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (640 - transverse1 + (mGpsPistance4 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (50 - disparity + (mGpsPistance4 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "9":
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (nine == false) {
-                    nine = true;
-                    mPeoplethree.setX(1000 - transverse1);
-                    mPeoplethree.setY(400 - disparity);
-                    if (mGpsPistance4 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance4) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance4 >= 43 && mGpsPistance4 < 81) {
-                        /*mPeoplethree.setX(800 - transverse1);
-                        mPeoplethree.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance4) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity + (81 - mGpsPistance4) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance4) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance4 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance4) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance4 >= 43 && mGpsPistance4 < 81) {
-                        /*mPeoplethree.setX(800 - transverse1);
-                        mPeoplethree.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance4) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity + (81 - mGpsPistance4) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 >= 0 && mGpsPistance4 < 43) {
-                        mPeoplethree.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance4) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "10":
-                nine = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (ten == false) {
-                    ten = true;
-                    mPeoplethree.setX(700 - transverse1);
-                    mPeoplethree.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (700 - transverse1 + mGpsPistance4 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplethree.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (700 - transverse1 + mGpsPistance4 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "11":
-                nine = false;
-                ten = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (eleven == false) {
-                    eleven = true;
-                    mPeoplethree.setX(600 - transverse1);
-                    mPeoplethree.setY(400 - disparity);
-                    if (mGpsPistance4 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance4) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity - (100 - mGpsPistance4) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance4) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance4 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance4) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity - (100 - mGpsPistance4) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance4) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "12":
-                nine = false;
-                ten = false;
-                eleven = false;
-                thirteen = false;
-                fourteen = false;
-                if (twelve == false) {
-                    twelve = true;
-                    mPeoplethree.setX(500 - transverse1);
-                    mPeoplethree.setY(300 - disparity);
-                    if (mGpsPistance4 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance4) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (300 - disparity - (100 - mGpsPistance4) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 >= 26 && mGpsPistance4 < 76) {
-                        mPeoplethree.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance4) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance4) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (200 - disparity - (25 - mGpsPistance4) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance4) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (300 - disparity - (100 - mGpsPistance4) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 >= 26 && mGpsPistance4 < 76) {
-                        mPeoplethree.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance4) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance4) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (200 - disparity - (25 - mGpsPistance4) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "13":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                fourteen = false;
-                if (thirteen == false) {
-                    thirteen = true;
-                    mPeoplethree.setX(800 - transverse1);
-                    mPeoplethree.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (800 - transverse - (100 - mGpsPistance4) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplethree.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (800 - transverse - (100 - mGpsPistance4) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "14":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                if (fourteen == false) {
-                    fourteen = true;
-                    mPeoplethree.setX(450 - transverse1);
-                    mPeoplethree.setY(400 - disparity);
-                    if (mGpsPistance4 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance4) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity + (100 - mGpsPistance4) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance4) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance4 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance4) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (400 - disparity + (100 - mGpsPistance4) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance4) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "15":
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (fifteen == false) {
-                    fifteen = true;
-                    mPeoplethree.setX(50 - transverse1);
-                    mPeoplethree.setY(300 - disparity);
-                    if (mGpsPistance4 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (50 - transverse1 + mGpsPistance4 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (300 - disparity + mGpsPistance4 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setX(500 - transverse1);
-                        mPeoplethree.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (500 - transverse1 + (mGpsPistance4 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (50 - transverse1 + mGpsPistance4 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (300 - disparity + mGpsPistance4 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (500 - transverse1 + (mGpsPistance4 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "16":
-                fifteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (sixteen == false) {
-                    sixteen = true;
-                    mPeoplethree.setX(450 - transverse1);
-                    mPeoplethree.setY(350 - disparity);
-                    if (mGpsPistance4 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (450 - transverse1 + mGpsPistance4 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity + mGpsPistance4 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (550 - transverse1 + (mGpsPistance4 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (450 - transverse1 + mGpsPistance4 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity + mGpsPistance4 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (550 - transverse1 + (mGpsPistance4 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "17":
-                fifteen = false;
-                sixteen = false;
-                eighteen = false;
-                nineteen = false;
-                if (seventeen == false) {
-                    seventeen = true;
-                    mPeoplethree.setX(150 - transverse1);
-                    mPeoplethree.setY(150 - disparity);
-                    if (mGpsPistance4 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (150 - transverse1 + mGpsPistance4 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (150 - disparity + mGpsPistance4 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setX(400 - transverse1);
-                        mPeoplethree.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (400 - transverse1 + (mGpsPistance4 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (150 - transverse1 + mGpsPistance4 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (150 - disparity + mGpsPistance4 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplethree.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (400 - transverse1 + (mGpsPistance4 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "18":
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (eighteen == false) {
-                    eighteen = true;
-                    mPeoplethree.setX(500 - transverse1);
-                    mPeoplethree.setY(350 - disparity);
-                    if (mGpsPistance4 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (500 - transverse1 + mGpsPistance4 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity - mGpsPistance4 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 8 && mGpsPistance4 <= 79) {
-                        mPeoplethree.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (550 - transverse1 + (mGpsPistance4 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (750 - transverse1 + (mGpsPistance4 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (250 - disparity + (mGpsPistance4 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (500 - transverse1 + mGpsPistance4 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (350 - disparity - mGpsPistance4 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance4 > 8 && mGpsPistance4 <= 79) {
-                        mPeoplethree.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (550 - transverse1 + (mGpsPistance4 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (750 - transverse1 + (mGpsPistance4 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplethree, "translationY", (float) (250 - disparity + (mGpsPistance4 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "19":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                if (nineteen == false) {
-                    nineteen = true;
-                    mPeoplethree.setX(800 - transverse1);
-                    mPeoplethree.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (800 - transverse1 + mGpsPistance4 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplethree.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplethree, "translationX", (float) (800 - transverse1 + mGpsPistance4 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-        }
-    }
-
-    //制动员9
-    private void proplrMove4() {
-        switch (mRatioOfGpsTrack5) {
-            case "1":
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (oneTrack == false) {
-                    mPeoplefour.setX(320 - transverse1);
-                    mPeoplefour.setY(450 - disparity);
-                    oneTrack = true;
-                    if (mGpsPistance5 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (320 - transverse1 + mGpsPistance5 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (450 - disparity + mGpsPistance5 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 5 && mGpsPistance5 <= 94) {
-                        mPeoplefour.setY(500 - disparity);
-                        //setStraightLine(340, mGpsPistance5 - 5, 2.88f);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (384 - transverse1 + (mGpsPistance5 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (640 - transverse1 + (mGpsPistance5 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (500 - disparity + (mGpsPistance5 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 5) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (320 - transverse1 + mGpsPistance5 * 12.8f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (450 - disparity + mGpsPistance5 * 10f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 5 && mGpsPistance5 <= 94) {
-                        mPeoplefour.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (384 - transverse1 + (mGpsPistance5 - 5) * 2.88f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (640 - transverse1 + (mGpsPistance5 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (500 - disparity + (mGpsPistance5 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "2":
-                oneTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (twoTrack == false) {
-                    mPeoplefour.setX(50 - transverse1);
-                    mPeoplefour.setY(450 - disparity);
-                    twoTrack = true;
-                    if (mGpsPistance5 <= 87) {
-                        mPeoplefour.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (50 - transverse1 + mGpsPistance5 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (768 - transverse1 + (mGpsPistance5 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (450 - disparity + (mGpsPistance5 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 87) {
-                        mPeoplefour.setY(450 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (50 - transverse1 + mGpsPistance5 * 8.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (768 - transverse1 + (mGpsPistance5 - 87) * 4.92f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (450 - disparity + (mGpsPistance5 - 87) * 3.84f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "3":
-                oneTrack = false;
-                twoTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (threeTrack == false) {
-                    mPeoplefour.setX(128 - transverse1);
-                    mPeoplefour.setY(400 - disparity);
-                    threeTrack = true;
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (128 - transverse1 + mGpsPistance5 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplefour.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (128 - transverse1 + mGpsPistance5 * 8.46f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "4":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fourTrack == false) {
-                    mPeoplefour.setX(256 - transverse1);
-                    mPeoplefour.setY(400 - disparity);
-                    fourTrack = true;
-                    if (mGpsPistance5 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (256 - transverse1 + mGpsPistance5 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity - mGpsPistance5 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 6 && mGpsPistance5 <= 94) {
-                        mPeoplefour.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (320 - transverse1 + (mGpsPistance5 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (704 - transverse1 + (mGpsPistance5 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity + (mGpsPistance5 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (256 - transverse1 + mGpsPistance5 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity - mGpsPistance5 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 6 && mGpsPistance5 <= 94) {
-                        mPeoplefour.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (320 - transverse1 + (mGpsPistance5 - 6) * 4.36f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (704 - transverse1 + (mGpsPistance5 - 94) * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity + (mGpsPistance5 - 94) * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "5":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (fiveTrack == false) {
-                    mPeoplefour.setX(320 - transverse1);
-                    mPeoplefour.setY(350 - disparity);
-                    fiveTrack = true;
-                    if (mGpsPistance5 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (320 - transverse1 + mGpsPistance5 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity - mGpsPistance5 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 6 && mGpsPistance5 <= 93) {
-                        mPeoplefour.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (384 - transverse1 + (mGpsPistance5 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (640 - transverse1 + (mGpsPistance5 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (300 - disparity + (mGpsPistance5 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 6) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (320 - transverse1 + mGpsPistance5 * 10.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity - mGpsPistance5 * 8.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 6 && mGpsPistance5 <= 93) {
-                        mPeoplefour.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (384 - transverse1 + (mGpsPistance5 - 6) * 2.94f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (640 - transverse1 + (mGpsPistance5 - 93) * 9.14f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (300 - disparity + (mGpsPistance5 - 93) * 7.14f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "6":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                eightTrack = false;
-                if (sixTrack == false) {
-                    mPeoplefour.setX(50 - transverse1);
-                    mPeoplefour.setY(250 - disparity);
-                    sixTrack = true;
-                    if (mGpsPistance5 <= 83) {
-                        mPeoplefour.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (50 - transverse1 + mGpsPistance5 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (768 - transverse1 + (mGpsPistance5 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (250 - disparity + (mGpsPistance5 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 83) {
-                        mPeoplefour.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (50 - transverse1 + mGpsPistance5 * 8.65f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (768 - transverse1 + (mGpsPistance5 - 83) * 7.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (250 - disparity + (mGpsPistance5 - 83) * 8.82f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "7":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                fiveTrack = false;
-                sixTrack = false;
-                eightTrack = false;
-                if (sevenTrack == false) {
-                    mPeoplefour.setX(128 - transverse);
-                    mPeoplefour.setY(250 - disparity);
-                    sevenTrack = true;
-                    if (mGpsPistance5 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (128 - transverse1 + mGpsPistance5 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (250 - disparity - mGpsPistance5 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 20 && mGpsPistance5 <= 78) {
-                        mPeoplefour.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (205 - transverse1 + (mGpsPistance5 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (768 - transverse1 + (mGpsPistance5 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (150 - disparity + (mGpsPistance5 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 20) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (128 - transverse1 + mGpsPistance5 * 3.84f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (250 - disparity - mGpsPistance5 * 5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 20 && mGpsPistance5 <= 78) {
-                        mPeoplefour.setY(150 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (205 - transverse1 + (mGpsPistance5 - 20) * 9.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (768 - transverse1 + (mGpsPistance5 - 78) * 2.91f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (150 - disparity + (mGpsPistance5 - 78) * 7.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "8":
-                oneTrack = false;
-                twoTrack = false;
-                threeTrack = false;
-                fourTrack = false;
-                sixTrack = false;
-                fiveTrack = false;
-                sevenTrack = false;
-                if (eightTrack == false) {
-                    mPeoplefour.setX(230 - transverse1);
-                    mPeoplefour.setY(150 - disparity);
-                    eightTrack = true;
-                    if (mGpsPistance5 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (230 - transverse1 + mGpsPistance5 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (150 - disparity - mGpsPistance5 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 21 && mGpsPistance5 <= 76) {
-                        mPeoplefour.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (307 - transverse1 + (mGpsPistance5 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (640 - transverse1 + (mGpsPistance5 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (50 - disparity + (mGpsPistance5 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 21) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (230 - transverse1 + mGpsPistance5 * 3.67f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (150 - disparity - mGpsPistance5 * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 21 && mGpsPistance5 <= 76) {
-                        mPeoplefour.setY(50 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (307 - transverse1 + (mGpsPistance5 - 21) * 6.05f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (640 - transverse1 + (mGpsPistance5 - 76) * 5.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (50 - disparity + (mGpsPistance5 - 76) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "9":
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (nine == false) {
-                    nine = true;
-                    mPeoplefour.setX(1000 - transverse1);
-                    mPeoplefour.setY(400 - disparity);
-                    if (mGpsPistance5 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance5) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance5 >= 43 && mGpsPistance5 < 81) {
-                        /*mPeoplefour.setX(800 - transverse1);
-                        mPeoplefour.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance5) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity + (81 - mGpsPistance5) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance5) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance5 >= 81) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (1000 - transverse1 - (100 - mGpsPistance5) * 10.53f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else if (mGpsPistance5 >= 43 && mGpsPistance5 < 81) {
-                        /*mPeoplefour.setX(800 - transverse1);
-                        mPeoplefour.setY(400 - disparity);*/
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (800 - transverse1 - (81 - mGpsPistance5) * 2.7f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity + (81 - mGpsPistance5) * 2.7f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 >= 0 && mGpsPistance5 < 43) {
-                        mPeoplefour.setY(700 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (700 - transverse1 - (43 - mGpsPistance5) * 4.76f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "10":
-                nine = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (ten == false) {
-                    ten = true;
-                    mPeoplefour.setX(700 - transverse1);
-                    mPeoplefour.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (700 - transverse1 + mGpsPistance5 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplefour.setY(500 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (700 - transverse1 + mGpsPistance5 * 3f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "11":
-                nine = false;
-                ten = false;
-                twelve = false;
-                thirteen = false;
-                fourteen = false;
-                if (eleven == false) {
-                    eleven = true;
-                    mPeoplefour.setX(600 - transverse1);
-                    mPeoplefour.setY(400 - disparity);
-                    if (mGpsPistance5 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance5) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity - (100 - mGpsPistance5) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance5) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance5 >= 77) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (600 - transverse1 - (100 - mGpsPistance5) * 2.17f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity - (100 - mGpsPistance5) * 4.35f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(300 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (550 - transverse1 - (76 - mGpsPistance5) * 6.58f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "12":
-                nine = false;
-                ten = false;
-                eleven = false;
-                thirteen = false;
-                fourteen = false;
-                if (twelve == false) {
-                    twelve = true;
-                    mPeoplefour.setX(500 - transverse1);
-                    mPeoplefour.setY(300 - disparity);
-                    if (mGpsPistance5 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance5) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (300 - disparity - (100 - mGpsPistance5) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 >= 26 && mGpsPistance5 < 76) {
-                        mPeoplefour.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance5) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance5) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (200 - disparity - (25 - mGpsPistance5) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 >= 76) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (500 - transverse1 - (100 - mGpsPistance5) * 2.08f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (300 - disparity - (100 - mGpsPistance5) * 4.17f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 >= 26 && mGpsPistance5 < 76) {
-                        mPeoplefour.setY(200 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (450 - transverse1 - (75 - mGpsPistance5) * 6.12f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (150 - transverse1 + (25 - mGpsPistance5) * 2f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (200 - disparity - (25 - mGpsPistance5) * 4f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "13":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                fourteen = false;
-                if (thirteen == false) {
-                    thirteen = true;
-                    mPeoplefour.setX(800 - transverse1);
-                    mPeoplefour.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (800 - transverse - (100 - mGpsPistance5) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplefour.setY(400 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (800 - transverse - (100 - mGpsPistance5) * 7.5f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-            case "14":
-                nine = false;
-                ten = false;
-                eleven = false;
-                twelve = false;
-                thirteen = false;
-                if (fourteen == false) {
-                    fourteen = true;
-                    mPeoplefour.setX(450 - transverse1);
-                    mPeoplefour.setY(400 - disparity);
-                    if (mGpsPistance5 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance5) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity + (100 - mGpsPistance5) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance5) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance5 >= 47) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (450 - transverse1 - (100 - mGpsPistance5) * 1.89f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (400 - disparity + (100 - mGpsPistance5) * 1.89f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(500 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (350 - transverse1 - (46 - mGpsPistance5) * 6.52f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "15":
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (fifteen == false) {
-                    fifteen = true;
-                    mPeoplefour.setX(50 - transverse1);
-                    mPeoplefour.setY(300 - disparity);
-                    if (mGpsPistance5 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (50 - transverse1 + mGpsPistance5 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (300 - disparity + mGpsPistance5 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setX(500 - transverse1);
-                        mPeoplefour.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (500 - transverse1 + (mGpsPistance5 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 42) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (50 - transverse1 + mGpsPistance5 * 10.71f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (300 - disparity + mGpsPistance5 * 5.95f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(550 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (500 - transverse1 + (mGpsPistance5 - 43) * 5.26f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "16":
-                fifteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (sixteen == false) {
-                    sixteen = true;
-                    mPeoplefour.setX(450 - transverse1);
-                    mPeoplefour.setY(350 - disparity);
-                    if (mGpsPistance4 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (450 - transverse1 + mGpsPistance5 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity + mGpsPistance5 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (550 - transverse1 + (mGpsPistance5 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance4 <= 30) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (450 - transverse1 + mGpsPistance5 * 3.33f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity + mGpsPistance5 * 3.33f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(450 - disparity);
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (550 - transverse1 + (mGpsPistance5 - 31) * 4.93f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "17":
-                fifteen = false;
-                sixteen = false;
-                eighteen = false;
-                nineteen = false;
-                if (seventeen == false) {
-                    seventeen = true;
-                    mPeoplefour.setX(150 - transverse1);
-                    mPeoplefour.setY(150 - disparity);
-                    if (mGpsPistance5 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (150 - transverse1 + mGpsPistance5 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (150 - disparity + mGpsPistance5 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setX(400 - transverse1);
-                        mPeoplefour.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (400 - transverse1 + (mGpsPistance5 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 52) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (150 - transverse1 + mGpsPistance5 * 4.81f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (150 - disparity + mGpsPistance5 * 3.85f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else {
-                        mPeoplefour.setY(350 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (400 - transverse1 + (mGpsPistance5 - 53) * 8.51f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    }
-                }
-                break;
-            case "18":
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                nineteen = false;
-                if (eighteen == false) {
-                    eighteen = true;
-                    mPeoplefour.setX(500 - transverse1);
-                    mPeoplefour.setY(350 - disparity);
-                    if (mGpsPistance5 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (500 - transverse1 + mGpsPistance5 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity - mGpsPistance5 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 8 && mGpsPistance5 <= 79) {
-                        mPeoplefour.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (550 - transverse1 + (mGpsPistance5 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (750 - transverse1 + (mGpsPistance5 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (250 - disparity + (mGpsPistance5 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                } else {
-                    if (mGpsPistance5 <= 8) {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (500 - transverse1 + mGpsPistance5 * 6.25f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (350 - disparity - mGpsPistance5 * 12.5f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    } else if (mGpsPistance5 > 8 && mGpsPistance5 <= 79) {
-                        mPeoplefour.setY(250 - disparity);
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (550 - transverse1 + (mGpsPistance5 - 8) * 2.82f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                    } else {
-                        ObjectAnimator animator
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (750 - transverse1 + (mGpsPistance5 - 79) * 2.38f));
-                        animator.setDuration(mTime);
-                        animator.start();
-                        ObjectAnimator animator1
-                                = ObjectAnimator.ofFloat(mPeoplefour, "translationY", (float) (250 - disparity + (mGpsPistance5 - 79) * 4.76f));
-                        animator1.setDuration(mTime);
-                        animator1.start();
-                    }
-                }
-                break;
-            case "19":
-                mMap3.setName("visible");
-                mMap1.setName("gone");
-                mMap2.setName("gone");
-                fifteen = false;
-                sixteen = false;
-                seventeen = false;
-                eighteen = false;
-                if (nineteen == false) {
-                    nineteen = true;
-                    mPeoplefour.setX(800 - transverse1);
-                    mPeoplefour.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (800 - transverse1 + mGpsPistance5 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                } else {
-                    mPeoplefour.setY(350 - disparity);
-                    ObjectAnimator animator
-                            = ObjectAnimator.ofFloat(mPeoplefour, "translationX", (float) (800 - transverse1 + mGpsPistance5 * 2f));
-                    animator.setDuration(mTime);
-                    animator.start();
-                }
-                break;
-        }
-    }
-
     private void one() {
         mOneTrackLeft = mOnePickLeft.getTrack();
         mOneLatLeft = mOnePickLeft.getLat();
@@ -8812,2764 +2786,46 @@ public class PointActivity extends SerialPortActivity {
         mFivePositionRight = mFivepickright.getPosition();
     }
 
-    private void jinjitingche() {
-        Log.e("秦广帅mPeopleId2", mPeopleId2);
-        switch (mPeopleId2) {
-            case "01":
-                sixPerson();
-                Log.e("秦广帅mGetGudaoOfGpsPoint2", mGetGudaoOfGpsPoint2 + "");
-                mControlTrack.setName(mGetGudaoOfGpsPoint2 + "");
-                switch (mGetGudaoOfGpsPoint2) {
-                    case 1:
-                        //判断是否有停留车
-                        String onePickLeftName = mOnePickLeft.getPosition();
-                        String onepickrightightName = mOnepickright.getPosition();
-                        if (onePickLeftName.equals("0") || onepickrightightName.equals("0")) {
-                            OneDataDao oneDataDao = new OneDataDao(getApplication());
-                            oneDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    oneLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    oneRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    oneLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    oneRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 2:
-                        //判断是否有停留车
-                        String twoPickLeftName = mTwoPickLeft.getPosition();
-                        String twopickrightightName = mTwopickright.getPosition();
-                        if (twoPickLeftName.equals("0") || twopickrightightName.equals("0")) {
-                            TwoDataDao twoDataDao = new TwoDataDao(getApplication());
-                            twoDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name2 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    twoLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    twoRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    twoLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    twoRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 3:
-                        //判断是否有停留车
-                        String threePickLeftName = mThreePickLeft.getPosition();
-                        String threepickrightightName = mThreepickright.getPosition();
-                        if (threePickLeftName.equals("0") || threepickrightightName.equals("0")) {
-                            ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
-                            threeDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name3 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    threeLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    threeRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    threeLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    threeRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 4:
-                        //判断是否有停留车
-                        String fourPickLeftName = mFourPickLeft.getPosition();
-                        String fourpickrightightName = mFourpickright.getPosition();
-                        Log.e("秦广帅", fourPickLeftName + "    " + fourpickrightightName);
-                        if (fourPickLeftName.equals("0") || fourpickrightightName.equals("0")) {
-                            FourDataDao fourDataDao = new FourDataDao(getApplication());
-                            fourDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name4 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fourLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fourRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fourLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fourRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 5:
-                        //判断是否有停留车
-                        String fivePickLeftName = mFivePickLeft.getPosition();
-                        String fivepickrightightName = mFivepickright.getPosition();
-                        if (fivePickLeftName.equals("0") || fivepickrightightName.equals("0")) {
-                            FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
-                            fiveDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fiveLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fiveRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fiveLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fiveRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 6:
-                        List<DataUser> sixDataUsers = mSixParkDataDao.find();
-                        int sixSize = sixDataUsers.size();
-                        Log.e("秦广帅", sixSize + "");
-                        String num = sixDataUsers.get(sixSize - 1).getNum();
-                        Integer integerNum = Integer.valueOf(num);
-                        Log.e("秦广帅", num + "");
-                        int sum = integerNum + 1;
-                        Log.e("秦广帅", sum + "");
-                        if (sixSize > 1) {
-                            for (int i = 1; i < sixSize; i++) {
-                                String lat = sixDataUsers.get(i).getLat();
-                                String lon = sixDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSixParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sum + "");
-                        }
-                        break;
-                    case 7:
-                        List<DataUser> sevenDataUsers = mSevenParkDataDao.find();
-                        int sevenSize = sevenDataUsers.size();
-                        String sevenNum = sevenDataUsers.get(sevenSize - 1).getNum();
-                        Integer integerSevenNum = Integer.valueOf(sevenNum);
-                        int sevenSum = integerSevenNum + 1;
-                        if (sevenSize > 1) {
-                            for (int i = 1; i < sevenSize; i++) {
-                                String lat = sevenDataUsers.get(i).getLat();
-                                String lon = sevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSevenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSevenParkDataDao.updaeUser("sevenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2, minIndex + 1);
-                            }
-                        } else {
-                            mSevenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sevenSum + "");
-                        }
-                        break;
-                    case 8:
-                        //判断是否有停留车
-                        String eightPickLeftName = mEightPickLeft.getPosition();
-                        String eightpickrightName = mEightpickright.getPosition();
-                        if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
-                            EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
-                            eightDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    eightLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    eightRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 9:
-                        List<DataUser> nineDataUsers = mNineParkDataDao.find();
-                        int nineSize = nineDataUsers.size();
-                        String nineNum = nineDataUsers.get(nineSize - 1).getNum();
-                        Integer integerNineNum = Integer.valueOf(nineNum);
-                        int nineSum = integerNineNum + 1;
-                        if (nineSize > 1) {
-                            for (int i = 1; i < nineSize; i++) {
-                                String lat = nineDataUsers.get(i).getLat();
-                                String lon = nineDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", nineSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineParkDataDao.updaeUser("nineparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mNineParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", nineSum + "");
-                        }
-                        break;
-                    case 10:
-                        //判断是否有停留车
-                        String tenPickLeftName = mTenPickLeft.getPosition();
-                        String tenpickrightName = mTenpickright.getPosition();
-                        if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
-                            TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
-                            tenDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint2))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    tenLeft(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    tenRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 11:
-                        List<DataUser> elevenDataUsers = mElevenParkDataDao.find();
-                        int elevenSize = elevenDataUsers.size();
-                        String elevenNum = elevenDataUsers.get(elevenSize - 1).getNum();
-                        Integer integerElevenNum = Integer.valueOf(elevenNum);
-                        int elevenSum = integerElevenNum + 1;
-                        if (elevenSize > 1) {
-                            for (int i = 1; i < elevenSize; i++) {
-                                String lat = elevenDataUsers.get(i).getLat();
-                                String lon = elevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mElevenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", elevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = elevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mElevenParkDataDao.updaeUser("elevenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mElevenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", elevenSum + "");
-                        }
-                        break;
-                    case 12:
-                        List<DataUser> twelveDataUsers = mTwelveParkDataDao.find();
-                        int twelveSize = twelveDataUsers.size();
-                        String twelveNum = twelveDataUsers.get(twelveSize - 1).getNum();
-                        Integer integerTwelveNum = Integer.valueOf(twelveNum);
-                        int twelveSum = integerTwelveNum + 1;
-                        if (twelveSize > 1) {
-                            for (int i = 1; i < twelveSize; i++) {
-                                String lat = twelveDataUsers.get(i).getLat();
-                                String lon = twelveDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mTwelveParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", twelveSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = twelveDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mTwelveParkDataDao.updaeUser("twelveparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mTwelveParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", twelveSum + "");
-                        }
-                        break;
-                    case 13:
-                        List<DataUser> thirteenDataUsers = mThirteenParkDataDao.find();
-                        int thirteenSize = thirteenDataUsers.size();
-                        String thirteenNum = thirteenDataUsers.get(thirteenSize - 1).getNum();
-                        Integer integerThirteenNum = Integer.valueOf(thirteenNum);
-                        int thirteenSum = integerThirteenNum + 1;
-                        if (thirteenSize > 1) {
-                            for (int i = 1; i < thirteenSize; i++) {
-                                String lat = thirteenDataUsers.get(i).getLat();
-                                String lon = thirteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mThirteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", thirteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = thirteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mThirteenParkDataDao.updaeUser("thirteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mThirteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", thirteenSum + "");
-                        }
-                        break;
-                    case 14:
-                        List<DataUser> fourteenDataUsers = mFourteenParkDataDao.find();
-                        int fourteenSize = fourteenDataUsers.size();
-                        String fourteenNum = fourteenDataUsers.get(fourteenSize - 1).getNum();
-                        Integer integerFourteenNum = Integer.valueOf(fourteenNum);
-                        int fourteenSum = integerFourteenNum + 1;
-                        if (fourteenSize > 1) {
-                            for (int i = 1; i < fourteenSize; i++) {
-                                String lat = fourteenDataUsers.get(i).getLat();
-                                String lon = fourteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFourteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", fourteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fourteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFourteenParkDataDao.updaeUser("fourteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mFourteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", fourteenSum + "");
-                        }
-                        break;
-                    case 15:
-                        List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
-                        int fifteenSize = fifteenDataUsers.size();
-                        String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
-                        Integer integerFifteenNum = Integer.valueOf(fifteenNum);
-                        int fifteenSum = integerFifteenNum + 1;
-                        if (fifteenSize > 1) {
-                            for (int i = 1; i < fifteenSize; i++) {
-                                String lat = fifteenDataUsers.get(i).getLat();
-                                String lon = fifteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFifteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", fifteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", fifteenSum + "");
-                        }
-                        break;
-                    case 16:
-                        List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
-                        int sixteenSize = sixteenDataUsers.size();
-                        String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
-                        Integer integerSixteenNum = Integer.valueOf(sixteenNum);
-                        int sixteenSum = integerSixteenNum + 1;
-                        if (sixteenSize > 1) {
-                            for (int i = 1; i < sixteenSize; i++) {
-                                String lat = sixteenDataUsers.get(i).getLat();
-                                String lon = sixteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sixteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sixteenSum + "");
-                        }
-                        break;
-                    case 17:
-                        List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
-                        int seventeenSize = seventeenDataUsers.size();
-                        String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
-                        Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
-                        int seventeenSum = integerSeventeenNum + 1;
-                        if (seventeenSize > 1) {
-                            for (int i = 1; i < seventeenSize; i++) {
-                                String lat = seventeenDataUsers.get(i).getLat();
-                                String lon = seventeenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", seventeenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", seventeenSum + "");
-                        }
-                        break;
-                    case 18:
-                        List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
-                        int eighteenSize = eighteenDataUsers.size();
-                        String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
-                        Integer integerEighteenNum = Integer.valueOf(eighteenNum);
-                        int eighteenSum = integerEighteenNum + 1;
-                        if (eighteenSize > 1) {
-                            for (int i = 1; i < eighteenSize; i++) {
-                                String lat = eighteenDataUsers.get(i).getLat();
-                                String lon = eighteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mEighteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", eighteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", eighteenSum + "");
-                        }
-                        break;
-                    case 19:
-                        List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
-                        int nineteenSize = nineteenDataUsers.size();
-                        String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
-                        Integer integerNineteenNum = Integer.valueOf(nineteenNum);
-                        int nineteenSum = integerNineteenNum + 1;
-                        if (nineteenSize > 1) {
-                            for (int i = 1; i < nineteenSize; i++) {
-                                String lat = nineteenDataUsers.get(i).getLat();
-                                String lon = nineteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", nineteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", nineteenSum + "");
-                        }
-                        break;
-                }
-                break;
-            case "02":
-                sevenPerson();
-                mControlTrack.setName(mGetGudaoOfGpsPoint2 + "");
-                switch (mGetGudaoOfGpsPoint3) {
-                    case 1:
-                        //判断是否有停留车
-                        String onePickLeftName = mOnePickLeft.getPosition();
-                        String onepickrightName = mOnepickright.getPosition();
-                        if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
-                            OneDataDao oneDataDao = new OneDataDao(getApplication());
-                            oneDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    oneLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    oneRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    oneLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    oneRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 2:
-                        //判断是否有停留车
-                        String twoPickLeftName = mTwoPickLeft.getPosition();
-                        String twopickrightName = mTwopickright.getPosition();
-                        if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
-                            TwoDataDao twoDataDao = new TwoDataDao(getApplication());
-                            twoDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name2 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    twoLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    twoRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    twoLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    twoRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 3:
-                        //判断是否有停留车
-                        String threePickLeftName = mThreePickLeft.getPosition();
-                        String threepickrightName = mThreepickright.getPosition();
-                        if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
-                            ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
-                            threeDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name3 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    threeLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    threeRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    threeLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    threeRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 4:
-                        //判断是否有停留车
-                        String fourPickLeftName = mFourPickLeft.getPosition();
-                        String fourpickrightName = mFourpickright.getPosition();
-                        if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
-                            FourDataDao fourDataDao = new FourDataDao(getApplication());
-                            fourDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name4 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fourLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fourRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fourLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fourRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 5:
-                        //判断是否有停留车
-                        String fivePickLeftName = mFivePickLeft.getPosition();
-                        String fivepickrightName = mFivepickright.getPosition();
-                        if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
-                            FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
-                            fiveDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fiveLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fiveRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fiveLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fiveRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 6:
-                        List<DataUser> sixDataUsers = mSixParkDataDao.find();
-                        int sixSize = sixDataUsers.size();
-                        String num = sixDataUsers.get(sixSize - 1).getNum();
-                        Integer integerNum = Integer.valueOf(num);
-                        int sum = integerNum + 1;
-                        if (sixSize > 1) {
-                            for (int i = 1; i < sixSize; i++) {
-                                String lat = sixDataUsers.get(i).getLat();
-                                String lon = sixDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", sum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSixParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", sum + "");
-                        }
-                        break;
-                    case 7:
-                        List<DataUser> sevenDataUsers = mSevenParkDataDao.find();
-                        int sevenSize = sevenDataUsers.size();
-                        String sevenNum = sevenDataUsers.get(sevenSize - 1).getNum();
-                        Integer integerSevenNum = Integer.valueOf(sevenNum);
-                        int sevenSum = integerSevenNum + 1;
-                        if (sevenSize > 1) {
-                            for (int i = 1; i < sevenSize; i++) {
-                                String lat = sevenDataUsers.get(i).getLat();
-                                String lon = sevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSevenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", sevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSevenParkDataDao.updaeUser("sevenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSevenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", sevenSum + "");
-                        }
-                        break;
-                    case 8:
-                        //判断是否有停留车
-                        String eightPickLeftName = mEightPickLeft.getPosition();
-                        String eightpickrightName = mEightpickright.getPosition();
-                        if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
-                            EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
-                            eightDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    eightLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    eightRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 9:
-                        List<DataUser> nineDataUsers = mNineParkDataDao.find();
-                        int nineSize = nineDataUsers.size();
-                        String nineNum = nineDataUsers.get(nineSize - 1).getNum();
-                        Integer integerNineNum = Integer.valueOf(nineNum);
-                        int nineSum = integerNineNum + 1;
-                        if (nineSize > 1) {
-                            for (int i = 1; i < nineSize; i++) {
-                                String lat = nineDataUsers.get(i).getLat();
-                                String lon = nineDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", nineSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineParkDataDao.updaeUser("nineparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mNineParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", nineSum + "");
-                        }
-                        break;
-                    case 10:
-                        //判断是否有停留车
-                        String tenPickLeftName = mTenPickLeft.getPosition();
-                        String tenpickrightName = mTenpickright.getPosition();
-                        if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
-                            TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
-                            tenDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint3))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    tenLeft(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    tenRight(mGpsPistance2 + "", mLat31, mLon31, mGetGudaoOfGpsPoint3 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 11:
-                        List<DataUser> elevenDataUsers = mElevenParkDataDao.find();
-                        int elevenSize = elevenDataUsers.size();
-                        String elevenNum = elevenDataUsers.get(elevenSize - 1).getNum();
-                        Integer integerElevenNum = Integer.valueOf(elevenNum);
-                        int elevenSum = integerElevenNum + 1;
-                        if (elevenSize > 1) {
-                            for (int i = 1; i < elevenSize; i++) {
-                                String lat = elevenDataUsers.get(i).getLat();
-                                String lon = elevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mElevenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", elevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = elevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mElevenParkDataDao.updaeUser("elevenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mElevenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", elevenSum + "");
-                        }
-                        break;
-                    case 12:
-                        List<DataUser> twelveDataUsers = mTwelveParkDataDao.find();
-                        int twelveSize = twelveDataUsers.size();
-                        String twelveNum = twelveDataUsers.get(twelveSize - 1).getNum();
-                        Integer integerTwelveNum = Integer.valueOf(twelveNum);
-                        int twelveSum = integerTwelveNum + 1;
-                        if (twelveSize > 1) {
-                            for (int i = 1; i < twelveSize; i++) {
-                                String lat = twelveDataUsers.get(i).getLat();
-                                String lon = twelveDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mTwelveParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", twelveSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = twelveDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mTwelveParkDataDao.updaeUser("twelveparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mTwelveParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", twelveSum + "");
-                        }
-                        break;
-                    case 13:
-                        List<DataUser> thirteenDataUsers = mThirteenParkDataDao.find();
-                        int thirteenSize = thirteenDataUsers.size();
-                        String thirteenNum = thirteenDataUsers.get(thirteenSize - 1).getNum();
-                        Integer integerThirteenNum = Integer.valueOf(thirteenNum);
-                        int thirteenSum = integerThirteenNum + 1;
-                        if (thirteenSize > 1) {
-                            for (int i = 1; i < thirteenSize; i++) {
-                                String lat = thirteenDataUsers.get(i).getLat();
-                                String lon = thirteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mThirteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", thirteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = thirteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mThirteenParkDataDao.updaeUser("thirteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mThirteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", thirteenSum + "");
-                        }
-                        break;
-                    case 14:
-                        List<DataUser> fourteenDataUsers = mFourteenParkDataDao.find();
-                        int fourteenSize = fourteenDataUsers.size();
-                        String fourteenNum = fourteenDataUsers.get(fourteenSize - 1).getNum();
-                        Integer integerFourteenNum = Integer.valueOf(fourteenNum);
-                        int fourteenSum = integerFourteenNum + 1;
-                        if (fourteenSize > 1) {
-                            for (int i = 1; i < fourteenSize; i++) {
-                                String lat = fourteenDataUsers.get(i).getLat();
-                                String lon = fourteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFourteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", fourteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fourteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFourteenParkDataDao.updaeUser("fourteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mFourteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", fourteenSum + "");
-                        }
-                        break;
-                    case 15:
-                        List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
-                        int fifteenSize = fifteenDataUsers.size();
-                        String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
-                        Integer integerFifteenNum = Integer.valueOf(fifteenNum);
-                        int fifteenSum = integerFifteenNum + 1;
-                        if (fifteenSize > 1) {
-                            for (int i = 1; i < fifteenSize; i++) {
-                                String lat = fifteenDataUsers.get(i).getLat();
-                                String lon = fifteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFifteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", fifteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", fifteenSum + "");
-                        }
-                        break;
-                    case 16:
-                        List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
-                        int sixteenSize = sixteenDataUsers.size();
-                        String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
-                        Integer integerSixteenNum = Integer.valueOf(sixteenNum);
-                        int sixteenSum = integerSixteenNum + 1;
-                        if (sixteenSize > 1) {
-                            for (int i = 1; i < sixteenSize; i++) {
-                                String lat = sixteenDataUsers.get(i).getLat();
-                                String lon = sixteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", sixteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", sixteenSum + "");
-                        }
-                        break;
-                    case 17:
-                        List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
-                        int seventeenSize = seventeenDataUsers.size();
-                        String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
-                        Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
-                        int seventeenSum = integerSeventeenNum + 1;
-                        if (seventeenSize > 1) {
-                            for (int i = 1; i < seventeenSize; i++) {
-                                String lat = seventeenDataUsers.get(i).getLat();
-                                String lon = seventeenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", seventeenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", seventeenSum + "");
-                        }
-                        break;
-                    case 18:
-                        List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
-                        int eighteenSize = eighteenDataUsers.size();
-                        String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
-                        Integer integerEighteenNum = Integer.valueOf(eighteenNum);
-                        int eighteenSum = integerEighteenNum + 1;
-                        if (eighteenSize > 1) {
-                            for (int i = 1; i < eighteenSize; i++) {
-                                String lat = eighteenDataUsers.get(i).getLat();
-                                String lon = eighteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mEighteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", eighteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPistance2 + "", eighteenSum + "");
-                        }
-                        break;
-                    case 19:
-                        List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
-                        int nineteenSize = nineteenDataUsers.size();
-                        String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
-                        Integer integerNineteenNum = Integer.valueOf(nineteenNum);
-                        int nineteenSum = integerNineteenNum + 1;
-                        if (nineteenSize > 1) {
-                            for (int i = 1; i < nineteenSize; i++) {
-                                String lat = nineteenDataUsers.get(i).getLat();
-                                String lon = nineteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat31), Double.valueOf(mLon31));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", nineteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint3 + "", mLat31, mLon31, mGpsPoint2 + "", nineteenSum + "");
-                        }
-                        break;
-                }
-                break;
-            case "03":
-                eightPerson();
-                mControlTrack.setName(mGetGudaoOfGpsPoint2 + "");
-                switch (mGetGudaoOfGpsPoint4) {
-                    case 1:
-                        //判断是否有停留车
-                        String onePickLeftName = mOnePickLeft.getPosition();
-                        String onepickrightName = mOnepickright.getPosition();
-                        if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
-                            OneDataDao oneDataDao = new OneDataDao(getApplication());
-                            oneDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    oneLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    oneRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    oneLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    oneRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 2:
-                        //判断是否有停留车
-                        String twoPickLeftName = mTwoPickLeft.getPosition();
-                        String twopickrightName = mTwopickright.getPosition();
-                        if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
-                            TwoDataDao twoDataDao = new TwoDataDao(getApplication());
-                            twoDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name2 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    twoLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    twoRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    twoLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    twoRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 3:
-                        //判断是否有停留车
-                        String threePickLeftName = mThreePickLeft.getPosition();
-                        String threepickrightName = mThreepickright.getPosition();
-                        if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
-                            ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
-                            threeDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name3 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    threeLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    threeRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    threeLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    threeRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 4:
-                        //判断是否有停留车
-                        String fourPickLeftName = mFourPickLeft.getPosition();
-                        String fourpickrightName = mFourpickright.getPosition();
-                        if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
-                            FourDataDao fourDataDao = new FourDataDao(getApplication());
-                            fourDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name4 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fourLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fourRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fourLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fourRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 5:
-                        //判断是否有停留车
-                        String fivePickLeftName = mFivePickLeft.getPosition();
-                        String fivepickrightName = mFivepickright.getPosition();
-                        if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
-                            FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
-                            fiveDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fiveLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fiveRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fiveLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fiveRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 6:
-                        List<DataUser> sixDataUsers = mSixParkDataDao.find();
-                        int sixSize = sixDataUsers.size();
-                        String num = sixDataUsers.get(sixSize - 1).getNum();
-                        Integer integerNum = Integer.valueOf(num);
-                        int sum = integerNum + 1;
-                        if (sixSize > 1) {
-                            for (int i = 1; i < sixSize; i++) {
-                                String lat = sixDataUsers.get(i).getLat();
-                                String lon = sixDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", sum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSixParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", sum + "");
-                        }
-                        break;
-                    case 7:
-                        List<DataUser> sevenDataUsers = mSevenParkDataDao.find();
-                        int sevenSize = sevenDataUsers.size();
-                        String sevenNum = sevenDataUsers.get(sevenSize - 1).getNum();
-                        Integer integerSevenNum = Integer.valueOf(sevenNum);
-                        int sevenSum = integerSevenNum + 1;
-                        if (sevenSize > 1) {
-                            for (int i = 1; i < sevenSize; i++) {
-                                String lat = sevenDataUsers.get(i).getLat();
-                                String lon = sevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSevenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", sevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSevenParkDataDao.updaeUser("sevenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSevenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", sevenSum + "");
-                        }
-                        break;
-                    case 8:
-                        //判断是否有停留车
-                        String eightPickLeftName = mEightPickLeft.getPosition();
-                        String eightpickrightName = mEightpickright.getPosition();
-                        if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
-                            EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
-                            eightDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    eightLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    eightRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 9:
-                        List<DataUser> nineDataUsers = mNineParkDataDao.find();
-                        int nineSize = nineDataUsers.size();
-                        String nineNum = nineDataUsers.get(nineSize - 1).getNum();
-                        Integer integerNineNum = Integer.valueOf(nineNum);
-                        int nineSum = integerNineNum + 1;
-                        if (nineSize > 1) {
-                            for (int i = 1; i < nineSize; i++) {
-                                String lat = nineDataUsers.get(i).getLat();
-                                String lon = nineDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", nineSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineParkDataDao.updaeUser("nineparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mNineParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", nineSum + "");
-                        }
-                        break;
-                    case 10:
-                        //判断是否有停留车
-                        String tenPickLeftName = mTenPickLeft.getPosition();
-                        String tenpickrightName = mTenpickright.getPosition();
-                        if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
-                            TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
-                            tenDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint4))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    tenLeft(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    tenRight(mGpsPistance2 + "", mLat4, mLon4, mGetGudaoOfGpsPoint4 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 11:
-                        List<DataUser> elevenDataUsers = mElevenParkDataDao.find();
-                        int elevenSize = elevenDataUsers.size();
-                        String elevenNum = elevenDataUsers.get(elevenSize - 1).getNum();
-                        Integer integerElevenNum = Integer.valueOf(elevenNum);
-                        int elevenSum = integerElevenNum + 1;
-                        if (elevenSize > 1) {
-                            for (int i = 1; i < elevenSize; i++) {
-                                String lat = elevenDataUsers.get(i).getLat();
-                                String lon = elevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mElevenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", elevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = elevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mElevenParkDataDao.updaeUser("elevenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mElevenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", elevenSum + "");
-                        }
-                        break;
-                    case 12:
-                        List<DataUser> twelveDataUsers = mTwelveParkDataDao.find();
-                        int twelveSize = twelveDataUsers.size();
-                        String twelveNum = twelveDataUsers.get(twelveSize - 1).getNum();
-                        Integer integerTwelveNum = Integer.valueOf(twelveNum);
-                        int twelveSum = integerTwelveNum + 1;
-                        if (twelveSize > 1) {
-                            for (int i = 1; i < twelveSize; i++) {
-                                String lat = twelveDataUsers.get(i).getLat();
-                                String lon = twelveDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mTwelveParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", twelveSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = twelveDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mTwelveParkDataDao.updaeUser("twelveparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mTwelveParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", twelveSum + "");
-                        }
-                        break;
-                    case 13:
-                        List<DataUser> thirteenDataUsers = mThirteenParkDataDao.find();
-                        int thirteenSize = thirteenDataUsers.size();
-                        String thirteenNum = thirteenDataUsers.get(thirteenSize - 1).getNum();
-                        Integer integerThirteenNum = Integer.valueOf(thirteenNum);
-                        int thirteenSum = integerThirteenNum + 1;
-                        if (thirteenSize > 1) {
-                            for (int i = 1; i < thirteenSize; i++) {
-                                String lat = thirteenDataUsers.get(i).getLat();
-                                String lon = thirteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mThirteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", thirteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = thirteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mThirteenParkDataDao.updaeUser("thirteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mThirteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", thirteenSum + "");
-                        }
-                        break;
-                    case 14:
-                        List<DataUser> fourteenDataUsers = mFourteenParkDataDao.find();
-                        int fourteenSize = fourteenDataUsers.size();
-                        String fourteenNum = fourteenDataUsers.get(fourteenSize - 1).getNum();
-                        Integer integerFourteenNum = Integer.valueOf(fourteenNum);
-                        int fourteenSum = integerFourteenNum + 1;
-                        if (fourteenSize > 1) {
-                            for (int i = 1; i < fourteenSize; i++) {
-                                String lat = fourteenDataUsers.get(i).getLat();
-                                String lon = fourteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFourteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", fourteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fourteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFourteenParkDataDao.updaeUser("fourteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mFourteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", fourteenSum + "");
-                        }
-                    case 15:
-                        List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
-                        int fifteenSize = fifteenDataUsers.size();
-                        String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
-                        Integer integerFifteenNum = Integer.valueOf(fifteenNum);
-                        int fifteenSum = integerFifteenNum + 1;
-                        if (fifteenSize > 1) {
-                            for (int i = 1; i < fifteenSize; i++) {
-                                String lat = fifteenDataUsers.get(i).getLat();
-                                String lon = fifteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFifteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", fifteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", fifteenSum + "");
-                        }
-                        break;
-                    case 16:
-                        List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
-                        int sixteenSize = sixteenDataUsers.size();
-                        String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
-                        Integer integerSixteenNum = Integer.valueOf(sixteenNum);
-                        int sixteenSum = integerSixteenNum + 1;
-                        if (sixteenSize > 1) {
-                            for (int i = 1; i < sixteenSize; i++) {
-                                String lat = sixteenDataUsers.get(i).getLat();
-                                String lon = sixteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", sixteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", sixteenSum + "");
-                        }
-                        break;
-                    case 17:
-                        List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
-                        int seventeenSize = seventeenDataUsers.size();
-                        String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
-                        Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
-                        int seventeenSum = integerSeventeenNum + 1;
-                        if (seventeenSize > 1) {
-                            for (int i = 1; i < seventeenSize; i++) {
-                                String lat = seventeenDataUsers.get(i).getLat();
-                                String lon = seventeenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", seventeenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", seventeenSum + "");
-                        }
-                        break;
-                    case 18:
-                        List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
-                        int eighteenSize = eighteenDataUsers.size();
-                        String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
-                        Integer integerEighteenNum = Integer.valueOf(eighteenNum);
-                        int eighteenSum = integerEighteenNum + 1;
-                        if (eighteenSize > 1) {
-                            for (int i = 1; i < eighteenSize; i++) {
-                                String lat = eighteenDataUsers.get(i).getLat();
-                                String lon = eighteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mEighteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", eighteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", eighteenSum + "");
-                        }
-                        break;
-                    case 19:
-                        List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
-                        int nineteenSize = nineteenDataUsers.size();
-                        String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
-                        Integer integerNineteenNum = Integer.valueOf(nineteenNum);
-                        int nineteenSum = integerNineteenNum + 1;
-                        if (nineteenSize > 1) {
-                            for (int i = 1; i < nineteenSize; i++) {
-                                String lat = nineteenDataUsers.get(i).getLat();
-                                String lon = nineteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat4), Double.valueOf(mLon4));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", nineteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint4 + "", mLat4, mLon4, mGpsPoint2 + "", nineteenSum + "");
-                        }
-                        break;
-                }
-                break;
-            case "04":
-                ninePerson();
-                mControlTrack.setName(mGetGudaoOfGpsPoint2 + "");
-                switch (mGetGudaoOfGpsPoint4) {
-                    case 1:
-                        //判断是否有停留车
-                        String onePickLeftName = mOnePickLeft.getPosition();
-                        String onepickrightName = mOnepickright.getPosition();
-                        if (onePickLeftName.equals("0") || onepickrightName.equals("0")) {
-                            OneDataDao oneDataDao = new OneDataDao(getApplication());
-                            oneDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    oneLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    oneRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    oneLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    oneRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 2:
-                        //判断是否有停留车
-                        String twoPickLeftName = mTwoPickLeft.getPosition();
-                        String twopickrightName = mTwopickright.getPosition();
-                        if (twoPickLeftName.equals("0") || twopickrightName.equals("0")) {
-                            TwoDataDao twoDataDao = new TwoDataDao(getApplication());
-                            twoDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name2 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    twoLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    twoRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    twoLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    twoRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 3:
-                        //判断是否有停留车
-                        String threePickLeftName = mThreePickLeft.getPosition();
-                        String threepickrightName = mThreepickright.getPosition();
-                        if (threePickLeftName.equals("0") || threepickrightName.equals("0")) {
-                            ThreeDataDao threeDataDao = new ThreeDataDao(getApplication());
-                            threeDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name3 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    threeLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    threeRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    threeLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    threeRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 4:
-                        //判断是否有停留车
-                        String fourPickLeftName = mFourPickLeft.getPosition();
-                        String fourpickrightName = mFourpickright.getPosition();
-                        if (fourPickLeftName.equals("0") || fourpickrightName.equals("0")) {
-                            FourDataDao fourDataDao = new FourDataDao(getApplication());
-                            fourDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name4 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fourLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fourRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fourLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fourRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 5:
-                        //判断是否有停留车
-                        String fivePickLeftName = mFivePickLeft.getPosition();
-                        String fivepickrightName = mFivepickright.getPosition();
-                        if (fivePickLeftName.equals("0") || fivepickrightName.equals("0")) {
-                            FiveParkDataDao fiveDataDao = new FiveParkDataDao(getApplication());
-                            fiveDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    fiveLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    fiveRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    fiveLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    fiveRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 6:
-                        List<DataUser> sixDataUsers = mSixParkDataDao.find();
-                        int sixSize = sixDataUsers.size();
-                        String num = sixDataUsers.get(sixSize - 1).getNum();
-                        Integer integerNum = Integer.valueOf(num);
-                        int sum = integerNum + 1;
-                        if (sixSize > 1) {
-                            for (int i = 1; i < sixSize; i++) {
-                                String lat = sixDataUsers.get(i).getLat();
-                                String lon = sixDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", sum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mSixParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", sum + "");
-                        }
-                        break;
-                    case 7://mSevenParkDataDao
-                        List<DataUser> sevenDataUsers = mSevenParkDataDao.find();
-                        int sevenSize = sevenDataUsers.size();
-                        String sevenNum = sevenDataUsers.get(sevenSize - 1).getNum();
-                        Integer integerSevenNum = Integer.valueOf(sevenNum);
-                        int sevenSum = integerSevenNum + 1;
-                        if (sevenSize > 1) {
-                            for (int i = 1; i < sevenSize; i++) {
-                                String lat = sevenDataUsers.get(i).getLat();
-                                String lon = sevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSevenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", sevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSevenParkDataDao.updaeUser("sevenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mSevenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", sevenSum + "");
-                        }
-                        break;
-                    case 8:
-                        //判断是否有停留车
-                        String eightPickLeftName = mEightPickLeft.getPosition();
-                        String eightpickrightName = mEightpickright.getPosition();
-                        if (eightPickLeftName.equals("0") || eightpickrightName.equals("0")) {
-                            EightParkDataDao eightDataDao = new EightParkDataDao(getApplication());
-                            eightDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    eightLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    eightRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 9:
-                        List<DataUser> nineDataUsers = mNineParkDataDao.find();
-                        int nineSize = nineDataUsers.size();
-                        String nineNum = nineDataUsers.get(nineSize - 1).getNum();
-                        Integer integerNineNum = Integer.valueOf(nineNum);
-                        int nineSum = integerNineNum + 1;
-                        if (nineSize > 1) {
-                            for (int i = 1; i < nineSize; i++) {
-                                String lat = nineDataUsers.get(i).getLat();
-                                String lon = nineDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", nineSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineParkDataDao.updaeUser("nineparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mNineParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", nineSum + "");
-                        }
-                        break;
-                    case 10:
-                        //判断是否有停留车
-                        String tenPickLeftName = mTenPickLeft.getPosition();
-                        String tenpickrightName = mTenpickright.getPosition();
-                        if (tenPickLeftName.equals("0") || tenpickrightName.equals("0")) {
-                            TenParkDataDao tenDataDao = new TenParkDataDao(getApplication());
-                            tenDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPistance2 + "");
-                            String name5 = mCarLocation.getName();
-                            if (mTrackCar.equals(String.valueOf(mGetGudaoOfGpsPoint5))) {
-                                if (mGpsPistance2 < mPositionCar1) {
-                                    tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (mGpsPistance2 > mPositionCar1) {
-                                    tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            } else {
-                                String name1 = mMain.getName();
-                                if (name1.equals("baili")) {
-                                    tenLeft(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                } else if (name1.equals("changfeng")) {
-                                    tenRight(mGpsPistance2 + "", mLat5, mLon5, mGetGudaoOfGpsPoint5 + "");
-                                }
-                            }
-                        }
-                        break;
-                    case 11:
-                        List<DataUser> elevenDataUsers = mElevenParkDataDao.find();
-                        int elevenSize = elevenDataUsers.size();
-                        String elevenNum = elevenDataUsers.get(elevenSize - 1).getNum();
-                        Integer integerElevenNum = Integer.valueOf(elevenNum);
-                        int elevenSum = integerElevenNum + 1;
-                        if (elevenSize > 1) {
-                            for (int i = 1; i < elevenSize; i++) {
-                                String lat = elevenDataUsers.get(i).getLat();
-                                String lon = elevenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mElevenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", elevenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = elevenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mElevenParkDataDao.updaeUser("elevenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-                        } else {
-                            mElevenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", elevenSum + "");
-                        }
-                        break;
-                    case 12:
-                        List<DataUser> twelveDataUsers = mTwelveParkDataDao.find();
-                        int twelveSize = twelveDataUsers.size();
-                        String twelveNum = twelveDataUsers.get(twelveSize - 1).getNum();
-                        Integer integerTwelveNum = Integer.valueOf(twelveNum);
-                        int twelveSum = integerTwelveNum + 1;
-                        if (twelveSize > 1) {
-                            for (int i = 1; i < twelveSize; i++) {
-                                String lat = twelveDataUsers.get(i).getLat();
-                                String lon = twelveDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mTwelveParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", twelveSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = twelveDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mTwelveParkDataDao.updaeUser("twelveparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mTwelveParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", twelveSum + "");
-                        }
-                        break;
-                    case 13:
-                        List<DataUser> thirteenDataUsers = mThirteenParkDataDao.find();
-                        int thirteenSize = thirteenDataUsers.size();
-                        String thirteenNum = thirteenDataUsers.get(thirteenSize - 1).getNum();
-                        Integer integerThirteenNum = Integer.valueOf(thirteenNum);
-                        int thirteenSum = integerThirteenNum + 1;
-                        if (thirteenSize > 1) {
-                            for (int i = 1; i < thirteenSize; i++) {
-                                String lat = thirteenDataUsers.get(i).getLat();
-                                String lon = thirteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mThirteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", thirteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = thirteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mThirteenParkDataDao.updaeUser("thirteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mThirteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", thirteenSum + "");
-                        }
-                        break;
-                    case 14:
-                        List<DataUser> fourteenDataUsers = mFourteenParkDataDao.find();
-                        int fourteenSize = fourteenDataUsers.size();
-                        String fourteenNum = fourteenDataUsers.get(fourteenSize - 1).getNum();
-                        Integer integerFourteenNum = Integer.valueOf(fourteenNum);
-                        int fourteenSum = integerFourteenNum + 1;
-                        if (fourteenSize > 1) {
-                            for (int i = 1; i < fourteenSize; i++) {
-                                String lat = fourteenDataUsers.get(i).getLat();
-                                String lon = fourteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFourteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", fourteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fourteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFourteenParkDataDao.updaeUser("fourteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mFourteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", fourteenSum + "");
-                        }
-                        break;
-                    case 15:
-                        List<DataUser> fifteenDataUsers = mFifteenParkDataDao.find();
-                        int fifteenSize = fifteenDataUsers.size();
-                        String fifteenNum = fifteenDataUsers.get(fifteenSize - 1).getNum();
-                        Integer integerFifteenNum = Integer.valueOf(fifteenNum);
-                        int fifteenSum = integerFifteenNum + 1;
-                        if (fifteenSize > 1) {
-                            for (int i = 1; i < fifteenSize; i++) {
-                                String lat = fifteenDataUsers.get(i).getLat();
-                                String lon = fifteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mFifteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", fifteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = fifteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mFifteenParkDataDao.updaeUser("fifteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mFifteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", fifteenSum + "");
-                        }
-                        break;
-                    case 16:
-                        List<DataUser> sixteenDataUsers = mSixteenParkDataDao.find();
-                        int sixteenSize = sixteenDataUsers.size();
-                        String sixteenNum = sixteenDataUsers.get(sixteenSize - 1).getNum();
-                        Integer integerSixteenNum = Integer.valueOf(sixteenNum);
-                        int sixteenSum = integerSixteenNum + 1;
-                        if (sixteenSize > 1) {
-                            for (int i = 1; i < sixteenSize; i++) {
-                                String lat = sixteenDataUsers.get(i).getLat();
-                                String lon = sixteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", sixteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = sixteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixteenParkDataDao.updaeUser("sixteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mSixteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", sixteenSum + "");
-                        }
-                        break;
-                    case 17:
-                        List<DataUser> seventeenDataUsers = mSeventeenParkDataDao.find();
-                        int seventeenSize = seventeenDataUsers.size();
-                        String seventeenNum = seventeenDataUsers.get(seventeenSize - 1).getNum();
-                        Integer integerSeventeenNum = Integer.valueOf(seventeenNum);
-                        int seventeenSum = integerSeventeenNum + 1;
-                        if (seventeenSize > 1) {
-                            for (int i = 1; i < seventeenSize; i++) {
-                                String lat = seventeenDataUsers.get(i).getLat();
-                                String lon = seventeenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", seventeenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = seventeenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSeventeenParkDataDao.updaeUser("seventeenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mSeventeenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", seventeenSum + "");
-                        }
-                        break;
-                    case 18:
-                        List<DataUser> eighteenDataUsers = mEighteenParkDataDao.find();
-                        int eighteenSize = eighteenDataUsers.size();
-                        String eighteenNum = eighteenDataUsers.get(eighteenSize - 1).getNum();
-                        Integer integerEighteenNum = Integer.valueOf(eighteenNum);
-                        int eighteenSum = integerEighteenNum + 1;
-                        if (eighteenSize > 1) {
-                            for (int i = 1; i < eighteenSize; i++) {
-                                String lat = eighteenDataUsers.get(i).getLat();
-                                String lon = eighteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mEighteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", eighteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = eighteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mEighteenParkDataDao.updaeUser("eighteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mEighteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", eighteenSum + "");
-                        }
-                        break;
-                    case 19:
-                        List<DataUser> nineteenDataUsers = mNineteenParkDataDao.find();
-                        int nineteenSize = nineteenDataUsers.size();
-                        String nineteenNum = nineteenDataUsers.get(nineteenSize - 1).getNum();
-                        Integer integerNineteenNum = Integer.valueOf(nineteenNum);
-                        int nineteenSum = integerNineteenNum + 1;
-                        if (nineteenSize > 1) {
-                            for (int i = 1; i < nineteenSize; i++) {
-                                String lat = nineteenDataUsers.get(i).getLat();
-                                String lon = nineteenDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat5), Double.valueOf(mLon5));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mNineteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", nineteenSum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
-                                    String ratioOfGpsPointCar = nineteenDataUsers.get(i).getRatioOfGpsPointCar();
-                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
-                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
-                                    int i1 = integerPointCar - integerGpsPistance2;
-                                    if (i1 < 0) {
-                                        int i2 = -i1;
-                                        mListNum.add(i2);
-                                    } else {
-                                        mListNum.add(i1);
-                                    }
-                                }
-                            }
-
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mNineteenParkDataDao.updaeUser("nineteenparkcar", mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", minIndex + 1);
-                            }
-
-                        } else {
-                            mNineteenParkDataDao.add(mGetGudaoOfGpsPoint5 + "", mLat5, mLon5, mGpsPoint2 + "", nineteenSum + "");
-                        }
-                        break;
-                }
-                break;
-        }
-    }
-
     private void tuijin() {
+        mListInteger.clear();
+        mListNum.clear();
         mAdvancedmr.setName("true");
         mControlTrackName = mControlTrack.getName();
         Log.e("秦广帅name", mControlTrackName);
+        isSixTrack = true;
         switch (mControlTrackName) {
             case "1":
                 //查看1道保存的数据是否只有挂钩data485.indexOf
+                List<DataUser> oneDataUsers = mOneDataDao.find();
+                int size = oneDataUsers.size();
                 String controlonepickrightName43 = mControlOnePick.getName();
                 if (controlonepickrightName43.indexOf("摘钩") == -1) {
+                    mOneDataDao.delete("oneparkcar", 1);
+                    mOneDataDao.delete("oneparkcar", 2);
                     oneLeft("0", "0", "0", "0");
                     oneRight("0", "0", "0", "0");
+                } else {
+                    if (size > 1) {
+                        for (int i = 1; i < size; i++) {
+                            String ratioOfGpsPointCar = oneDataUsers.get(i).getRatioOfGpsPointCar();
+                            Integer integerRatioOfGpsPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                            mListInteger.add(integerRatioOfGpsPointCar);
+                        }
+
+                        int maxIndex = getMaxIndex(mListInteger);
+                        int minIndex = getMinIndex(mListInteger);
+                        String maxRatioOfGpsPointCar = oneDataUsers.get(maxIndex + 1).getRatioOfGpsPointCar();
+                        String maxLat = oneDataUsers.get(maxIndex + 1).getLat();
+                        String maxLon = oneDataUsers.get(maxIndex + 1).getLon();
+                        String maxGd = oneDataUsers.get(maxIndex + 1).getGd();
+                        String minRatioOfGpsPointCar = oneDataUsers.get(minIndex + 1).getRatioOfGpsPointCar();
+                        String minLat = oneDataUsers.get(minIndex + 1).getLat();
+                        String minLon = oneDataUsers.get(minIndex + 1).getLon();
+                        String minGd = oneDataUsers.get(minIndex + 1).getGd();
+                        Log.e("秦广帅Index", maxIndex + "    " + minIndex);
+                        Log.e("秦广帅max", maxRatioOfGpsPointCar + "    " + maxLat + "    " + maxLon + "    " + maxGd);
+                        Log.e("秦广帅min", minRatioOfGpsPointCar + "    " + minLat + "    " + minLon + "    " + minGd);
+                    }
                 }
                 /*String leftOnePosition = mOnePickLeft.getPosition();
                 String leftOneLat = mOnePickLeft.getLat();
@@ -11579,15 +2835,15 @@ public class PointActivity extends SerialPortActivity {
                 String rightOneLon = mOnepickright.getLon();*/
 
                 one();
-                if (mOneLatLeft.length() > 6 && mOneLonLeft.length() > 6 && mOneLatRight.length() > 0 && mOneLonRight.length() > 0) {
+                if (mOneLatLeft.length() > 6 && mOneLonLeft.length() > 6 && mOneLatRight.length() > 6 && mOneLonRight.length() > 6) {
                     String lat = mOneLatLeft.substring(4, mOneLatLeft.length());
                     String lon = mOneLonLeft.substring(3, mOneLonLeft.length());
                     String lat1 = mOneLatRight.substring(4, mOneLatRight.length());
                     String lon1 = mOneLonRight.substring(3, mOneLonRight.length());
-                    String textOneName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textOneName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textOneName);
-                } else {
-                    String textOneName = "0"+mControlTrackName + "-停留车-" + "(" + mOneLonLeft + "," + mOneLatLeft + ")" + "(" + mOneLonRight + "," + mOneLatRight + ")";
+                } else if (mOneLatLeft.length() == 1 && mOneLonLeft.length() == 1 && mOneLatRight.length() == 1 && mOneLonRight.length() == 1) {
+                    String textOneName = "0" + mControlTrackName + "-停留车-" + "(" + "000000" + "," + "000000" + ")" + "(" + "000000" + "," + "000000" + ")";
                     sendMessage(mConversationId, textOneName);
                 }
 
@@ -11609,15 +2865,15 @@ public class PointActivity extends SerialPortActivity {
                 String rightTwoLon = mTwopickright.getLon();*/
 
                 two();
-                if (mTwoLatLeft.length() > 6 && mTwoLonLeft.length() > 6 && mTwoLatRight.length() > 0 && mTwoLonRight.length() > 0) {
+                if (mTwoLatLeft.length() > 6 && mTwoLonLeft.length() > 6 && mTwoLatRight.length() > 6 && mTwoLonRight.length() > 6) {
                     String lat = mTwoLatLeft.substring(4, mTwoLatLeft.length());
                     String lon = mTwoLonLeft.substring(3, mTwoLonLeft.length());
                     String lat1 = mTwoLatRight.substring(4, mTwoLatRight.length());
                     String lon1 = mTwoLonRight.substring(3, mTwoLonRight.length());
-                    String textTwoName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textTwoName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textTwoName);
-                } else {
-                    String textTwoName = "0"+mControlTrackName + "-停留车-" + "(" + mTwoLonLeft + "," + mTwoLatLeft + ")" + "(" + mTwoLonRight + "," + mTwoLatRight + ")";
+                } else if (mTwoLatLeft.length() == 1 && mTwoLonLeft.length() == 1 && mTwoLatRight.length() == 1 && mTwoLonRight.length() == 1) {
+                    String textTwoName = "0" + mControlTrackName + "-停留车-" + "(" + mTwoLonLeft + "," + mTwoLatLeft + ")" + "(" + mTwoLonRight + "," + mTwoLatRight + ")";
                     sendMessage(mConversationId, textTwoName);
                 }
 
@@ -11633,15 +2889,15 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 three();
-                if (mThreeLatLeft.length() > 6 && mThreeLonLeft.length() > 6 && mThreeLatRight.length() > 0 && mThreeLatRight.length() > 0) {
+                if (mThreeLatLeft.length() > 6 && mThreeLonLeft.length() > 6 && mThreeLatRight.length() > 6 && mThreeLatRight.length() > 6) {
                     String lat = mThreeLatLeft.substring(4, mThreeLatLeft.length());
                     String lon = mThreeLonLeft.substring(3, mThreeLonLeft.length());
                     String lat1 = mThreeLatRight.substring(4, mThreeLatRight.length());
                     String lon1 = mThreeLonRight.substring(3, mThreeLonRight.length());
-                    String textThreeName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textThreeName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textThreeName);
-                } else {
-                    String textThreeName = "0"+mControlTrackName + "-停留车-" + "(" + mThreeLonLeft + "," + mThreeLatLeft + ")" + "(" + mThreeLonRight + "," + mThreeLatRight + ")";
+                } else if (mThreeLatLeft.length() == 1 && mThreeLonLeft.length() == 1 && mThreeLatRight.length() == 1 && mThreeLatRight.length() == 1) {
+                    String textThreeName = "0" + mControlTrackName + "-停留车-" + "(" + mThreeLonLeft + "," + mThreeLatLeft + ")" + "(" + mThreeLonRight + "," + mThreeLatRight + ")";
                     sendMessage(mConversationId, textThreeName);
                 }
                 mControlThreePick.setName("0");
@@ -11656,15 +2912,15 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 four();
-                if (mFourLatLeft.length() > 6 && mFourLonLeft.length() > 6 && mFourLatRight.length() > 0 && mFourLonRight.length() > 0) {
+                if (mFourLatLeft.length() > 6 && mFourLonLeft.length() > 6 && mFourLatRight.length() > 6 && mFourLonRight.length() > 6) {
                     String lat = mFourLatLeft.substring(4, mFourLatLeft.length());
                     String lon = mFourLonLeft.substring(3, mFourLonLeft.length());
                     String lat1 = mFourLatRight.substring(4, mFourLatRight.length());
                     String lon1 = mFourLonRight.substring(3, mFourLonRight.length());
-                    String textFourName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textFourName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textFourName);
-                } else {
-                    String textFourName = "0"+mControlTrackName + "-停留车-" + "(" + mFourLonLeft + "," + mFourLatLeft + ")" + "(" + mFourLonRight + "," + mFourLatRight + ")";
+                } else if (mFourLatLeft.length() == 1 && mFourLonLeft.length() == 1 && mFourLatRight.length() == 1 && mFourLonRight.length() == 1) {
+                    String textFourName = "0" + mControlTrackName + "-停留车-" + "(" + mFourLonLeft + "," + mFourLatLeft + ")" + "(" + mFourLonRight + "," + mFourLatRight + ")";
                     sendMessage(mConversationId, textFourName);
                 }
 
@@ -11680,15 +2936,15 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 five();
-                if (mFiveLatLeft.length() > 6 && mFiveLonLeft.length() > 6 && mFiveLatRight.length() > 0 && mFiveLonRight.length() > 0) {
+                if (mFiveLatLeft.length() > 6 && mFiveLonLeft.length() > 6 && mFiveLatRight.length() > 6 && mFiveLonRight.length() > 6) {
                     String lat = mFiveLatLeft.substring(4, mFiveLatLeft.length());
                     String lon = mFiveLonLeft.substring(3, mFiveLonLeft.length());
                     String lat1 = mFiveLatRight.substring(4, mFiveLatRight.length());
                     String lon1 = mFiveLonRight.substring(3, mFiveLonRight.length());
-                    String textFiveName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textFiveName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textFiveName);
-                } else {
-                    String textFiveName = "0"+mControlTrackName + "-停留车-" + "(" + mFiveLonLeft + "," + mFiveLatLeft + ")" + "(" + mFiveLonRight + "," + mFiveLatRight + ")";
+                } else if (mFiveLatLeft.length() == 1 && mFiveLonLeft.length() == 1 && mFiveLatRight.length() == 1 && mFiveLonRight.length() == 1) {
+                    String textFiveName = "0" + mControlTrackName + "-停留车-" + "(" + mFiveLonLeft + "," + mFiveLatLeft + ")" + "(" + mFiveLonRight + "," + mFiveLatRight + ")";
                     sendMessage(mConversationId, textFiveName);
                 }
 
@@ -11862,15 +3118,15 @@ public class PointActivity extends SerialPortActivity {
                 String rightEightLat = mEightpickright.getLat();
                 String rightEightLon = mEightpickright.getLon();
 
-                if (leftEightLat.length() > 6 && leftEightLon.length() > 6 && rightEightLat.length() > 0 && rightEightLon.length() > 0) {
+                if (leftEightLat.length() > 6 && leftEightLon.length() > 6 && rightEightLat.length() > 6 && rightEightLon.length() > 6) {
                     String lat = leftEightLat.substring(4, leftEightLat.length());
                     String lon = leftEightLon.substring(3, leftEightLon.length());
                     String lat1 = rightEightLat.substring(4, rightEightLat.length());
                     String lon1 = rightEightLon.substring(3, rightEightLon.length());
-                    String textEightName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textEightName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textEightName);
-                } else {
-                    String textEightName = "0"+mControlTrackName + "-停留车-" + "(" + leftEightLon + "," + leftEightLat + ")" + "(" + rightEightLon + "," + rightEightLat + ")";
+                } else if (leftEightLat.length() == 1 && leftEightLon.length() == 1 && rightEightLat.length() == 1 && rightEightLon.length() == 1) {
+                    String textEightName = "0" + mControlTrackName + "-停留车-" + "(" + leftEightLon + "," + leftEightLat + ")" + "(" + rightEightLon + "," + rightEightLat + ")";
                     sendMessage(mConversationId, textEightName);
                 }
 
@@ -11960,14 +3216,14 @@ public class PointActivity extends SerialPortActivity {
                 String rightTenLat = mTenpickright.getLat();
                 String rightTenLon = mTenpickright.getLon();
 
-                if (leftTenLat.length() > 6 && leftTenLon.length() > 6 && rightTenLat.length() > 0 && rightTenLat.length() > 0) {
+                if (leftTenLat.length() > 6 && leftTenLon.length() > 6 && rightTenLat.length() > 6 && rightTenLon.length() > 6) {
                     String lat = leftTenLat.substring(4, leftTenLat.length());
                     String lon = leftTenLon.substring(3, leftTenLon.length());
                     String lat1 = rightTenLat.substring(4, rightTenLat.length());
                     String lon1 = rightTenLon.substring(3, rightTenLon.length());
                     String textEightName = mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textEightName);
-                } else {
+                } else if (leftTenLat.length() == 1 && leftTenLon.length() == 1 && rightTenLat.length() == 1 && rightTenLon.length() == 1) {
                     String textEightName = mControlTrackName + "-停留车-" + "(" + leftTenLon + "," + leftTenLat + ")" + "(" + rightTenLon + "," + rightTenLat + ")";
                     sendMessage(mConversationId, textEightName);
                 }
@@ -12591,27 +3847,63 @@ public class PointActivity extends SerialPortActivity {
     }
 
     private void qidong() {
+        mListInteger.clear();
+        mListNum.clear();
         mAdvancedmr.setName("true");
         mControlTrackName = mControlTrack.getName();
         Log.e("秦广帅name", mControlTrackName);
+        isSixTrack = true;
         switch (mControlTrackName) {
             case "1":
                 //查看1道保存的数据是否只有挂钩data485.indexOf
+                List<DataUser> oneDataUsers = mOneDataDao.find();
+                int size = oneDataUsers.size();
+                Log.e("秦广帅size", size + "");
                 String controlonepickrightName41 = mControlOnePick.getName();
-                if (controlonepickrightName41.indexOf("摘钩") == -1) {
+                if (controlonepickrightName41.contains("摘钩") == false && controlonepickrightName41.contains("挂钩")) {
+                    Log.e("秦广帅", "挂钩");
+                    mOneDataDao.delete("oneparkcar", 1);
+                    mOneDataDao.delete("oneparkcar", 2);
                     oneLeft("0", "0", "0", "0");
                     oneRight("0", "0", "0", "0");
+                } else {
+                    Log.e("秦广帅", "摘钩");
+                    if (size > 1) {
+                        for (int i = 1; i < size; i++) {
+                            String ratioOfGpsPointCar = oneDataUsers.get(i).getRatioOfGpsPointCar();
+                            Integer integerRatioOfGpsPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                            mListInteger.add(integerRatioOfGpsPointCar);
+                        }
+                        Log.e("秦广帅mListInteger", mListInteger.toString());
+
+                        int maxIndex = getMaxIndex(mListInteger);
+                        int minIndex = getMinIndex(mListInteger);
+                        String maxRatioOfGpsPointCar = oneDataUsers.get(maxIndex + 1).getRatioOfGpsPointCar();
+                        String maxLat = oneDataUsers.get(maxIndex + 1).getLat();
+                        String maxLon = oneDataUsers.get(maxIndex + 1).getLon();
+                        String maxGd = oneDataUsers.get(maxIndex + 1).getGd();
+                        String minRatioOfGpsPointCar = oneDataUsers.get(minIndex + 1).getRatioOfGpsPointCar();
+                        String minLat = oneDataUsers.get(minIndex + 1).getLat();
+                        String minLon = oneDataUsers.get(minIndex + 1).getLon();
+                        String minGd = oneDataUsers.get(minIndex + 1).getGd();
+                        oneLeft(maxRatioOfGpsPointCar, minLat, minLon, minGd);
+                        oneRight(minRatioOfGpsPointCar, maxLat, maxLon, maxGd);
+                        Log.e("秦广帅Index", maxIndex + "    " + minIndex);
+                        Log.e("秦广帅max", maxRatioOfGpsPointCar + "    " + maxLat + "    " + maxLon + "    " + maxGd);
+                        Log.e("秦广帅min", minRatioOfGpsPointCar + "    " + minLat + "    " + minLon + "    " + minGd);
+                    }
                 }
+
                 one();
-                if (mOneLatLeft.length() > 6 && mOneLonLeft.length() > 6 && mOneLatRight.length() > 0 && mOneLonRight.length() > 0) {
+                if (mOneLatLeft.length() > 6 && mOneLonLeft.length() > 6 && mOneLatRight.length() > 6 && mOneLonRight.length() > 6) {
                     String lat = mOneLatLeft.substring(4, mOneLatLeft.length());
                     String lon = mOneLonLeft.substring(3, mOneLonLeft.length());
                     String lat1 = mOneLatRight.substring(4, mOneLatRight.length());
                     String lon1 = mOneLonRight.substring(3, mOneLonRight.length());
-                    String textOneName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textOneName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textOneName);
-                } else {
-                    String textOneName = "0"+mControlTrackName + "-停留车-" + "(" + mOneLonLeft + "," + mOneLatLeft + ")" + "(" + mOneLonRight + "," + mOneLatRight + ")";
+                } else if (mOneLatLeft.length() == 1 && mOneLonLeft.length() == 1 && mOneLatRight.length() == 1 && mOneLonRight.length() == 1) {
+                    String textOneName = "0" + mControlTrackName + "-停留车-" + "(" + mOneLonLeft + "," + mOneLatLeft + ")" + "(" + mOneLonRight + "," + mOneLatRight + ")";
                     sendMessage(mConversationId, textOneName);
                 }
                 mControlOnePick.setName("0");
@@ -12626,15 +3918,15 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 two();
-                if (mTwoLatLeft.length() > 6 && mTwoLonLeft.length() > 6 && mTwoLatRight.length() > 0 && mTwoLonRight.length() > 0) {
+                if (mTwoLatLeft.length() > 6 && mTwoLonLeft.length() > 6 && mTwoLatRight.length() > 6 && mTwoLonRight.length() > 6) {
                     String lat = mTwoLatLeft.substring(4, mTwoLatLeft.length());
                     String lon = mTwoLonLeft.substring(3, mTwoLonLeft.length());
                     String lat1 = mTwoLatRight.substring(4, mTwoLatRight.length());
                     String lon1 = mTwoLonRight.substring(3, mTwoLonRight.length());
-                    String textTwoName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textTwoName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textTwoName);
-                } else {
-                    String textTwoName = "0"+mControlTrackName + "-停留车-" + "(" + mTwoLonLeft + "," + mTwoLatLeft + ")" + "(" + mTwoLonRight + "," + mTwoLatRight + ")";
+                } else if (mTwoLatLeft.length() == 1 && mTwoLonLeft.length() == 1 && mTwoLatRight.length() == 1 && mTwoLonRight.length() == 1) {
+                    String textTwoName = "0" + mControlTrackName + "-停留车-" + "(" + mTwoLonLeft + "," + mTwoLatLeft + ")" + "(" + mTwoLonRight + "," + mTwoLatRight + ")";
                     sendMessage(mConversationId, textTwoName);
                 }
 
@@ -12650,14 +3942,14 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 three();
-                if (mThreeLatLeft.length() > 6 && mThreeLonLeft.length() > 6 && mThreeLatRight.length() > 0 && mThreeLatRight.length() > 0) {
+                if (mThreeLatLeft.length() > 6 && mThreeLonLeft.length() > 6 && mThreeLatRight.length() > 6 && mThreeLatRight.length() > 6) {
                     String lat = mThreeLatLeft.substring(4, mThreeLatLeft.length());
                     String lon = mThreeLonLeft.substring(3, mThreeLonLeft.length());
                     String lat1 = mThreeLatRight.substring(4, mThreeLatRight.length());
                     String lon1 = mThreeLonRight.substring(3, mThreeLonRight.length());
                     String textThreeName = mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textThreeName);
-                } else {
+                } else if (mThreeLatLeft.length() == 1 && mThreeLonLeft.length() == 1 && mThreeLatRight.length() == 1 && mThreeLatRight.length() == 1) {
                     String textThreeName = mControlTrackName + "-停留车-" + "(" + mThreeLonLeft + "," + mThreeLatLeft + ")" + "(" + mThreeLonRight + "," + mThreeLatRight + ")";
                     sendMessage(mConversationId, textThreeName);
                 }
@@ -12674,14 +3966,14 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 four();
-                if (mFourLatLeft.length() > 6 && mFourLonLeft.length() > 6 && mFourLatRight.length() > 0 && mFourLonRight.length() > 0) {
+                if (mFourLatLeft.length() > 6 && mFourLonLeft.length() > 6 && mFourLatRight.length() > 6 && mFourLonRight.length() > 6) {
                     String lat = mFourLatLeft.substring(4, mFourLatLeft.length());
                     String lon = mFourLonLeft.substring(3, mFourLonLeft.length());
                     String lat1 = mFourLatRight.substring(4, mFourLatRight.length());
                     String lon1 = mFourLonRight.substring(3, mFourLonRight.length());
                     String textFourName = mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textFourName);
-                } else {
+                } else if (mFourLatLeft.length() == 1 && mFourLonLeft.length() == 1 && mFourLatRight.length() == 1 && mFourLonRight.length() == 1) {
                     String textFourName = mControlTrackName + "-停留车-" + "(" + mFourLonLeft + "," + mFourLatLeft + ")" + "(" + mFourLonRight + "," + mFourLatRight + ")";
                     sendMessage(mConversationId, textFourName);
                 }
@@ -12698,14 +3990,14 @@ public class PointActivity extends SerialPortActivity {
                 }
 
                 five();
-                if (mFiveLatLeft.length() > 6 && mFiveLonLeft.length() > 6 && mFiveLatRight.length() > 0 && mFiveLonRight.length() > 0) {
+                if (mFiveLatLeft.length() > 6 && mFiveLonLeft.length() > 6 && mFiveLatRight.length() > 6 && mFiveLonRight.length() > 6) {
                     String lat = mFiveLatLeft.substring(4, mFiveLatLeft.length());
                     String lon = mFiveLonLeft.substring(3, mFiveLonLeft.length());
                     String lat1 = mFiveLatRight.substring(4, mFiveLatRight.length());
                     String lon1 = mFiveLonRight.substring(3, mFiveLonRight.length());
                     String textFiveName = mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textFiveName);
-                } else {
+                } else if (mFiveLatLeft.length() == 1 && mFiveLonLeft.length() == 1 && mFiveLatRight.length() == 1 && mFiveLonRight.length() == 1) {
                     String textFiveName = mControlTrackName + "-停留车-" + "(" + mFiveLonLeft + "," + mFiveLatLeft + ")" + "(" + mFiveLonRight + "," + mFiveLatRight + ")";
                     sendMessage(mConversationId, textFiveName);
                 }
@@ -12742,6 +4034,7 @@ public class PointActivity extends SerialPortActivity {
                             String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
                             Integer integerGpsPoint = Integer.valueOf(ratioOfGpsPointCar);
                             Integer integerSixPosition = Integer.valueOf(sixPosition);
+                            //mListNum.add(integerGpsPoint);
                             int sixNum = integerGpsPoint - integerSixPosition;
                             Log.e("秦广帅", ratioOfGpsPointCar + "  " + sixPosition + "  ");
                             if (sixNum < 0) {
@@ -12752,39 +4045,62 @@ public class PointActivity extends SerialPortActivity {
                             }
                         }
 
-                        //获取最小值下标
-                        int sixMinIndex = getMinIndex(mListInteger);
-                        Log.e("秦广帅sixMinIndex", sixMinIndex + "  ");
-                        //对应数据库的下标
-                        int numIndex = sixMinIndex + 1;
-                        //判断最小值的位置
-                        if (sixMinIndex % 2 == 0) {
-                            Log.e("秦广帅", " 0 ");
-                            mSixParkDataDao.delete("sixparkcar", sixMinIndex + 2);
-                            mSixParkDataDao.delete("sixparkcar", sixMinIndex + 1);
-                            for (int i = 1; i < sixSize; i++) {
-                                String sixNum = sixDataUsers.get(i).getNum();
-                                Integer integerSixNum = Integer.valueOf(sixNum);
-                                if (integerSixNum > sixMinIndex + 1) {
-                                    int sixZhai = integerSixNum - 2;
-                                    mSixParkDataDao.updateData("sixparkcar", "" + sixZhai, integerSixNum);
-                                }
-                            }
-                        } else {
+                        if (mListInteger.size() > 0) {
+                            //获取最小值下标
+                            int sixMinIndex = getMinIndex(mListInteger);
                             Log.e("秦广帅sixMinIndex", sixMinIndex + "  ");
-                            mSixParkDataDao.delete("sixparkcar", sixMinIndex + 1);
-                            mSixParkDataDao.delete("sixparkcar", sixMinIndex);
-                            for (int i = 1; i < sixSize; i++) {
-                                String sixNum = sixDataUsers.get(i).getNum();
-                                Integer integerSixNum = Integer.valueOf(sixNum);
-                                if (integerSixNum > sixMinIndex + 1) {
-                                    int sixZhai = integerSixNum - 2;
-                                    mSixParkDataDao.updateData("sixparkcar", "" + sixZhai, integerSixNum);
+                            //对应数据库的下标
+                            int numIndex = sixMinIndex + 1;
+                            //判断最小值的位置
+                            if (sixMinIndex % 2 == 0) {
+                                Log.e("秦广帅", " 0 ");
+                                mSixParkDataDao.delete("sixparkcar", sixMinIndex + 2);
+                                mSixParkDataDao.delete("sixparkcar", sixMinIndex + 1);
+                                for (int i = 1; i < sixSize; i++) {
+                                    String sixNum = sixDataUsers.get(i).getNum();
+                                    Integer integerSixNum = Integer.valueOf(sixNum);
+                                    if (integerSixNum > sixMinIndex + 1) {
+                                        int sixZhai = integerSixNum - 2;
+                                        mSixParkDataDao.updateData("sixparkcar", "" + sixZhai, integerSixNum);
+                                    }
+                                }
+                            } else {
+                                Log.e("秦广帅sixMinIndex", sixMinIndex + "  ");
+                                mSixParkDataDao.delete("sixparkcar", sixMinIndex + 1);
+                                mSixParkDataDao.delete("sixparkcar", sixMinIndex);
+                                for (int i = 1; i < sixSize; i++) {
+                                    String sixNum = sixDataUsers.get(i).getNum();
+                                    Integer integerSixNum = Integer.valueOf(sixNum);
+                                    if (integerSixNum > sixMinIndex + 1) {
+                                        int sixZhai = integerSixNum - 2;
+                                        mSixParkDataDao.updateData("sixparkcar", "" + sixZhai, integerSixNum);
+                                    }
                                 }
                             }
                         }
+
+                        /*if (mListNum.size()>0){
+                            int maxIndex = getMaxIndex(mListNum);
+                            int minIndex = getMinIndex(mListNum);
+                            String minLat = sixDataUsers.get(minIndex).getLat();
+                            String maxLat = sixDataUsers.get(maxIndex).getLat();
+                            String minLon = sixDataUsers.get(minIndex).getLon();
+                            String maxLon = sixDataUsers.get(maxIndex).getLon();
+                            String minGpsPointCar = sixDataUsers.get(minIndex).getRatioOfGpsPointCar();
+                            String maxGpsPointCar = sixDataUsers.get(maxIndex).getRatioOfGpsPointCar();
+                            mSixPickLeft.setLat(minLat);
+                            mSixPickLeft.setLon(minLon);
+                            mSixPickLeft.setPosition(minGpsPointCar);
+                            mSixpickright.setLat(maxLat);
+                            mSixpickright.setLon(maxLon);
+                            mSixpickright.setPosition(maxGpsPointCar);
+                        }*/
                     } else {
+                        mSixPickLeft.setLat("0");
+                        mSixPickLeft.setLon("0");
                         mSixPickLeft.setPosition("0");
+                        mSixpickright.setLat("0");
+                        mSixpickright.setLon("0");
                         mSixpickright.setPosition("0");
                     }
                 } else if (controlsixpickrightName41.contains("摘钩") == true) {
@@ -12880,15 +4196,15 @@ public class PointActivity extends SerialPortActivity {
                 String rightEightLat = mEightpickright.getLat();
                 String rightEightLon = mEightpickright.getLon();
 
-                if (leftEightLat.length() > 6 && leftEightLon.length() > 6 && rightEightLat.length() > 0 && rightEightLon.length() > 0) {
+                if (leftEightLat.length() > 6 && leftEightLon.length() > 6 && rightEightLat.length() > 6 && rightEightLon.length() > 6) {
                     String lat = leftEightLat.substring(4, leftEightLat.length());
                     String lon = leftEightLon.substring(3, leftEightLon.length());
                     String lat1 = rightEightLat.substring(4, rightEightLat.length());
                     String lon1 = rightEightLon.substring(3, rightEightLon.length());
-                    String textEightName = "0"+mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
+                    String textEightName = "0" + mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textEightName);
-                } else {
-                    String textEightName = "0"+mControlTrackName + "-停留车-" + "(" + leftEightLon + "," + leftEightLat + ")" + "(" + rightEightLon + "," + rightEightLat + ")";
+                } else if (leftEightLat.length() == 1 && leftEightLon.length() == 1 && rightEightLat.length() == 1 && rightEightLon.length() == 1) {
+                    String textEightName = "0" + mControlTrackName + "-停留车-" + "(" + leftEightLon + "," + leftEightLat + ")" + "(" + rightEightLon + "," + rightEightLat + ")";
                     sendMessage(mConversationId, textEightName);
                 }
 
@@ -12978,14 +4294,14 @@ public class PointActivity extends SerialPortActivity {
                 String rightTenLat = mTenpickright.getLat();
                 String rightTenLon = mTenpickright.getLon();
 
-                if (leftTenLat.length() > 6 && leftTenLon.length() > 6 && rightTenLat.length() > 0 && rightTenLat.length() > 0) {
+                if (leftTenLat.length() > 6 && leftTenLon.length() > 6 && rightTenLat.length() > 6 && rightTenLon.length() > 6) {
                     String lat = leftTenLat.substring(4, leftTenLat.length());
                     String lon = leftTenLon.substring(3, leftTenLon.length());
                     String lat1 = rightTenLat.substring(4, rightTenLat.length());
                     String lon1 = rightTenLon.substring(3, rightTenLon.length());
                     String textEightName = mControlTrackName + "-停留车-" + "(" + lon + "," + lat + ")" + "(" + lon1 + "," + lat1 + ")";
                     sendMessage(mConversationId, textEightName);
-                } else {
+                } else if (leftTenLat.length() == 1 && leftTenLon.length() == 1 && rightTenLat.length() == 1 && rightTenLon.length() == 1) {
                     String textEightName = mControlTrackName + "-停留车-" + "(" + leftTenLon + "," + leftTenLat + ")" + "(" + rightTenLon + "," + rightTenLat + ")";
                     sendMessage(mConversationId, textEightName);
                 }
@@ -13609,24 +4925,113 @@ public class PointActivity extends SerialPortActivity {
     }
 
     private void zhaigou() {
+        mListNum.clear();
+        mListInteger.clear();
+        maxString = "";
         switch (mPeopleId2) {
             //1号调车员
             case "01":
-                List<PersonDataUser> personDataUsers1 = mSixDataDao.find();
-                int size2 = personDataUsers1.size();
-                String lat2 = personDataUsers1.get(size2 - 1).getLat();
-                String lon2 = personDataUsers1.get(size2 - 1).getLon();
-                String lat12 = lat2.substring(lat2.indexOf(".") + 1, lat2.length());
-                String lon12 = lon2.substring(lon2.indexOf(".") + 1, lon2.length());
-                String total2 = "01-摘钩GPS-" + lat12 + "-" + lon12;
-                sendMessage(mConversationId, total2);
-
                 sixPerson();
-                //调车员对应的股道
+                String total0 = "01-摘钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total0);
+                mControlTrack.setName(mGetGudaoOfGpsPoint2 + "");
                 switch (mGetGudaoOfGpsPoint2) {
                     case 1:
                         //判断是否有停留车
-                        String onePickLeftName = mOnePickLeft.getPosition();
+                        List<DataUser> oneDataUsers = mOneDataDao.find();
+                        int oneSize = oneDataUsers.size();
+                        Log.e("秦广帅oneSize", oneSize + "");
+                        String num1 = oneDataUsers.get(oneSize - 1).getNum();
+                        Log.e("秦广帅num1", num1 + "");
+                        Integer integerNum1 = Integer.valueOf(num1);
+                        int integerSum = integerNum1 + 1;
+                        Log.e("秦广帅integerSum", integerSum + "");
+
+                        if (oneSize < 3) {
+                            mOneDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", integerSum + "");
+                        } else {
+                            //站场布局
+                            String name1 = mMain.getName();
+                            Log.e("秦广帅name1", name1);
+                            if (name1.equals("main")) {
+                                //查看机车位置在停留车的哪一侧
+                                String position = mStopcar.getPosition();
+                                Double positonDouble = Double.valueOf(position);
+                                Log.e("秦广帅position", position + "");
+                                String onePickLeftPosition = mOnePickLeft.getPosition();
+                                Double onePickLeftPositionDouble = Double.valueOf(onePickLeftPosition);
+                                String onepickrightPosition = mOnepickright.getPosition();
+                                Double onepickrightPositionDouble = Double.valueOf(onepickrightPosition);
+                                String ratioOfGpsPointCar = oneDataUsers.get(1).getRatioOfGpsPointCar();
+                                Double ratioOfGpsPointCarDouble = Double.valueOf(ratioOfGpsPointCar);
+                                String ratioOfGpsPointCarEnd = oneDataUsers.get(2).getRatioOfGpsPointCar();
+                                Double ratioOfGpsPointCarEndDouble = Double.valueOf(ratioOfGpsPointCarEnd);
+                                Log.e("秦广帅", ratioOfGpsPointCar + "    " + ratioOfGpsPointCarEnd);
+                                if (positonDouble < ratioOfGpsPointCarDouble && positonDouble < ratioOfGpsPointCarEndDouble) {
+                                    for (int i = 1; i < oneSize; i++) {
+                                        String ratioOfGpsPointCar1 = oneDataUsers.get(i).getRatioOfGpsPointCar();
+                                        Integer integer = Integer.valueOf(ratioOfGpsPointCar1);
+                                        mListInteger.add(integer);
+                                    }
+
+                                    if (oneSize > 1) {
+                                        int minIndex = getMinIndex(mListInteger);
+                                        Log.e("秦广帅minIndex", minIndex + "");
+                                        mOneDataDao.updaeUser("oneparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", minIndex + 1);
+                                    }
+                                } else if (positonDouble > ratioOfGpsPointCarDouble && positonDouble > ratioOfGpsPointCarEndDouble) {
+                                    for (int i = 1; i < oneSize; i++) {
+                                        String ratioOfGpsPointCar1 = oneDataUsers.get(i).getRatioOfGpsPointCar();
+                                        Integer integer = Integer.valueOf(ratioOfGpsPointCar1);
+                                        mListInteger.add(integer);
+                                    }
+
+                                    if (oneSize > 1) {
+                                        int maxIndex = getMaxIndex(mListInteger);
+                                        Log.e("秦广帅maxIndex", maxIndex + "");
+                                        mOneDataDao.updaeUser("oneparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", maxIndex + 1);
+                                    }
+                                }
+                            } else if (name1.equals("changfeng")) {
+                                for (int i = 1; i < oneSize; i++) {
+                                    String ratioOfGpsPointCar = oneDataUsers.get(oneSize).getRatioOfGpsPointCar();
+                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
+                                    int sum = integerPointCar - integerGpsPistance2;
+                                    if (sum < 0) {
+                                        int sumZheng = -sum;
+                                        mListNum.add(sumZheng);
+                                    } else {
+                                        mListNum.add(sum);
+                                    }
+                                }
+                                if (mListNum.size() > 1) {
+                                    //取出list里最小值的下标替换
+                                    int minIndex = getMinIndex(mListNum);
+                                    mOneDataDao.updaeUser("oneparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", minIndex + 1);
+                                }
+                            } else if (name1.equals("baili")) {
+                                for (int i = 1; i < oneSize; i++) {
+                                    String ratioOfGpsPointCar = oneDataUsers.get(oneSize).getRatioOfGpsPointCar();
+                                    Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
+                                    Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
+                                    int sum = integerPointCar - integerGpsPistance2;
+                                    if (sum < 0) {
+                                        int sumZheng = -sum;
+                                        mListNum.add(sumZheng);
+                                    } else {
+                                        mListNum.add(sum);
+                                    }
+                                }
+                                if (mListNum.size() > 1) {
+                                    //取出list里最小值的下标替换
+                                    int minIndex = getMinIndex(mListNum);
+                                    mOneDataDao.updaeUser("oneparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", minIndex + 1);
+                                }
+                            }
+                        }
+
+                        /*String onePickLeftName = mOnePickLeft.getPosition();
                         String onepickrightName = mOnepickright.getPosition();
                         String takeOffTotal = mControlOnePick.getName();
                         mControlOnePick.setName(takeOffTotal + "摘钩");
@@ -13661,7 +5066,7 @@ public class PointActivity extends SerialPortActivity {
                             } else if (name1.equals("baili")) {
                                 oneRight(mGpsPistance2 + "", mLat21, mLon21, mGetGudaoOfGpsPoint2 + "");
                             }
-                        }
+                        }*/
                         break;
                     case 2:
                         //判断是否有停留车
@@ -13824,41 +5229,69 @@ public class PointActivity extends SerialPortActivity {
                         String num = sixDataUsers.get(sixSize - 1).getNum();
                         Integer integerNum = Integer.valueOf(num);
                         int sum = integerNum + 1;
-                        if (sixSize > 2) {
+                        Log.e("秦广帅sixSize", sixSize + "    " + sum);
+                        if (sixSize > 3) {
                             for (int i = 1; i < sixSize; i++) {
                                 String lat = sixDataUsers.get(i).getLat();
                                 String lon = sixDataUsers.get(i).getLon();
-                                //计算紧急停车位置与数据库里的每一条数据的距离
-                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
-                                if (distance > 11) {
-                                    if (isSixTrack) {
-                                        isSixTrack = false;
-                                        mSixParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sum + "");
-                                    }
-                                } else {
-                                    //获取在某个股道上的位置
+                                String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
+                                Log.e("秦广帅lat", lat + "    " + lon + "    " + ratioOfGpsPointCar);
+                                double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat6), Double.valueOf(mLon6));
+                                Log.e("秦广帅distance", distance + "    ");
+                                Integer ratioOfGpsPointCarInteger = Integer.valueOf(ratioOfGpsPointCar);
+                                mListNum.add(ratioOfGpsPointCarInteger);
+                            }
+                            if (mListNum.size() > 0) {
+                                mMinIndex = getMinIndex(mListNum);
+                                mMaxIndex = getMaxIndex(mListNum);
+                            }
+                            String sixPickLeftPosition = mSixPickLeft.getPosition();
+                            String sixpickrightPosition = mSixpickright.getPosition();
+                            if (Double.valueOf(sixPickLeftPosition) < mGpsPistance2 && mGpsPistance2 < Double.valueOf(sixpickrightPosition)) {
+                                //查看机车位置在停留车的哪一侧
+                                String position = mStopcar.getPosition();
+                                Double positonDouble = Double.valueOf(position);
+                                if (positonDouble < Double.valueOf(sixPickLeftPosition) && positonDouble < Double.valueOf(sixpickrightPosition)) {
+                                    mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", mMinIndex + 1);
+                                } else if (positonDouble > Double.valueOf(sixPickLeftPosition) && positonDouble > Double.valueOf(sixpickrightPosition)) {
+                                    mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", mMaxIndex + 1);
+                                }
+                            } else {
+                                for (int i = 1; i < sixSize; i++) {
+                                    String lat = sixDataUsers.get(i).getLat();
+                                    String lon = sixDataUsers.get(i).getLon();
                                     String ratioOfGpsPointCar = sixDataUsers.get(i).getRatioOfGpsPointCar();
                                     Integer integerPointCar = Integer.valueOf(ratioOfGpsPointCar);
                                     Integer integerGpsPistance2 = Integer.valueOf(mGpsPoint2 + "");
                                     int i1 = integerPointCar - integerGpsPistance2;
                                     if (i1 < 0) {
                                         int i2 = -i1;
-                                        mListNum.add(i2);
+                                        mListInteger.add(i2);
                                     } else {
-                                        mListNum.add(i1);
+                                        mListInteger.add(i1);
+                                    }
+                                    //计算紧急停车位置与数据库里的每一条数据的距离
+                                    double distance = getDistance(Double.valueOf(lat), Double.valueOf(lon), Double.valueOf(mLat21), Double.valueOf(mLon21));
+                                    if (distance > 11) {
+                                        maxString += "0";
+                                    } else {
+                                        maxString += "1";
+                                    }
+                                }
+                                if (maxString.contains("1") == false && maxString.contains("0")) {
+                                    mSixParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", sum + "");
+                                } else {
+                                    if (mListInteger.size() > 0) {
+                                        int minIndex = getMinIndex(mListInteger);
+                                        mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", minIndex + 1);
                                     }
                                 }
                             }
-                            isSixTrack = true;
-                            if (mListNum.size() != 0) {
-                                //取出list里最小值的下标替换
-                                int minIndex = getMinIndex(mListNum);
-                                mSixParkDataDao.updaeUser("sixparkcar", mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", minIndex + 1);
-                            }
-
                         } else {
-                            mSixParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat21, mLon21, mGpsPoint2 + "", sum + "");
+                            mSixParkDataDao.add(mGetGudaoOfGpsPoint2 + "", mLat6, mLon6, mGpsPoint2 + "", sum + "");
                         }
+
+                        isSixTrack = true;
                         break;
                     case 7:
                         String takeOffTotal7 = mControlSevenPick.getName();
@@ -14427,16 +5860,9 @@ public class PointActivity extends SerialPortActivity {
                 }
                 break;
             case "02":
-                List<PersonDataUser> personDataUsers2 = mSevenDataDao.find();
-                int size3 = personDataUsers2.size();
-                String lat3 = personDataUsers2.get(size3 - 1).getLat();
-                String lon3 = personDataUsers2.get(size3 - 1).getLon();
-                String lat13 = lat3.substring(lat3.indexOf(".") + 1, lat3.length());
-                String lon13 = lon3.substring(lon3.indexOf(".") + 1, lon3.length());
-                String total3 = "02-摘钩GPS-" + lat13 + "-" + lon13;
-                sendMessage(mConversationId, total3);
-
                 sevenPerson();
+                String total1 = "02-摘钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total1);
                 switch (mGetGudaoOfGpsPoint3) {
                     case 1:
                         //判断是否有停留车
@@ -15244,16 +6670,9 @@ public class PointActivity extends SerialPortActivity {
                 }
                 break;
             case "03":
-                List<PersonDataUser> personDataUsers3 = mEightDataDao.find();
-                int size4 = personDataUsers3.size();
-                String lat4 = personDataUsers3.get(size4 - 1).getLat();
-                String lon4 = personDataUsers3.get(size4 - 1).getLon();
-                String lat14 = lat4.substring(lat4.indexOf(".") + 1, lat4.length());
-                String lon14 = lon4.substring(lon4.indexOf(".") + 1, lon4.length());
-                String total4 = "03-摘钩GPS-" + lat14 + "-" + lon14;
-                sendMessage(mConversationId, total4);
-
                 eightPerson();
+                String total2 = "03-摘钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total2);
                 switch (mGetGudaoOfGpsPoint4) {
                     case 1:
                         //判断是否有停留车
@@ -16063,16 +7482,9 @@ public class PointActivity extends SerialPortActivity {
                 }
                 break;
             case "04":
-                List<PersonDataUser> personDataUsers4 = mNineDataDao.find();
-                int size5 = personDataUsers4.size();
-                String lat5 = personDataUsers4.get(size5 - 1).getLat();
-                String lon5 = personDataUsers4.get(size5 - 1).getLon();
-                String lat15 = lat5.substring(lat5.indexOf(".") + 1, lat5.length());
-                String lon15 = lon5.substring(lon5.indexOf(".") + 1, lon5.length());
-                String total5 = "04-摘钩GPS-" + lat15 + "-" + lon15;
-                sendMessage(mConversationId, total5);
-
                 ninePerson();
+                String total3 = "04-摘钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total3);
                 switch (mGetGudaoOfGpsPoint5) {
                     case 1:
                         //判断是否有停留车
@@ -16884,69 +8296,564 @@ public class PointActivity extends SerialPortActivity {
         }
     }
 
-    private void mainPicture(){
-        mOneparkcar.setVisibility(View.VISIBLE);
-        mTwoparkcar.setVisibility(View.VISIBLE);
-        mThreeparkcar.setVisibility(View.VISIBLE);
-        mFourparkcar.setVisibility(View.VISIBLE);
-        mFiveparkcar.setVisibility(View.VISIBLE);
-        mSixParkCar.setVisibility(View.VISIBLE);
-        mSevenParkCar.setVisibility(View.VISIBLE);
-        mEightparkcar.setVisibility(View.VISIBLE);
-        mNineParkCar.setVisibility(View.GONE);
-        mTenparkcar.setVisibility(View.GONE);
-        mElevenParkCar.setVisibility(View.GONE);
-        mTwelveParkCar.setVisibility(View.GONE);
-        mThirteenParkCar.setVisibility(View.GONE);
-        mFourteenParkCar.setVisibility(View.GONE);
-        mFifteenParkCar.setVisibility(View.GONE);
-        mSixteenParkCar.setVisibility(View.GONE);
-        mSeventeenParkCar.setVisibility(View.GONE);
-        mEighteenParkCar.setVisibility(View.GONE);
-        mNineteenParkCar.setVisibility(View.GONE);
-    }
+    private void guagou() {
+        switch (mPeopleId2) {
+            //1号调车员
+            case "01":
+                sixPerson();
 
-    private void changfengPicture(){
-        mOneparkcar.setVisibility(View.GONE);
-        mTwoparkcar.setVisibility(View.GONE);
-        mThreeparkcar.setVisibility(View.GONE);
-        mFourparkcar.setVisibility(View.GONE);
-        mFiveparkcar.setVisibility(View.GONE);
-        mSixParkCar.setVisibility(View.GONE);
-        mSevenParkCar.setVisibility(View.GONE);
-        mEightparkcar.setVisibility(View.GONE);
-        mNineParkCar.setVisibility(View.VISIBLE);
-        mTenparkcar.setVisibility(View.VISIBLE);
-        mElevenParkCar.setVisibility(View.VISIBLE);
-        mTwelveParkCar.setVisibility(View.VISIBLE);
-        mThirteenParkCar.setVisibility(View.VISIBLE);
-        mFourteenParkCar.setVisibility(View.VISIBLE);
-        mFifteenParkCar.setVisibility(View.GONE);
-        mSixteenParkCar.setVisibility(View.GONE);
-        mSeventeenParkCar.setVisibility(View.GONE);
-        mEighteenParkCar.setVisibility(View.GONE);
-        mNineteenParkCar.setVisibility(View.GONE);
-    }
+                String total0 = "01-挂钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total0);
+                String hookTotal = mControlOnePick.getName();
+                switch (mGetGudaoOfGpsPoint2) {
+                    case 1:
+                        mControlOnePick.setName(hookTotal + "挂钩");
+                        mControlOnePick.setTrack(mRatioOfGpsTrackCar2);
+                        mControlOnePick.setLat(mLat21);
+                        mControlOnePick.setLon(mLon21);
+                        break;
+                    case 2:
+                        mControlTwoPick.setName(hookTotal + "挂钩");
+                        break;
+                    case 3:
+                        mControlThreePick.setName(hookTotal + "挂钩");
+                        break;
+                    case 4:
+                        mControlFourPick.setName(hookTotal + "挂钩");
+                        break;
+                    case 5:
+                        mControlFivePick.setName(hookTotal + "挂钩");
+                        break;
+                    case 6:
+                        mControlSixPick.setName(hookTotal + "挂钩");
+                        mControlSixPick.setLat(mLat21);
+                        mControlSixPick.setLon(mLon21);
+                        //股道
+                        mControlSixPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlSixPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 7:
+                        mControlSevenPick.setName(hookTotal + "挂钩");
+                        mControlSevenPick.setLat(mLat21);
+                        mControlSevenPick.setLon(mLon21);
+                        //股道
+                        mControlSevenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlSevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 8:
+                        mControlEightPick.setName(hookTotal + "挂钩");
+                        break;
+                    case 9:
+                        mControlNinePick.setName(hookTotal + "挂钩");
+                        mControlNinePick.setLat(mLat21);
+                        mControlNinePick.setLon(mLon21);
+                        //股道
+                        mControlNinePick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlNinePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 10:
+                        mControlTenPick.setName(hookTotal + "挂钩");
+                        break;
+                    case 11:
+                        mControlElevenPick.setName(hookTotal + "挂钩");
+                        mControlElevenPick.setLat(mLat21);
+                        mControlElevenPick.setLon(mLon21);
+                        //股道
+                        mControlElevenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlElevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 12:
+                        mControlTwelvePick.setName(hookTotal + "挂钩");
+                        mControlTwelvePick.setLat(mLat21);
+                        mControlTwelvePick.setLon(mLon21);
+                        //股道
+                        mControlTwelvePick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlTwelvePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 13:
+                        mControlThirteenPick.setName(hookTotal + "挂钩");
+                        mControlThirteenPick.setLat(mLat21);
+                        mControlThirteenPick.setLon(mLon21);
+                        //股道
+                        mControlThirteenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlThirteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 14:
+                        mControlFourteenPick.setName(hookTotal + "挂钩");
+                        mControlFourteenPick.setLat(mLat21);
+                        mControlFourteenPick.setLon(mLon21);
+                        //股道
+                        mControlFourteenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlFourteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 15:
+                        mControlFifteenPick.setName(hookTotal + "挂钩");
+                        mControlFifteenPick.setLat(mLat21);
+                        mControlFifteenPick.setLon(mLon21);
+                        //股道
+                        mControlFifteenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlFifteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 16:
+                        mControlSixteenPick.setName(hookTotal + "挂钩");
+                        mControlSixteenPick.setLat(mLat21);
+                        mControlSixteenPick.setLon(mLon21);
+                        //股道
+                        mControlSixteenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlSixteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 17:
+                        mControlSeventeenPick.setName(hookTotal + "挂钩");
+                        mControlSeventeenPick.setLat(mLat21);
+                        mControlSeventeenPick.setLon(mLon21);
+                        //股道
+                        mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlSeventeenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 18:
+                        mControlEighteenPick.setName(hookTotal + "挂钩");
+                        mControlEighteenPick.setLat(mLat21);
+                        mControlEighteenPick.setLon(mLon21);
+                        //股道
+                        mControlEighteenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlEighteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 19:
+                        mControlNineteenPick.setName(hookTotal + "挂钩");
+                        mControlNineteenPick.setLat(mLat21);
+                        mControlNineteenPick.setLon(mLon21);
+                        //股道
+                        mControlNineteenPick.setTrack(mRatioOfGpsTrackCar2);
+                        //位置
+                        mControlNineteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                }
+                break;
+            case "02":
+                sevenPerson();
 
-    private void bailiPicture(){
-        mOneparkcar.setVisibility(View.GONE);
-        mTwoparkcar.setVisibility(View.GONE);
-        mThreeparkcar.setVisibility(View.GONE);
-        mFourparkcar.setVisibility(View.GONE);
-        mFiveparkcar.setVisibility(View.GONE);
-        mSixParkCar.setVisibility(View.GONE);
-        mSevenParkCar.setVisibility(View.GONE);
-        mEightparkcar.setVisibility(View.GONE);
-        mNineParkCar.setVisibility(View.GONE);
-        mTenparkcar.setVisibility(View.GONE);
-        mElevenParkCar.setVisibility(View.GONE);
-        mTwelveParkCar.setVisibility(View.GONE);
-        mThirteenParkCar.setVisibility(View.GONE);
-        mFourteenParkCar.setVisibility(View.GONE);
-        mFifteenParkCar.setVisibility(View.VISIBLE);
-        mSixteenParkCar.setVisibility(View.VISIBLE);
-        mSeventeenParkCar.setVisibility(View.VISIBLE);
-        mEighteenParkCar.setVisibility(View.VISIBLE);
-        mNineteenParkCar.setVisibility(View.VISIBLE);
+                String total1 = "02-挂钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total1);
+                String hookTotal2 = mControlOnePick.getName();
+                switch (mGetGudaoOfGpsPoint3) {
+                    case 1:
+                        mControlOnePick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 2:
+                        mControlTwoPick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 3:
+                        mControlThreePick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 4:
+                        mControlFourPick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 5:
+                        mControlFivePick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 6:
+                        mControlSixPick.setName(hookTotal2 + "挂钩");
+                        mControlSixPick.setLat(mLat31);
+                        mControlSixPick.setLon(mLon31);
+                        //股道
+                        mControlSixPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlSixPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 7:
+                        mControlSevenPick.setName(hookTotal2 + "挂钩");
+                        mControlSevenPick.setLat(mLat31);
+                        mControlSevenPick.setLon(mLon31);
+                        //股道
+                        mControlSevenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlSevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 8:
+                        mControlEightPick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 9:
+                        mControlNinePick.setName(hookTotal2 + "挂钩");
+                        mControlNinePick.setLat(mLat31);
+                        mControlNinePick.setLon(mLon31);
+                        //股道
+                        mControlNinePick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlNinePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 10:
+                        mControlTenPick.setName(hookTotal2 + "挂钩");
+                        break;
+                    case 11:
+                        mControlElevenPick.setName(hookTotal2 + "挂钩");
+                        mControlElevenPick.setLat(mLat31);
+                        mControlElevenPick.setLon(mLon31);
+                        //股道
+                        mControlElevenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlElevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 12:
+                        mControlTwelvePick.setName(hookTotal2 + "挂钩");
+                        mControlTwelvePick.setLat(mLat31);
+                        mControlTwelvePick.setLon(mLon31);
+                        //股道
+                        mControlTwelvePick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlTwelvePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 13:
+                        mControlThirteenPick.setName(hookTotal2 + "挂钩");
+                        mControlThirteenPick.setLat(mLat31);
+                        mControlThirteenPick.setLon(mLon31);
+                        //股道
+                        mControlThirteenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlThirteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 14:
+                        mControlFourteenPick.setName(hookTotal2 + "挂钩");
+                        mControlFourteenPick.setLat(mLat31);
+                        mControlFourteenPick.setLon(mLon31);
+                        //股道
+                        mControlFourteenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlFourteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 15:
+                        mControlFifteenPick.setName(hookTotal2 + "挂钩");
+                        mControlFifteenPick.setLat(mLat31);
+                        mControlFifteenPick.setLon(mLon31);
+                        //股道
+                        mControlFifteenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlFifteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 16:
+                        mControlSixteenPick.setName(hookTotal2 + "挂钩");
+                        mControlSixteenPick.setLat(mLat31);
+                        mControlSixteenPick.setLon(mLon31);
+                        //股道
+                        mControlSixteenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlSixteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 17:
+                        mControlSeventeenPick.setName(hookTotal2 + "挂钩");
+                        mControlSeventeenPick.setLat(mLat31);
+                        mControlSeventeenPick.setLon(mLon31);
+                        //股道
+                        mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlSeventeenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 18:
+                        mControlEighteenPick.setName(hookTotal2 + "挂钩");
+                        mControlEighteenPick.setLat(mLat31);
+                        mControlEighteenPick.setLon(mLon31);
+                        //股道
+                        mControlEighteenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlEighteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 19:
+                        mControlNineteenPick.setName(hookTotal2 + "挂钩");
+                        mControlNineteenPick.setLat(mLat31);
+                        mControlNineteenPick.setLon(mLon31);
+                        //股道
+                        mControlNineteenPick.setTrack(mRatioOfGpsTrackCar3);
+                        //位置
+                        mControlNineteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                }
+                break;
+            case "03":
+                eightPerson();
+
+                String total2 = "03-挂钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total2);
+                String hookTotal3 = mControlOnePick.getName();
+                switch (mGetGudaoOfGpsPoint4) {
+                    case 1:
+                        mControlOnePick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 2:
+                        mControlTwoPick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 3:
+                        mControlThreePick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 4:
+                        mControlFourPick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 5:
+                        mControlFivePick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 6:
+                        mControlSixPick.setName(hookTotal3 + "挂钩");
+                        mControlSixPick.setLat(mLat4);
+                        mControlSixPick.setLon(mLon4);
+                        //股道
+                        mControlSixPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlSixPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 7:
+                        mControlSevenPick.setName(hookTotal3 + "挂钩");
+                        mControlSevenPick.setLat(mLat4);
+                        mControlSevenPick.setLon(mLon4);
+                        //股道
+                        mControlSevenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlSevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 8:
+                        mControlEightPick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 9:
+                        mControlNinePick.setName(hookTotal3 + "挂钩");
+                        mControlNinePick.setLat(mLat4);
+                        mControlNinePick.setLon(mLon4);
+                        //股道
+                        mControlNinePick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlNinePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 10:
+                        mControlTenPick.setName(hookTotal3 + "挂钩");
+                        break;
+                    case 11:
+                        mControlElevenPick.setName(hookTotal3 + "挂钩");
+                        mControlElevenPick.setLat(mLat4);
+                        mControlElevenPick.setLon(mLon4);
+                        //股道
+                        mControlElevenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlElevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 12:
+                        mControlTwelvePick.setName(hookTotal3 + "挂钩");
+                        mControlTwelvePick.setLat(mLat4);
+                        mControlTwelvePick.setLon(mLon4);
+                        //股道
+                        mControlTwelvePick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlTwelvePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 13:
+                        mControlThirteenPick.setName(hookTotal3 + "挂钩");
+                        mControlThirteenPick.setLat(mLat4);
+                        mControlThirteenPick.setLon(mLon4);
+                        //股道
+                        mControlThirteenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlThirteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 14:
+                        mControlFourteenPick.setName(hookTotal3 + "挂钩");
+                        mControlFourteenPick.setLat(mLat4);
+                        mControlFourteenPick.setLon(mLon4);
+                        //股道
+                        mControlFourteenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlFourteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 15:
+                        mControlFifteenPick.setName(hookTotal3 + "挂钩");
+                        mControlFifteenPick.setLat(mLat4);
+                        mControlFifteenPick.setLon(mLon4);
+                        //股道
+                        mControlFifteenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlFifteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 16:
+                        mControlSixteenPick.setName(hookTotal3 + "挂钩");
+                        mControlSixteenPick.setLat(mLat4);
+                        mControlSixteenPick.setLon(mLon4);
+                        //股道
+                        mControlSixteenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlSixteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 17:
+                        mControlSeventeenPick.setName(hookTotal3 + "挂钩");
+                        mControlSeventeenPick.setLat(mLat4);
+                        mControlSeventeenPick.setLon(mLon4);
+                        //股道
+                        mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlSeventeenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 18:
+                        mControlEighteenPick.setName(hookTotal3 + "挂钩");
+                        mControlEighteenPick.setLat(mLat4);
+                        mControlEighteenPick.setLon(mLon4);
+                        //股道
+                        mControlEighteenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlEighteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 19:
+                        mControlNineteenPick.setName(hookTotal3 + "挂钩");
+                        mControlNineteenPick.setLat(mLat4);
+                        mControlNineteenPick.setLon(mLon4);
+                        //股道
+                        mControlNineteenPick.setTrack(mRatioOfGpsTrackCar4);
+                        //位置
+                        mControlNineteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                }
+                break;
+            case "04":
+                ninePerson();
+
+                String total3 = "04-挂钩GPS-" + mLat61 + "-" + mLon61;
+                sendMessage(mConversationId, total3);
+                String hookTotal4 = mControlOnePick.getName();
+                switch (mGetGudaoOfGpsPoint4) {
+                    case 1:
+                        mControlOnePick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 2:
+                        mControlTwoPick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 3:
+                        mControlThreePick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 4:
+                        mControlFourPick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 5:
+                        mControlFivePick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 6:
+                        mControlSixPick.setName(hookTotal4 + "挂钩");
+                        mControlSixPick.setLat(mLat5);
+                        mControlSixPick.setLon(mLon5);
+                        //股道
+                        mControlSixPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlSixPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 7:
+                        mControlSevenPick.setName(hookTotal4 + "挂钩");
+                        mControlSevenPick.setLat(mLat5);
+                        mControlSevenPick.setLon(mLon5);
+                        //股道
+                        mControlSevenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlSevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 8:
+                        mControlEightPick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 9:
+                        mControlNinePick.setName(hookTotal4 + "挂钩");
+                        mControlNinePick.setLat(mLat5);
+                        mControlNinePick.setLon(mLon5);
+                        //股道
+                        mControlNinePick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlNinePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 10:
+                        mControlTenPick.setName(hookTotal4 + "挂钩");
+                        break;
+                    case 11:
+                        mControlElevenPick.setName(hookTotal4 + "挂钩");
+                        mControlElevenPick.setLat(mLat5);
+                        mControlElevenPick.setLon(mLon5);
+                        //股道
+                        mControlElevenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlElevenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 12:
+                        mControlTwelvePick.setName(hookTotal4 + "挂钩");
+                        mControlTwelvePick.setLat(mLat5);
+                        mControlTwelvePick.setLon(mLon5);
+                        //股道
+                        mControlTwelvePick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlTwelvePick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 13:
+                        mControlThirteenPick.setName(hookTotal4 + "挂钩");
+                        mControlThirteenPick.setLat(mLat5);
+                        mControlThirteenPick.setLon(mLon5);
+                        //股道
+                        mControlThirteenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlThirteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 14:
+                        mControlFourteenPick.setName(hookTotal4 + "挂钩");
+                        mControlFourteenPick.setLat(mLat5);
+                        mControlFourteenPick.setLon(mLon5);
+                        //股道
+                        mControlFourteenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlFourteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 15:
+                        mControlFifteenPick.setName(hookTotal4 + "挂钩");
+                        mControlFifteenPick.setLat(mLat5);
+                        mControlFifteenPick.setLon(mLon5);
+                        //股道
+                        mControlFifteenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlFifteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 16:
+                        mControlSixteenPick.setName(hookTotal4 + "挂钩");
+                        mControlSixteenPick.setLat(mLat5);
+                        mControlSixteenPick.setLon(mLon5);
+                        //股道
+                        mControlSixteenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlSixteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 17:
+                        mControlSeventeenPick.setName(hookTotal4 + "挂钩");
+                        mControlSeventeenPick.setLat(mLat5);
+                        mControlSeventeenPick.setLon(mLon5);
+                        //股道
+                        mControlSeventeenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlSeventeenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 18:
+                        mControlEighteenPick.setName(hookTotal4 + "挂钩");
+                        mControlEighteenPick.setLat(mLat5);
+                        mControlEighteenPick.setLon(mLon5);
+                        //股道
+                        mControlEighteenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlEighteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                    case 19:
+                        mControlNineteenPick.setName(hookTotal4 + "挂钩");
+                        mControlNineteenPick.setLat(mLat5);
+                        mControlNineteenPick.setLon(mLon5);
+                        //股道
+                        mControlNineteenPick.setTrack(mRatioOfGpsTrackCar5);
+                        //位置
+                        mControlNineteenPick.setPosition(mGpsPoint2 + "");
+                        break;
+                }
+                break;
+        }
     }
 }
